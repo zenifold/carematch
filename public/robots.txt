@@ -1,0 +1,23 @@
+User-agent: *
+Allow: /
+Disallow: /_authenticated/
+Disallow: /dashboard
+Disallow: /senior
+Disallow: /family
+Disallow: /provider
+Disallow: /auth
+
+# Explicitly welcome AI crawlers to marketing pages
+User-agent: GPTBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://carematcher.lovable.app/api/sitemap.xml

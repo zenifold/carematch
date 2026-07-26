@@ -1,0 +1,1 @@
+REVOKE ALL ON FUNCTION public.recompute_provider_rating_and_coach() FROM PUBLIC, anon, authenticated;
