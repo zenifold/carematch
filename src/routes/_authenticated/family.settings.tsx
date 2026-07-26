@@ -1,13 +1,25 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Check, ShieldCheck, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 
-import { EmptyState, PageSkeleton, RouteErrorBoundary, PermissionBanner, RequestChangeDialog, OutgoingRequestsList } from "@/components/carematch";
+import {
+  EmptyState,
+  PageSkeleton,
+  RouteErrorBoundary,
+  PermissionBanner,
+  RequestChangeDialog,
+  OutgoingRequestsList,
+} from "@/components/carematch";
 import { FamilySeniorInvites } from "@/components/carematch/FamilySeniorInvites";
-import { getSeniorEditPermission, listMyLinkedSeniors } from "@/lib/family.functions";
+import {
+  getFamilyNotificationPrefs,
+  getSeniorEditPermission,
+  listMyLinkedSeniors,
+  updateFamilyNotificationPrefs,
+} from "@/lib/family.functions";
 
 export const Route = createFileRoute("/_authenticated/family/settings")({
   component: FamilySettings,
@@ -19,7 +31,11 @@ type Perm = "view" | "modify" | "financial";
 const permissionRows: { id: Perm; label: string; desc: string }[] = [
   { id: "view", label: "View only", desc: "See visits, care plan, and budget." },
   { id: "modify", label: "Book & modify", desc: "Request changes — the senior approves each one." },
-  { id: "financial", label: "Full financial", desc: "Manage payment methods and see all transactions." },
+  {
+    id: "financial",
+    label: "Full financial",
+    desc: "Manage payment methods and see all transactions.",
+  },
 ];
 
 function initialsOf(name: string | null) {
@@ -36,6 +52,8 @@ function initialsOf(name: string | null) {
 function FamilySettings() {
   const fetchLinks = useServerFn(listMyLinkedSeniors);
   const fetchPerm = useServerFn(getSeniorEditPermission);
+  const fetchNotifPrefs = useServerFn(getFamilyNotificationPrefs);
+  const saveNotifPrefs = useServerFn(updateFamilyNotificationPrefs);
   const linksQ = useQuery({
     queryKey: ["family", "links"],
     queryFn: () => fetchLinks(),
@@ -49,7 +67,21 @@ function FamilySettings() {
   });
   const canEdit = permQ.data?.can_edit ?? false;
 
+  const notifQ = useQuery({
+    queryKey: ["family", "notification-prefs"],
+    queryFn: () => fetchNotifPrefs(),
+  });
   const [notif, setNotif] = useState({ sms: true, email: true, push: false });
+  useEffect(() => {
+    if (notifQ.data) setNotif(notifQ.data);
+  }, [notifQ.data]);
+  const saveNotif = (next: typeof notif) => {
+    setNotif(next);
+    saveNotifPrefs({ data: next }).catch(() => {
+      toast.error("Couldn't save notification settings");
+    });
+  };
+
   const [reqPerm, setReqPerm] = useState<Perm | null>(null);
 
   if (linksQ.isPending) {
@@ -122,12 +154,11 @@ function FamilySettings() {
                     </span>
                     <div className="min-w-0">
                       <p className="truncate font-medium">{l.full_name ?? "Senior"}</p>
-                      {l.city && (
-                        <p className="text-sm text-muted-foreground">{l.city}</p>
-                      )}
+                      {l.city && <p className="text-sm text-muted-foreground">{l.city}</p>}
                       <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
                         <ShieldCheck className="size-3.5 text-primary" />
-                        Approved · {permissionRows.find((p) => p.id === l.permission)?.label ?? l.permission}
+                        Approved ·{" "}
+                        {permissionRows.find((p) => p.id === l.permission)?.label ?? l.permission}
                       </p>
                     </div>
                   </div>
@@ -140,14 +171,7 @@ function FamilySettings() {
                         key={p.id}
                         type="button"
                         disabled={active}
-                        onClick={() => {
-                          if (canEdit) {
-                            toast.info("Direct edits coming soon. Send a request for now.");
-                            setReqPerm(p.id);
-                          } else {
-                            setReqPerm(p.id);
-                          }
-                        }}
+                        onClick={() => setReqPerm(p.id)}
                         className={`rounded-2xl border p-3 text-left text-sm transition ${
                           active
                             ? "border-primary bg-primary/5"
@@ -174,9 +198,7 @@ function FamilySettings() {
         )}
       </section>
 
-      {primary && (
-        <OutgoingRequestsList seniorId={primary.senior_id} />
-      )}
+      {primary && <OutgoingRequestsList seniorId={primary.senior_id} />}
 
       {primary && reqPerm && (
         <RequestChangeDialog
@@ -219,7 +241,7 @@ function FamilySettings() {
             >
               <span className="font-medium">{label}</span>
               <button
-                onClick={() => setNotif((n) => ({ ...n, [k]: !n[k] }))}
+                onClick={() => saveNotif({ ...notif, [k]: !notif[k] })}
                 aria-pressed={notif[k]}
                 className={`relative h-6 w-11 rounded-full transition ${
                   notif[k] ? "bg-primary" : "bg-muted"

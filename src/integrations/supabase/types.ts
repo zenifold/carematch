@@ -101,6 +101,9 @@ export type Database = {
           hourly_rate_cents: number
           id: string
           notes: string | null
+          paid_at: string | null
+          paid_by: string | null
+          payment_status: string
           provider_comment: string | null
           provider_id: string
           provider_rating: number | null
@@ -116,6 +119,9 @@ export type Database = {
           hourly_rate_cents: number
           id?: string
           notes?: string | null
+          paid_at?: string | null
+          paid_by?: string | null
+          payment_status?: string
           provider_comment?: string | null
           provider_id: string
           provider_rating?: number | null
@@ -131,6 +137,9 @@ export type Database = {
           hourly_rate_cents?: number
           id?: string
           notes?: string | null
+          paid_at?: string | null
+          paid_by?: string | null
+          payment_status?: string
           provider_comment?: string | null
           provider_id?: string
           provider_rating?: number | null
@@ -328,6 +337,33 @@ export type Database = {
           target_user_id?: string | null
           title?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      family_notification_prefs: {
+        Row: {
+          created_at: string
+          email: boolean
+          push: boolean
+          sms: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email?: boolean
+          push?: boolean
+          sms?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: boolean
+          push?: boolean
+          sms?: boolean
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -660,6 +696,9 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          care_home_notes: string | null
+          care_medical_notes: string | null
+          care_no_go_notes: string | null
           care_notes: string | null
           city: string | null
           created_at: string
@@ -676,6 +715,9 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          care_home_notes?: string | null
+          care_medical_notes?: string | null
+          care_no_go_notes?: string | null
           care_notes?: string | null
           city?: string | null
           created_at?: string
@@ -692,6 +734,9 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          care_home_notes?: string | null
+          care_medical_notes?: string | null
+          care_no_go_notes?: string | null
           care_notes?: string | null
           city?: string | null
           created_at?: string
@@ -1455,6 +1500,7 @@ export type Database = {
       senior_preferences: {
         Row: {
           call_for_changes: boolean
+          care_needs: string[]
           created_at: string
           extras_monthly_budget_cents: number
           family_can_edit: boolean
@@ -1468,6 +1514,7 @@ export type Database = {
         }
         Insert: {
           call_for_changes?: boolean
+          care_needs?: string[]
           created_at?: string
           extras_monthly_budget_cents?: number
           family_can_edit?: boolean
@@ -1481,6 +1528,7 @@ export type Database = {
         }
         Update: {
           call_for_changes?: boolean
+          care_needs?: string[]
           created_at?: string
           extras_monthly_budget_cents?: number
           family_can_edit?: boolean
@@ -2047,6 +2095,7 @@ export type Database = {
         | "support"
         | "finance"
         | "success"
+        | "trust_safety"
       background_check_adjudication:
         | "pending"
         | "engaged"
@@ -2324,6 +2373,7 @@ export const Constants = {
         "support",
         "finance",
         "success",
+        "trust_safety",
       ],
       background_check_adjudication: [
         "pending",

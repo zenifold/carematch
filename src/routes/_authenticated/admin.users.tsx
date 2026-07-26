@@ -1,4 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { z } from "zod";
+import { checkIsAdmin } from "@/lib/admin.functions";
 import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -10,7 +12,6 @@ import {
   ShieldOff,
   KeyRound,
   Mail,
-
   X,
   Circle,
   CheckCircle2,
@@ -31,15 +32,32 @@ import {
 import { startImpersonation, type ImpersonationStart } from "@/lib/impersonation.functions";
 import { exportUserData } from "@/lib/admin-ops.functions";
 
-
 import { PageSkeleton, EmptyState, ErrorState, RouteErrorBoundary } from "@/components/carematch";
 
 export const Route = createFileRoute("/_authenticated/admin/users")({
   component: UsersPage,
   errorComponent: RouteErrorBoundary,
+  validateSearch: (search: Record<string, unknown>) =>
+    z.object({ q: z.string().optional() }).parse(search),
+  beforeLoad: async () => {
+    // Admin-only page (user/role management, impersonation, GDPR export) —
+    // other staff roles pass the parent /admin gate but not this one.
+    const { isAdmin } = await checkIsAdmin();
+    if (!isAdmin) throw redirect({ to: "/admin" });
+  },
 });
 
-const ALL_ROLES = ["senior", "family", "provider", "admin", "staff", "support", "finance", "success"] as const;
+const ALL_ROLES = [
+  "senior",
+  "family",
+  "provider",
+  "admin",
+  "staff",
+  "support",
+  "finance",
+  "success",
+  "trust_safety",
+] as const;
 type AppRole = (typeof ALL_ROLES)[number];
 
 const roleTone: Record<AppRole, string> = {
@@ -51,18 +69,24 @@ const roleTone: Record<AppRole, string> = {
   support: "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300",
   finance: "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300",
   success: "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300",
+  trust_safety: "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300",
 };
 
 function fmtDate(iso: string | null) {
   if (!iso) return "—";
-  return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+  return new Date(iso).toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
 function UsersPage() {
+  const { q: initialQuery } = Route.useSearch();
   const listFn = useServerFn(listAdminUsers);
   const [status, setStatus] = useState<"all" | "active" | "suspended" | "deleted">("all");
   const [roleFilter, setRoleFilter] = useState<AppRole | "">("");
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(initialQuery ?? "");
   const [selected, setSelected] = useState<string | null>(null);
   const [showCreate, setShowCreate] = useState(false);
 
@@ -83,7 +107,8 @@ function UsersPage() {
     );
   }, [q.data, query]);
 
-  const selectedUser = filtered.find((u) => u.id === selected) ?? q.data?.find((u) => u.id === selected) ?? null;
+  const selectedUser =
+    filtered.find((u) => u.id === selected) ?? q.data?.find((u) => u.id === selected) ?? null;
 
   return (
     <div className="space-y-5">
@@ -146,7 +171,11 @@ function UsersPage() {
           <ErrorState error={q.error} onRetry={() => q.refetch()} />
         ) : filtered.length === 0 ? (
           <div className="p-6">
-            <EmptyState icon={<Users className="size-6" />} title="No users" description="Try changing the filters." />
+            <EmptyState
+              icon={<Users className="size-6" />}
+              title="No users"
+              description="Try changing the filters."
+            />
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -199,7 +228,9 @@ function UsersPage() {
                         </span>
                       )}
                     </td>
-                    <td className="px-3 py-2 text-muted-foreground">{fmtDate(u.last_sign_in_at)}</td>
+                    <td className="px-3 py-2 text-muted-foreground">
+                      {fmtDate(u.last_sign_in_at)}
+                    </td>
                     <td className="px-3 py-2 text-muted-foreground">{fmtDate(u.created_at)}</td>
                   </tr>
                 ))}
@@ -224,8 +255,6 @@ function UserDrawer({ user, onClose }: { user: AdminUserRow; onClose: () => void
   const reset = useServerFn(sendPasswordReset);
   const impersonate = useServerFn(startImpersonation);
   const [impResult, setImpResult] = useState<ImpersonationStart | null>(null);
-
-
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ["admin", "users"] });
 
@@ -268,15 +297,14 @@ function UserDrawer({ user, onClose }: { user: AdminUserRow; onClose: () => void
     onError: (e: any) => toast.error(e.message ?? "Failed"),
   });
   const imperM = useMutation({
-    mutationFn: (reason: string) => impersonate({ data: { user_id: user.id, reason, minutes: 30 } }),
+    mutationFn: (reason: string) =>
+      impersonate({ data: { user_id: user.id, reason, minutes: 30 } }),
     onSuccess: (r) => {
       setImpResult(r);
       toast.success("Impersonation session started");
     },
     onError: (e: any) => toast.error(e.message ?? "Failed"),
   });
-
-
 
   const missingRoles = ALL_ROLES.filter((r) => !user.roles.includes(r));
 
@@ -291,7 +319,10 @@ function UserDrawer({ user, onClose }: { user: AdminUserRow; onClose: () => void
             <h2 className="font-serif text-xl">{user.full_name ?? "Unnamed"}</h2>
             <p className="text-sm text-muted-foreground">{user.email ?? "—"}</p>
           </div>
-          <button onClick={onClose} className="grid size-8 place-items-center rounded-lg hover:bg-secondary">
+          <button
+            onClick={onClose}
+            className="grid size-8 place-items-center rounded-lg hover:bg-secondary"
+          >
             <X className="size-4" />
           </button>
         </header>
@@ -301,8 +332,12 @@ function UserDrawer({ user, onClose }: { user: AdminUserRow; onClose: () => void
             <p className="mb-2 text-xs uppercase tracking-widest text-muted-foreground">Status</p>
             {user.suspended_at ? (
               <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-sm">
-                <p className="font-medium text-destructive">Suspended {fmtDate(user.suspended_at)}</p>
-                {user.suspended_reason && <p className="text-muted-foreground">{user.suspended_reason}</p>}
+                <p className="font-medium text-destructive">
+                  Suspended {fmtDate(user.suspended_at)}
+                </p>
+                {user.suspended_reason && (
+                  <p className="text-muted-foreground">{user.suspended_reason}</p>
+                )}
                 <button
                   onClick={() => reactivateM.mutate()}
                   disabled={reactivateM.isPending}
@@ -343,17 +378,19 @@ function UserDrawer({ user, onClose }: { user: AdminUserRow; onClose: () => void
                   <UserCog className="size-3" /> View as user
                 </button>
                 <ExportUserDataButton userId={user.id} />
-
               </div>
             )}
-            {impResult && <ImpersonationResult result={impResult} onDone={() => setImpResult(null)} />}
+            {impResult && (
+              <ImpersonationResult result={impResult} onDone={() => setImpResult(null)} />
+            )}
           </section>
-
 
           <section>
             <p className="mb-2 text-xs uppercase tracking-widest text-muted-foreground">Roles</p>
             <div className="mb-2 flex flex-wrap gap-1">
-              {user.roles.length === 0 && <span className="text-xs text-muted-foreground">No roles assigned</span>}
+              {user.roles.length === 0 && (
+                <span className="text-xs text-muted-foreground">No roles assigned</span>
+              )}
               {user.roles.map((r) => (
                 <button
                   key={r}
@@ -432,13 +469,19 @@ function CreateUserDialog({ onClose }: { onClose: () => void }) {
       >
         <header className="flex items-center justify-between">
           <h2 className="font-serif text-lg">Create user</h2>
-          <button type="button" onClick={onClose} className="grid size-8 place-items-center rounded-lg hover:bg-secondary">
+          <button
+            type="button"
+            onClick={onClose}
+            className="grid size-8 place-items-center rounded-lg hover:bg-secondary"
+          >
             <X className="size-4" />
           </button>
         </header>
 
         <div className="space-y-2">
-          <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Full name</label>
+          <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Full name
+          </label>
           <input
             required
             value={name}
@@ -447,7 +490,9 @@ function CreateUserDialog({ onClose }: { onClose: () => void }) {
           />
         </div>
         <div className="space-y-2">
-          <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Email</label>
+          <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Email
+          </label>
           <input
             required
             type="email"
@@ -457,7 +502,9 @@ function CreateUserDialog({ onClose }: { onClose: () => void }) {
           />
         </div>
         <div className="space-y-2">
-          <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Primary role</label>
+          <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Primary role
+          </label>
           <select
             value={role}
             onChange={(e) => setRole(e.target.value as AppRole)}
@@ -471,7 +518,11 @@ function CreateUserDialog({ onClose }: { onClose: () => void }) {
           </select>
         </div>
         <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" checked={sendInvite} onChange={(e) => setSendInvite(e.target.checked)} />
+          <input
+            type="checkbox"
+            checked={sendInvite}
+            onChange={(e) => setSendInvite(e.target.checked)}
+          />
           <span className="inline-flex items-center gap-1">
             <Mail className="size-3.5" /> Send invite email
           </span>
@@ -489,7 +540,13 @@ function CreateUserDialog({ onClose }: { onClose: () => void }) {
   );
 }
 
-function ImpersonationResult({ result, onDone }: { result: ImpersonationStart; onDone: () => void }) {
+function ImpersonationResult({
+  result,
+  onDone,
+}: {
+  result: ImpersonationStart;
+  onDone: () => void;
+}) {
   return (
     <div className="mt-3 rounded-lg border border-amber-300 bg-amber-50 p-3 text-xs dark:border-amber-900/40 dark:bg-amber-950/30">
       <p className="font-medium text-amber-900 dark:text-amber-100">
@@ -563,5 +620,3 @@ function ExportUserDataButton({ userId }: { userId: string }) {
     </button>
   );
 }
-
-

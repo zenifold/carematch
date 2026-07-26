@@ -1,8 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Clock, Inbox, Users, Briefcase, Calendar, AlertTriangle, ShieldAlert } from "lucide-react";
-import { getAdminOverview } from "@/lib/admin.functions";
+import { getAdminOverview, checkIsAdmin } from "@/lib/admin.functions";
 import {
   PageSkeleton,
   EmptyState,
@@ -13,6 +13,12 @@ import {
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: QueuePage,
   errorComponent: RouteErrorBoundary,
+  beforeLoad: async () => {
+    // Admin-only. Redirect through /dashboard (not /admin — that's this
+    // route) so non-admin staff land on whichever page they can actually use.
+    const { isAdmin } = await checkIsAdmin();
+    if (!isAdmin) throw redirect({ to: "/dashboard" });
+  },
 });
 
 function QueuePage() {

@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { getAdminAnalytics } from "@/lib/admin.functions";
+import { getAdminAnalytics, checkIsAdmin } from "@/lib/admin.functions";
 import {
   PageSkeleton,
   ErrorState,
@@ -11,6 +11,10 @@ import {
 export const Route = createFileRoute("/_authenticated/admin/analytics")({
   component: AnalyticsPage,
   errorComponent: RouteErrorBoundary,
+  beforeLoad: async () => {
+    const { isAdmin } = await checkIsAdmin();
+    if (!isAdmin) throw redirect({ to: "/admin" });
+  },
 });
 
 function fmtMoney(cents: number) {

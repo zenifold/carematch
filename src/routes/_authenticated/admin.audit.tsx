@@ -1,14 +1,19 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { ScrollText, Search } from "lucide-react";
 import { listAuditLog } from "@/lib/admin-users.functions";
+import { checkIsAdmin } from "@/lib/admin.functions";
 import { PageSkeleton, EmptyState, ErrorState, RouteErrorBoundary } from "@/components/carematch";
 
 export const Route = createFileRoute("/_authenticated/admin/audit")({
   component: AuditPage,
   errorComponent: RouteErrorBoundary,
+  beforeLoad: async () => {
+    const { isAdmin } = await checkIsAdmin();
+    if (!isAdmin) throw redirect({ to: "/admin" });
+  },
 });
 
 function fmtWhen(iso: string) {

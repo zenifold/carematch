@@ -25,7 +25,13 @@ import {
   PermissionBanner,
   RequestChangeDialog,
 } from "@/components/carematch";
-import { getSeniorEditPermission, listMyLinkedSeniors, listVisitsForSenior } from "@/lib/family.functions";
+import {
+  getSeniorCarePlan,
+  getSeniorEditPermission,
+  listMyLinkedSeniors,
+  listVisitsForSenior,
+} from "@/lib/family.functions";
+import { parseCareNotes } from "@/lib/care-notes";
 
 export const Route = createFileRoute("/_authenticated/family/care-plan")({
   component: FamilyCarePlan,
@@ -51,6 +57,7 @@ function FamilyCarePlan() {
   const fetchLinks = useServerFn(listMyLinkedSeniors);
   const fetchVisits = useServerFn(listVisitsForSenior);
   const fetchPerm = useServerFn(getSeniorEditPermission);
+  const fetchCarePlan = useServerFn(getSeniorCarePlan);
 
   const linksQ = useQuery({ queryKey: ["family", "links"], queryFn: () => fetchLinks() });
   const primary = linksQ.data?.[0];
@@ -64,6 +71,12 @@ function FamilyCarePlan() {
     enabled: !!primary,
     queryFn: () => fetchPerm({ data: { senior_id: primary!.senior_id } }),
   });
+  const carePlanQ = useQuery({
+    queryKey: ["family", "care-plan", primary?.senior_id ?? ""],
+    enabled: !!primary,
+    queryFn: () => fetchCarePlan({ data: { senior_id: primary!.senior_id } }),
+  });
+  const careNotes = useMemo(() => parseCareNotes(carePlanQ.data?.care_notes), [carePlanQ.data]);
 
   const weekStart = useMemo(() => startOfWeek(new Date()), []);
   const weekEnd = useMemo(() => addDays(weekStart, 7), [weekStart]);
@@ -147,7 +160,6 @@ function FamilyCarePlan() {
         <PermissionBanner seniorName={primary.full_name} action="edit the care plan" />
       )}
 
-
       {/* Mode + print toolbar */}
       <div className="flex flex-wrap items-center gap-2 print:hidden">
         <button
@@ -209,10 +221,14 @@ function FamilyCarePlan() {
           hint="What caregivers should know"
           hiddenInPreview={false}
         >
-          <Placeholder>
-            Conditions, allergies, and medications will appear here once added.
-            Caregivers see this section on every visit.
-          </Placeholder>
+          {carePlanQ.data?.care_medical_notes ? (
+            <p className="whitespace-pre-wrap">{carePlanQ.data.care_medical_notes}</p>
+          ) : (
+            <Placeholder>
+              Conditions, allergies, and medications will appear here once{" "}
+              {primary.full_name ?? "they"} add them. Caregivers see this section on every visit.
+            </Placeholder>
+          )}
         </Section>
 
         <Section
@@ -220,9 +236,13 @@ function FamilyCarePlan() {
           title="Home"
           hint="Getting in and around"
         >
-          <Placeholder>
-            Entry instructions, pets, stairs, and accessibility notes go here.
-          </Placeholder>
+          {carePlanQ.data?.care_home_notes ? (
+            <p className="whitespace-pre-wrap">{carePlanQ.data.care_home_notes}</p>
+          ) : (
+            <Placeholder>
+              Entry instructions, pets, stairs, and accessibility notes go here.
+            </Placeholder>
+          )}
         </Section>
 
         <Section
@@ -256,10 +276,13 @@ function FamilyCarePlan() {
           title="No-go"
           hint="Hard limits — never override"
         >
-          <Placeholder>
-            Boundaries the caregiver must respect. This section is always visible
-            to caregivers.
-          </Placeholder>
+          {carePlanQ.data?.care_no_go_notes ? (
+            <p className="whitespace-pre-wrap">{carePlanQ.data.care_no_go_notes}</p>
+          ) : (
+            <Placeholder>
+              Boundaries the caregiver must respect. This section is always visible to caregivers.
+            </Placeholder>
+          )}
         </Section>
 
         {!caregiverPreview && (
@@ -268,9 +291,25 @@ function FamilyCarePlan() {
             title="Family notes"
             hint="Only family and the senior see this"
           >
-            <Placeholder>
-              Private context for family members. Hidden from caregivers.
-            </Placeholder>
+            {careNotes.length === 0 ? (
+              <Placeholder>
+                Private context for family members. Hidden from caregivers. Use "Suggest a note"
+                above — {primary.full_name ?? "they"} approves before it's added.
+              </Placeholder>
+            ) : (
+              <ul className="space-y-2">
+                {careNotes.map((n, i) => (
+                  <li key={i} className="rounded-xl border border-border/60 bg-secondary/30 p-3">
+                    {n.date && (
+                      <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+                        {n.date}
+                      </p>
+                    )}
+                    <p className="mt-0.5 whitespace-pre-wrap">{n.text}</p>
+                  </li>
+                ))}
+              </ul>
+            )}
           </Section>
         )}
       </div>
@@ -280,8 +319,7 @@ function FamilyCarePlan() {
           <div>
             <h2 className="font-serif text-2xl">This week</h2>
             <p className="text-sm text-muted-foreground">
-              {week.length} visit{week.length === 1 ? "" : "s"} planned ·{" "}
-              {fmtMoney(totalCents)}
+              {week.length} visit{week.length === 1 ? "" : "s"} planned · {fmtMoney(totalCents)}
             </p>
           </div>
           <Link
@@ -305,10 +343,7 @@ function FamilyCarePlan() {
               const at = new Date(v.scheduled_at);
               const pay = Math.round((v.hourly_rate_cents * v.duration_minutes) / 60);
               return (
-                <li
-                  key={v.id}
-                  className="grid grid-cols-[64px_1fr_auto] items-center gap-4 p-5"
-                >
+                <li key={v.id} className="grid grid-cols-[64px_1fr_auto] items-center gap-4 p-5">
                   <div className="text-center">
                     <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
                       {at.toLocaleDateString(undefined, { weekday: "short" })}
@@ -341,8 +376,8 @@ function FamilyCarePlan() {
           <div>
             <h2 className="font-serif text-2xl">Funding navigator</h2>
             <p className="text-sm text-muted-foreground">
-              Programs like VA Aid &amp; Attendance and Medicaid HCBS waivers may help
-              cover care. A screener will land here soon.
+              Programs like VA Aid &amp; Attendance and Medicaid HCBS waivers may help cover care. A
+              screener will land here soon.
             </p>
           </div>
         </div>
@@ -360,9 +395,7 @@ function FamilyCarePlan() {
         title="Suggest a care-plan note"
         summary={
           <div className="space-y-2">
-            <p className="text-xs uppercase tracking-widest text-muted-foreground">
-              Proposed note
-            </p>
+            <p className="text-xs uppercase tracking-widest text-muted-foreground">Proposed note</p>
             <textarea
               value={noteDraft}
               onChange={(e) => setNoteDraft(e.target.value)}
@@ -385,9 +418,7 @@ function FamilyCarePlan() {
 function Header({ seniorName }: { seniorName?: string | null }) {
   return (
     <div>
-      <p className="text-xs uppercase tracking-widest text-muted-foreground">
-        The shared artifact
-      </p>
+      <p className="text-xs uppercase tracking-widest text-muted-foreground">The shared artifact</p>
       <h1 className="mt-1 font-serif text-3xl lg:text-4xl">Care plan</h1>
       {seniorName && (
         <p className="mt-2 max-w-xl text-sm text-muted-foreground">

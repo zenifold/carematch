@@ -103,23 +103,17 @@ function SeniorMoney() {
   const twoWeeksOut = now.getTime() + 14 * 24 * 60 * 60 * 1000;
 
   const spent = rows
-    .filter(
-      (r) => r.status === "completed" && new Date(r.scheduled_at).getTime() >= monthStart,
-    )
+    .filter((r) => r.status === "completed" && new Date(r.scheduled_at).getTime() >= monthStart)
     .reduce((sum, r) => sum + computeVisitCost(r), 0);
 
   // Traffic-light framing
   const pct = budget > 0 ? spent / budget : 0;
-  const light: "green" | "amber" | "red" =
-    pct >= 0.9 ? "red" : pct >= 0.65 ? "amber" : "green";
+  const light: "green" | "amber" | "red" = pct >= 0.9 ? "red" : pct >= 0.65 ? "amber" : "green";
   const completedThisMonth = rows.filter(
     (r) => r.status === "completed" && new Date(r.scheduled_at).getTime() >= monthStart,
   ).length;
   const remaining = Math.max(0, budget - spent);
-  const daysLeft = Math.max(
-    1,
-    Math.ceil((nextMonthStart - now.getTime()) / (24 * 60 * 60 * 1000)),
-  );
+  const daysLeft = Math.max(1, Math.ceil((nextMonthStart - now.getTime()) / (24 * 60 * 60 * 1000)));
 
   const lightCopy: Record<typeof light, { chip: string; classes: string; summary: string }> = {
     green: {
@@ -145,17 +139,15 @@ function SeniorMoney() {
     },
   };
 
-  // Upcoming charges — next 14 days of scheduled/accepted visits
+  // Upcoming charges — next 14 days of not-yet-completed visits
   const upcoming = rows
     .filter(
       (r) =>
-        (r.status === "scheduled" || r.status === "accepted" || r.status === "pending") &&
+        (r.status === "requested" || r.status === "confirmed" || r.status === "in_progress") &&
         new Date(r.scheduled_at).getTime() >= now.getTime() &&
         new Date(r.scheduled_at).getTime() <= twoWeeksOut,
     )
-    .sort(
-      (a, b) => new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime(),
-    )
+    .sort((a, b) => new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime())
     .slice(0, 6);
 
   const upcomingTotal = upcoming.reduce((s, r) => s + computeVisitCost(r), 0);
@@ -178,11 +170,8 @@ function SeniorMoney() {
     const end = new Date(start);
     end.setDate(start.getDate() + 6);
     const sameMonth = start.getMonth() === end.getMonth();
-    const f = (d: Date) =>
-      d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
-    return sameMonth
-      ? `Week of ${f(start)}`
-      : `${f(start)} – ${f(end)}`;
+    const f = (d: Date) => d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+    return sameMonth ? `Week of ${f(start)}` : `${f(start)} – ${f(end)}`;
   }
 
   const weekMap = new Map<string, VisitRow[]>();
@@ -193,7 +182,6 @@ function SeniorMoney() {
     weekMap.set(k, list);
   }
   const weeks = Array.from(weekMap.entries()).slice(0, 6);
-
 
   const familyCanSee = prefsQ.data?.family_can_see ?? false;
 
@@ -217,9 +205,7 @@ function SeniorMoney() {
             }`}
             aria-hidden
           />
-          <p className="text-xs font-bold uppercase tracking-widest">
-            {lightCopy[light].chip}
-          </p>
+          <p className="text-xs font-bold uppercase tracking-widest">{lightCopy[light].chip}</p>
         </div>
         <p className="mt-3 text-lg leading-relaxed">{lightCopy[light].summary}</p>
         <div className="mt-4">
@@ -276,8 +262,8 @@ function SeniorMoney() {
                     </span>
                     <div>
                       <p className="text-base font-semibold">
-                        {r.provider_name ?? "Caregiver TBD"} ·{" "}
-                        {Math.round(r.duration_minutes / 60)}h
+                        {r.provider_name ?? "Caregiver TBD"} · {Math.round(r.duration_minutes / 60)}
+                        h
                       </p>
                       <p className="text-sm text-muted-foreground">
                         {when.toLocaleDateString(undefined, {
@@ -291,9 +277,7 @@ function SeniorMoney() {
                           minute: "2-digit",
                         })}
                       </p>
-                      <p className="text-xs text-muted-foreground">
-                        Charged after check-out
-                      </p>
+                      <p className="text-xs text-muted-foreground">Charged after check-out</p>
                     </div>
                   </div>
                   <p className="font-serif text-xl">~{fmt(computeVisitCost(r))}</p>
@@ -348,9 +332,7 @@ function SeniorMoney() {
                                 {r.provider_name ?? "Caregiver"} ·{" "}
                                 {Math.round(r.duration_minutes / 60)}h
                               </p>
-                              <p className="text-sm text-muted-foreground">
-                                {r.service_type}
-                              </p>
+                              <p className="text-sm text-muted-foreground">{r.service_type}</p>
                               <p className="text-xs text-muted-foreground">
                                 {new Date(r.scheduled_at).toLocaleDateString(undefined, {
                                   weekday: "short",
@@ -381,8 +363,8 @@ function SeniorMoney() {
 
       <div className="mt-8 rounded-2xl bg-sage-50 p-5 text-sm text-sage-700">
         <p>
-          Every visit is only charged after check-out. Refunds are one tap — no
-          arguments, no hold music.
+          Every visit is only charged after check-out. Refunds are one tap — no arguments, no hold
+          music.
         </p>
         <Link
           to="/senior/help"

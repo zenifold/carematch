@@ -91,6 +91,8 @@ function SeniorOnboarding() {
           notify_before_visit: true,
           call_for_changes: callForChanges,
           family_can_see: familyCanSee,
+          family_can_edit: false,
+          care_needs: needs,
         },
       });
       toast.success("You're all set!");
@@ -223,7 +225,9 @@ function SeniorOnboarding() {
                     type="button"
                     onClick={() => setTextSize(t.id)}
                     className={`rounded-2xl border p-3 text-sm font-semibold transition ${
-                      active ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"
+                      active
+                        ? "border-primary bg-primary/5"
+                        : "border-border hover:border-primary/40"
                     }`}
                   >
                     {t.label}
@@ -235,7 +239,12 @@ function SeniorOnboarding() {
 
           {(
             [
-              ["callForChanges", "Call me before any schedule changes", callForChanges, setCallForChanges],
+              [
+                "callForChanges",
+                "Call me before any schedule changes",
+                callForChanges,
+                setCallForChanges,
+              ],
               ["familyCanSee", "Let approved family view my visits", familyCanSee, setFamilyCanSee],
             ] as const
           ).map(([k, label, val, setter]) => (
@@ -309,12 +318,15 @@ function SeniorOnboarding() {
               }}
               className="inline-flex min-h-12 items-center gap-2 rounded-full border border-input bg-card px-5 text-base font-semibold hover:bg-secondary disabled:opacity-50"
             >
-              {invitingBusy ? <Loader2 className="size-4 animate-spin" /> : <Mail className="size-4" />}
+              {invitingBusy ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Mail className="size-4" />
+              )}
               Generate invite code
             </button>
           )}
         </section>
-
 
         <div className="flex flex-wrap items-center justify-between gap-3">
           <button

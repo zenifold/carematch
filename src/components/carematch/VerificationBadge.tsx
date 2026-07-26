@@ -37,7 +37,7 @@ const STAGES: Record<VerificationStage, StageMeta> = {
     icon: ShieldCheck,
     what: "National criminal + sex offender registry, plus multi-state records.",
     frequency: "Before the first visit, refreshed every year.",
-    vendor: "Verified by Checkr",
+    vendor: "Verified by Certn",
   },
   credential: {
     label: "License Verified",
@@ -51,7 +51,7 @@ const STAGES: Record<VerificationStage, StageMeta> = {
     icon: Repeat,
     what: "New charges, license changes, and registry updates re-checked automatically.",
     frequency: "Every 30 days for the life of the account.",
-    vendor: "Verified by Checkr Continuous",
+    vendor: "Verified by Certn Continuous",
   },
   arrival: {
     label: "Verified on Arrival",

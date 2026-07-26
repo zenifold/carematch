@@ -10,16 +10,22 @@ const PrefsSchema = z.object({
   call_for_changes: z.boolean(),
   family_can_see: z.boolean(),
   family_can_edit: z.boolean(),
+  // Optional and never defaulted: the periodic autosave from
+  // use-senior-preferences.tsx never sends this, and defaulting it would
+  // wipe onboarding's saved value on the next unrelated preference change.
+  care_needs: z.array(z.string()).optional(),
 });
 
-export type SeniorPreferencesRow = z.infer<typeof PrefsSchema>;
+export type SeniorPreferencesRow = z.infer<typeof PrefsSchema> & { care_needs: string[] };
 
 export const getSeniorPreferences = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("senior_preferences")
-      .select("text_size, high_contrast, reduce_motion, notify_before_visit, call_for_changes, family_can_see, family_can_edit")
+      .select(
+        "text_size, high_contrast, reduce_motion, notify_before_visit, call_for_changes, family_can_see, family_can_edit, care_needs",
+      )
       .eq("user_id", context.userId)
       .maybeSingle();
     if (error) throw error;
@@ -30,9 +36,15 @@ export const upsertSeniorPreferences = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => PrefsSchema.parse(input))
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase
-      .from("senior_preferences")
-      .upsert({ user_id: context.userId, ...data }, { onConflict: "user_id" });
+    const { care_needs, ...rest } = data;
+    const { error } = await context.supabase.from("senior_preferences").upsert(
+      {
+        user_id: context.userId,
+        ...rest,
+        ...(care_needs !== undefined ? { care_needs } : {}),
+      },
+      { onConflict: "user_id" },
+    );
     if (error) throw error;
     return { ok: true };
   });

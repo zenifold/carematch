@@ -6,7 +6,11 @@ const CreateBookingSchema = z.object({
   provider_id: z.string().uuid(),
   service_type: z.string().min(1),
   scheduled_at: z.string().datetime(),
-  duration_minutes: z.number().int().min(30).max(24 * 60),
+  duration_minutes: z
+    .number()
+    .int()
+    .min(30)
+    .max(24 * 60),
   hourly_rate_cents: z.number().int().min(0),
   notes: z.string().max(2000).optional().nullable(),
 });
@@ -23,8 +27,9 @@ export type VisitRow = {
   provider_name: string | null;
   provider_avatar_url: string | null;
   senior_rating: string | null;
+  payment_status: string;
+  paid_at: string | null;
 };
-
 
 export const createBooking = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -69,18 +74,19 @@ export const listMyVisits = createServerFn({ method: "GET" })
     const { data, error } = await context.supabase
       .from("bookings")
       .select(
-        "id, service_type, scheduled_at, duration_minutes, hourly_rate_cents, status, notes, provider_id, provider:providers!inner(id, profile:profiles!inner(full_name, avatar_url)), visit:visits(senior_rating)",
+        "id, service_type, scheduled_at, duration_minutes, hourly_rate_cents, status, notes, provider_id, payment_status, paid_at, provider:providers!inner(id, profile:profiles!inner(full_name, avatar_url)), visit:visits(senior_rating)",
       )
       .eq("senior_id", context.userId)
       .order("scheduled_at", { ascending: false });
     if (error) throw error;
     return (data ?? []).map((row) => {
-      const providerRel = row.provider as
-        | { profile: { full_name: string | null; avatar_url: string | null } | null }
-        | null;
+      const providerRel = row.provider as {
+        profile: { full_name: string | null; avatar_url: string | null } | null;
+      } | null;
       const profileRel = providerRel?.profile ?? null;
-      const visitRel = row.visit as { senior_rating: string | null } | { senior_rating: string | null }[] | null;
-      const visit = Array.isArray(visitRel) ? visitRel[0] ?? null : visitRel;
+      const visitRel = row.visit as
+        { senior_rating: string | null } | { senior_rating: string | null }[] | null;
+      const visit = Array.isArray(visitRel) ? (visitRel[0] ?? null) : visitRel;
       return {
         id: row.id,
         service_type: row.service_type,
@@ -93,10 +99,11 @@ export const listMyVisits = createServerFn({ method: "GET" })
         provider_name: profileRel?.full_name ?? null,
         provider_avatar_url: profileRel?.avatar_url ?? null,
         senior_rating: visit?.senior_rating ?? null,
+        payment_status: row.payment_status,
+        paid_at: row.paid_at,
       };
     });
   });
-
 
 export const getVisit = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -105,15 +112,15 @@ export const getVisit = createServerFn({ method: "GET" })
     const { data: row, error } = await context.supabase
       .from("bookings")
       .select(
-        "id, service_type, scheduled_at, duration_minutes, hourly_rate_cents, status, notes, provider_id, senior_id, provider:providers!inner(id, profile:profiles!inner(full_name, avatar_url))",
+        "id, service_type, scheduled_at, duration_minutes, hourly_rate_cents, status, notes, provider_id, senior_id, payment_status, paid_at, provider:providers!inner(id, profile:profiles!inner(full_name, avatar_url))",
       )
       .eq("id", data.id)
       .maybeSingle();
     if (error) throw error;
     if (!row) return null;
-    const providerRel = row.provider as
-      | { profile: { full_name: string | null; avatar_url: string | null } | null }
-      | null;
+    const providerRel = row.provider as {
+      profile: { full_name: string | null; avatar_url: string | null } | null;
+    } | null;
     const profileRel = providerRel?.profile ?? null;
     return {
       id: row.id,
@@ -127,9 +134,10 @@ export const getVisit = createServerFn({ method: "GET" })
       provider_name: profileRel?.full_name ?? null,
       provider_avatar_url: profileRel?.avatar_url ?? null,
       senior_rating: null,
+      payment_status: row.payment_status,
+      paid_at: row.paid_at,
     };
   });
-
 
 export type MatchedProvider = {
   id: string;
@@ -269,7 +277,6 @@ export const requestProviderNotification = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-
 // ============================================================
 // Booking lifecycle: accept / decline / cancel / reschedule
 // check-in / check-out / rate
@@ -293,9 +300,7 @@ export const acceptBooking = createServerFn({ method: "POST" })
       .eq("module_code", "companion_basics_v1")
       .maybeSingle();
     if (!basics?.passed) {
-      throw new Error(
-        "Finish the Companion Basics course before accepting your first job.",
-      );
+      throw new Error("Finish the Companion Basics course before accepting your first job.");
     }
 
     const { error: updErr } = await context.supabase
@@ -317,7 +322,6 @@ export const acceptBooking = createServerFn({ method: "POST" })
     }
     return { ok: true };
   });
-
 
 export const declineBooking = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -348,10 +352,12 @@ export const cancelBooking = createServerFn({ method: "POST" })
 export const rescheduleBooking = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z.object({
-      id: z.string().uuid(),
-      scheduled_at: z.string().datetime(),
-    }).parse(input),
+    z
+      .object({
+        id: z.string().uuid(),
+        scheduled_at: z.string().datetime(),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase
@@ -369,11 +375,13 @@ export const rescheduleBooking = createServerFn({ method: "POST" })
 export const checkInVisit = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z.object({
-      id: z.string().uuid(),
-      lat: z.number().min(-90).max(90).optional().nullable(),
-      lng: z.number().min(-180).max(180).optional().nullable(),
-    }).parse(input),
+    z
+      .object({
+        id: z.string().uuid(),
+        lat: z.number().min(-90).max(90).optional().nullable(),
+        lng: z.number().min(-180).max(180).optional().nullable(),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { data: existing } = await context.supabase
@@ -411,12 +419,14 @@ export const checkInVisit = createServerFn({ method: "POST" })
 export const checkOutVisit = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z.object({
-      id: z.string().uuid(),
-      provider_notes: z.string().max(4000).optional().nullable(),
-      checkout_summary_text: z.string().max(4000).optional().nullable(),
-      checkout_voice_url: z.string().max(1000).optional().nullable(),
-    }).parse(input),
+    z
+      .object({
+        id: z.string().uuid(),
+        provider_notes: z.string().max(4000).optional().nullable(),
+        checkout_summary_text: z.string().max(4000).optional().nullable(),
+        checkout_voice_url: z.string().max(1000).optional().nullable(),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const now = new Date().toISOString();
@@ -446,13 +456,19 @@ export const checkOutVisit = createServerFn({ method: "POST" })
 export const setVisitPlan = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z.object({
-      booking_id: z.string().uuid(),
-      items: z.array(z.object({
-        label: z.string().min(1).max(200),
-        done: z.boolean().optional(),
-      })).max(10),
-    }).parse(input),
+    z
+      .object({
+        booking_id: z.string().uuid(),
+        items: z
+          .array(
+            z.object({
+              label: z.string().min(1).max(200),
+              done: z.boolean().optional(),
+            }),
+          )
+          .max(10),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const items = data.items.map((i) => ({ label: i.label, done: !!i.done }));
@@ -482,16 +498,20 @@ export const setVisitPlan = createServerFn({ method: "POST" })
 export const rateVisit = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z.object({
-      booking_id: z.string().uuid(),
-      rating: z.enum(["great", "okay", "bad"]).optional().nullable(),
-      rating_num: z.number().int().min(1).max(5).optional().nullable(),
-      comment: z.string().max(2000).optional().nullable(),
-    }).parse(input),
+    z
+      .object({
+        booking_id: z.string().uuid(),
+        rating: z.enum(["great", "okay", "bad"]).optional().nullable(),
+        rating_num: z.number().int().min(1).max(5).optional().nullable(),
+        comment: z.string().max(2000).optional().nullable(),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     // Map 3-tier → numeric when only tier provided.
-    const num = data.rating_num ?? (data.rating === "great" ? 5 : data.rating === "okay" ? 3 : data.rating === "bad" ? 1 : null);
+    const num =
+      data.rating_num ??
+      (data.rating === "great" ? 5 : data.rating === "okay" ? 3 : data.rating === "bad" ? 1 : null);
     const patch = {
       senior_rating: data.rating ?? null,
       senior_rating_num: num,
@@ -522,11 +542,13 @@ export const rateVisit = createServerFn({ method: "POST" })
 export const rateVisitByProvider = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z.object({
-      booking_id: z.string().uuid(),
-      rating: z.number().int().min(1).max(5),
-      comment: z.string().max(2000).optional().nullable(),
-    }).parse(input),
+    z
+      .object({
+        booking_id: z.string().uuid(),
+        rating: z.number().int().min(1).max(5),
+        comment: z.string().max(2000).optional().nullable(),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase
@@ -560,7 +582,7 @@ async function awardConsistencyBonusIfDue(bookingId: string, providerId: string)
   const completed = count ?? 0;
 
   const milestones: { n: number; cents: number; memo: string }[] = [
-    { n: 4,  cents: 2500, memo: "Consistency bonus — 4th visit with the same senior" },
+    { n: 4, cents: 2500, memo: "Consistency bonus — 4th visit with the same senior" },
     { n: 12, cents: 7500, memo: "Consistency bonus — 12th visit with the same senior" },
   ];
   for (const m of milestones) {
@@ -607,7 +629,6 @@ async function awardConsistencyBonusIfDue(bookingId: string, providerId: string)
   }
 }
 
-
 export type VisitPlanItem = { label: string; done: boolean };
 
 export type VisitDetail = VisitRow & {
@@ -639,21 +660,23 @@ export const getVisitDetail = createServerFn({ method: "GET" })
     const { data: row, error } = await context.supabase
       .from("bookings")
       .select(
-        "id, service_type, scheduled_at, duration_minutes, hourly_rate_cents, status, notes, provider_id, senior_id, provider_rating, provider_comment, provider:providers!inner(id, profile:profiles!inner(full_name, avatar_url)), visit:visits(id, checked_in_at, checked_out_at, provider_notes, senior_rating, senior_rating_num, senior_comment, plan_items, checkin_lat, checkin_lng, checkout_summary_text, checkout_voice_url)",
+        "id, service_type, scheduled_at, duration_minutes, hourly_rate_cents, status, notes, provider_id, senior_id, payment_status, paid_at, provider_rating, provider_comment, provider:providers!inner(id, profile:profiles!inner(full_name, avatar_url)), visit:visits(id, checked_in_at, checked_out_at, provider_notes, senior_rating, senior_rating_num, senior_comment, plan_items, checkin_lat, checkin_lng, checkout_summary_text, checkout_voice_url)",
       )
       .eq("id", data.id)
       .maybeSingle();
     if (error) throw error;
     if (!row) return null;
-    const providerRel = row.provider as
-      | { profile: { full_name: string | null; avatar_url: string | null } | null }
-      | null;
+    const providerRel = row.provider as {
+      profile: { full_name: string | null; avatar_url: string | null } | null;
+    } | null;
     const profileRel = providerRel?.profile ?? null;
     const visitArr = (row.visit as any[] | null) ?? [];
     const v = visitArr[0] ?? null;
     const planRaw = (v?.plan_items ?? []) as unknown;
     const plan_items: VisitPlanItem[] = Array.isArray(planRaw)
-      ? planRaw.map((p: any) => ({ label: String(p?.label ?? ""), done: !!p?.done })).filter((p) => p.label)
+      ? planRaw
+          .map((p: any) => ({ label: String(p?.label ?? ""), done: !!p?.done }))
+          .filter((p) => p.label)
       : [];
     return {
       id: row.id,
@@ -667,6 +690,8 @@ export const getVisitDetail = createServerFn({ method: "GET" })
       senior_id: row.senior_id,
       provider_name: profileRel?.full_name ?? null,
       provider_avatar_url: profileRel?.avatar_url ?? null,
+      payment_status: row.payment_status,
+      paid_at: row.paid_at,
       visit_id: v?.id ?? null,
       checked_in_at: v?.checked_in_at ?? null,
       checked_out_at: v?.checked_out_at ?? null,
@@ -683,7 +708,6 @@ export const getVisitDetail = createServerFn({ method: "GET" })
       checkout_voice_url: v?.checkout_voice_url ?? null,
     };
   });
-
 
 /** Number of `requested` bookings waiting on the current provider. */
 export const getPendingJobCount = createServerFn({ method: "GET" })

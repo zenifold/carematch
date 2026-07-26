@@ -1,19 +1,18 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Search, Users } from "lucide-react";
-import { listAdminSeniors } from "@/lib/admin.functions";
-import {
-  PageSkeleton,
-  EmptyState,
-  ErrorState,
-  RouteErrorBoundary,
-} from "@/components/carematch";
+import { listAdminSeniors, checkIsAdmin } from "@/lib/admin.functions";
+import { PageSkeleton, EmptyState, ErrorState, RouteErrorBoundary } from "@/components/carematch";
 
 export const Route = createFileRoute("/_authenticated/admin/seniors")({
   component: SeniorsPage,
   errorComponent: RouteErrorBoundary,
+  beforeLoad: async () => {
+    const { isAdmin } = await checkIsAdmin();
+    if (!isAdmin) throw redirect({ to: "/admin" });
+  },
 });
 
 function fmtMoney(cents: number | null) {
@@ -36,7 +35,9 @@ function SeniorsPage() {
     const needle = query.trim().toLowerCase();
     if (!needle) return all;
     return all.filter(
-      (s) => (s.full_name ?? "").toLowerCase().includes(needle) || (s.city ?? "").toLowerCase().includes(needle),
+      (s) =>
+        (s.full_name ?? "").toLowerCase().includes(needle) ||
+        (s.city ?? "").toLowerCase().includes(needle),
     );
   }, [q.data, query]);
 
@@ -61,7 +62,9 @@ function SeniorsPage() {
               className="w-full bg-transparent text-sm outline-none"
             />
           </div>
-          <span className="text-xs text-muted-foreground">{filtered.length} of {q.data?.length ?? 0}</span>
+          <span className="text-xs text-muted-foreground">
+            {filtered.length} of {q.data?.length ?? 0}
+          </span>
         </div>
 
         {filtered.length === 0 ? (
@@ -91,11 +94,21 @@ function SeniorsPage() {
               <tbody>
                 {filtered.map((s) => (
                   <tr key={s.id} className="border-t border-border hover:bg-secondary/40">
-                    <td className="px-3 py-2 font-medium">{s.full_name ?? "Unnamed"}</td>
+                    <td className="px-3 py-2">
+                      <Link
+                        to="/admin/users"
+                        search={{ q: s.full_name ?? "" }}
+                        className="font-medium hover:underline"
+                      >
+                        {s.full_name ?? "Unnamed"}
+                      </Link>
+                    </td>
                     <td className="px-3 py-2 text-muted-foreground">{s.city ?? "—"}</td>
                     <td className="px-3 py-2">{fmtMoney(s.monthly_budget_cents)}</td>
                     <td className="px-3 py-2 text-right tabular-nums">{s.linked_family}</td>
-                    <td className="px-3 py-2 text-muted-foreground">{fmtRelative(s.last_booking_at)}</td>
+                    <td className="px-3 py-2 text-muted-foreground">
+                      {fmtRelative(s.last_booking_at)}
+                    </td>
                   </tr>
                 ))}
               </tbody>

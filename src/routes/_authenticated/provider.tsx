@@ -1,4 +1,5 @@
 import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import {
   Heart,
   LogOut,
@@ -33,11 +34,24 @@ const nav: { to: string; label: string; icon: typeof Home; exact?: boolean }[] =
   { to: "/provider/help", label: "Help", icon: LifeBuoy },
 ];
 
-
 function ProviderLayout() {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const isActive = (to: string, exact?: boolean) => (exact ? pathname === to : pathname.startsWith(to));
+  const isActive = (to: string, exact?: boolean) =>
+    exact ? pathname === to : pathname.startsWith(to);
+
+  const profileQ = useQuery({
+    queryKey: ["provider", "header-basics"],
+    queryFn: async () => {
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) return null;
+      const [{ data: profile }, { data: provider }] = await Promise.all([
+        supabase.from("profiles").select("full_name").eq("id", u.user.id).maybeSingle(),
+        supabase.from("providers").select("tier").eq("id", u.user.id).maybeSingle(),
+      ]);
+      return { full_name: profile?.full_name ?? null, tier: provider?.tier ?? null };
+    },
+  });
 
   const signOut = async () => {
     await supabase.auth.signOut();
@@ -56,7 +70,9 @@ function ProviderLayout() {
             CareMatch
           </Link>
           <p className="mt-3 rounded-lg bg-card px-3 py-2 text-xs">
-            <span className="font-semibold uppercase tracking-widest text-muted-foreground">Portal</span>
+            <span className="font-semibold uppercase tracking-widest text-muted-foreground">
+              Portal
+            </span>
             <br />
             <span className="text-sm">Provider</span>
           </p>
@@ -95,8 +111,15 @@ function ProviderLayout() {
       <div className="min-w-0">
         <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border bg-background/95 px-4 py-3 backdrop-blur lg:px-6">
           <div className="flex-1">
-            <p className="text-xs uppercase tracking-widest text-muted-foreground">Provider portal</p>
-            <p className="text-sm font-semibold">Elena Martinez · Silver tier</p>
+            <p className="text-xs uppercase tracking-widest text-muted-foreground">
+              Provider portal
+            </p>
+            <p className="text-sm font-semibold">
+              {profileQ.data?.full_name ?? "…"}
+              {profileQ.data?.tier
+                ? ` · ${profileQ.data.tier[0].toUpperCase()}${profileQ.data.tier.slice(1)} tier`
+                : ""}
+            </p>
           </div>
           <Link
             to="/provider/messages"
@@ -151,7 +174,6 @@ function ProviderLayout() {
           <Outlet />
         </main>
         <SupportWidget portal="provider" />
-
       </div>
     </div>
   );

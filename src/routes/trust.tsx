@@ -60,7 +60,7 @@ const checks: CheckItem[] = [
     when: "Before first visit, refreshed yearly",
     detail:
       "Multi-state and federal criminal records, plus the national sex offender registry. Anything disqualifying removes the helper from CareMatch before they ever accept a booking.",
-    vendor: "Verified by Checkr",
+    vendor: "Verified by Certn",
     frequency: "Pre-hire + annual refresh",
     disqualifiers: [
       "Violent felony convictions",
@@ -92,7 +92,7 @@ const checks: CheckItem[] = [
     when: "Every 30 days, for the life of the account",
     detail:
       "Background and license status is re-verified monthly — not once at signup. New charges, license changes, or registry updates surface within days. The date of every re-check appears on the helper's profile.",
-    vendor: "Verified by Checkr Continuous",
+    vendor: "Verified by Certn Continuous",
     frequency: "Every 30 days, indefinitely",
     disqualifiers: [
       "New criminal charge post-hire",

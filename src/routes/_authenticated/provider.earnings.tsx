@@ -1,14 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { TrendingUp, Wallet } from "lucide-react";
+import { Loader2, TrendingUp, Wallet } from "lucide-react";
+import { toast } from "sonner";
 import { getProviderEarnings } from "@/lib/provider.functions";
-import {
-  PageSkeleton,
-  EmptyState,
-  ErrorState,
-  RouteErrorBoundary,
-} from "@/components/carematch";
+import { createSupportTicket } from "@/lib/support.functions";
+import { PageSkeleton, EmptyState, ErrorState, RouteErrorBoundary } from "@/components/carematch";
 
 export const Route = createFileRoute("/_authenticated/provider/earnings")({
   component: EarningsPage,
@@ -26,6 +23,16 @@ function EarningsPage() {
   const fn = useServerFn(getProviderEarnings);
   const q = useQuery({ queryKey: ["provider", "earnings"], queryFn: () => fn() });
 
+  const createTicket = useServerFn(createSupportTicket);
+  const requestOpsAction = useMutation({
+    mutationFn: (subject: string) =>
+      createTicket({
+        data: { subject, body: `Requested from the Earnings page.`, portal: "provider" },
+      }),
+    onSuccess: () => toast.success("Sent — Ops will follow up by email"),
+    onError: (err) => toast.error(err instanceof Error ? err.message : "Couldn't send request"),
+  });
+
   if (q.isPending) return <PageSkeleton title="earnings" cards={4} />;
   if (q.isError) return <ErrorState error={q.error} onRetry={() => q.refetch()} />;
 
@@ -36,7 +43,8 @@ function EarningsPage() {
   // Next Monday for payout schedule
   const nextPayout = new Date();
   nextPayout.setDate(nextPayout.getDate() + ((1 + 7 - nextPayout.getDay()) % 7 || 7));
-  const unpaidCents = e.this_week.gross_cents - Math.round((e.this_week.gross_cents * e.platform_fee_bps) / 10000);
+  const unpaidCents =
+    e.this_week.gross_cents - Math.round((e.this_week.gross_cents * e.platform_fee_bps) / 10000);
 
   return (
     <div className="space-y-6">
@@ -51,7 +59,12 @@ function EarningsPage() {
             <p className="text-xs uppercase tracking-widest text-primary">Next payout</p>
             <p className="mt-1 font-serif text-3xl">{fmtMoney(unpaidCents)}</p>
             <p className="text-sm text-muted-foreground">
-              Estimated net · pays out {nextPayout.toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" })}
+              Estimated net · pays out{" "}
+              {nextPayout.toLocaleDateString(undefined, {
+                weekday: "long",
+                month: "short",
+                day: "numeric",
+              })}
             </p>
           </div>
           <div className="text-right text-xs text-muted-foreground">
@@ -62,10 +75,26 @@ function EarningsPage() {
       </section>
 
       <div className="grid gap-3 sm:grid-cols-4">
-        <Kpi label="This week (in progress)" value={fmtMoneyShort(e.this_week.gross_cents)} hint={`${e.this_week.bookings} bookings`} />
-        <Kpi label="Last week" value={fmtMoneyShort(e.last_week.gross_cents)} hint={`${e.last_week.bookings} bookings`} />
-        <Kpi label="Month to date" value={fmtMoneyShort(e.month_to_date.gross_cents)} hint={`${Math.round(e.month_to_date.hours)}h worked`} />
-        <Kpi label="Year to date" value={fmtMoneyShort(e.year_to_date.gross_cents)} hint="1099 due Jan 31" />
+        <Kpi
+          label="This week (in progress)"
+          value={fmtMoneyShort(e.this_week.gross_cents)}
+          hint={`${e.this_week.bookings} bookings`}
+        />
+        <Kpi
+          label="Last week"
+          value={fmtMoneyShort(e.last_week.gross_cents)}
+          hint={`${e.last_week.bookings} bookings`}
+        />
+        <Kpi
+          label="Month to date"
+          value={fmtMoneyShort(e.month_to_date.gross_cents)}
+          hint={`${Math.round(e.month_to_date.hours)}h worked`}
+        />
+        <Kpi
+          label="Year to date"
+          value={fmtMoneyShort(e.year_to_date.gross_cents)}
+          hint="1099 due Jan 31"
+        />
       </div>
 
       <section className="rounded-2xl border border-border bg-card p-5">
@@ -76,8 +105,12 @@ function EarningsPage() {
           </span>
         </div>
         <p className="mt-1 text-sm text-muted-foreground">
-          Platform fee funds background checks, insurance, payment protection, and family visibility. See{" "}
-          <a href="/pricing" className="underline">pricing</a> for full breakdown.
+          Platform fee funds background checks, insurance, payment protection, and family
+          visibility. See{" "}
+          <a href="/pricing" className="underline">
+            pricing
+          </a>{" "}
+          for full breakdown.
         </p>
         {latest ? (
           <div className="mt-4 grid gap-2 text-sm sm:grid-cols-3">
@@ -93,7 +126,9 @@ function EarningsPage() {
       </section>
 
       <section>
-        <h2 className="mb-2 text-sm font-bold uppercase tracking-widest text-muted-foreground">Weekly history</h2>
+        <h2 className="mb-2 text-sm font-bold uppercase tracking-widest text-muted-foreground">
+          Weekly history
+        </h2>
         {e.history.length === 0 ? (
           <EmptyState
             icon={<Wallet className="size-6" />}
@@ -115,13 +150,23 @@ function EarningsPage() {
                 {e.history.map((p) => (
                   <tr key={p.week_start} className="border-t border-border">
                     <td className="px-3 py-2">
-                      {new Date(p.week_start).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                      {new Date(p.week_start).toLocaleDateString(undefined, {
+                        month: "short",
+                        day: "numeric",
+                      })}
                       {" – "}
-                      {new Date(p.week_end).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                      {new Date(p.week_end).toLocaleDateString(undefined, {
+                        month: "short",
+                        day: "numeric",
+                      })}
                     </td>
                     <td className="px-3 py-2 text-right tabular-nums">{fmtMoney(p.gross_cents)}</td>
-                    <td className="px-3 py-2 text-right tabular-nums text-muted-foreground">-{fmtMoney(p.fee_cents)}</td>
-                    <td className="px-3 py-2 text-right font-semibold tabular-nums">{fmtMoney(p.net_cents)}</td>
+                    <td className="px-3 py-2 text-right tabular-nums text-muted-foreground">
+                      -{fmtMoney(p.fee_cents)}
+                    </td>
+                    <td className="px-3 py-2 text-right font-semibold tabular-nums">
+                      {fmtMoney(p.net_cents)}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -136,15 +181,33 @@ function EarningsPage() {
           <p className="mt-1 text-sm text-muted-foreground">
             Payouts run every Monday to the bank account you have on file.
           </p>
-          <button className="mt-3 rounded-lg border border-input bg-background px-3 py-1.5 text-xs font-semibold hover:bg-secondary">
+          <button
+            type="button"
+            disabled={requestOpsAction.isPending}
+            onClick={() => requestOpsAction.mutate("Update bank / payout details")}
+            className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-input bg-background px-3 py-1.5 text-xs font-semibold hover:bg-secondary disabled:opacity-50"
+          >
+            {requestOpsAction.isPending ? <Loader2 className="size-3.5 animate-spin" /> : null}
             Update bank
           </button>
         </div>
         <div className="rounded-2xl border border-border bg-card p-5">
           <h3 className="font-serif text-lg">Tax documents</h3>
-          <p className="mt-1 text-sm text-muted-foreground">1099-NEC available in January for earnings over $600.</p>
-          <button className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-input bg-background px-3 py-1.5 text-xs font-semibold hover:bg-secondary">
-            <TrendingUp className="size-3.5" /> View W-9 / 1099
+          <p className="mt-1 text-sm text-muted-foreground">
+            1099-NEC available in January for earnings over $600.
+          </p>
+          <button
+            type="button"
+            disabled={requestOpsAction.isPending}
+            onClick={() => requestOpsAction.mutate("Send my W-9 / 1099 documents")}
+            className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-input bg-background px-3 py-1.5 text-xs font-semibold hover:bg-secondary disabled:opacity-50"
+          >
+            {requestOpsAction.isPending ? (
+              <Loader2 className="size-3.5 animate-spin" />
+            ) : (
+              <TrendingUp className="size-3.5" />
+            )}
+            View W-9 / 1099
           </button>
         </div>
       </section>

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -14,11 +14,16 @@ import {
   type FlagRow,
   type BroadcastRow,
 } from "@/lib/admin-ops.functions";
+import { checkIsAdmin } from "@/lib/admin.functions";
 import { PageSkeleton, EmptyState, ErrorState, RouteErrorBoundary } from "@/components/carematch";
 
 export const Route = createFileRoute("/_authenticated/admin/settings")({
   component: SettingsPage,
   errorComponent: RouteErrorBoundary,
+  beforeLoad: async () => {
+    const { isAdmin } = await checkIsAdmin();
+    if (!isAdmin) throw redirect({ to: "/admin" });
+  },
 });
 
 function fmt(iso: string | null | undefined) {

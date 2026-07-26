@@ -431,7 +431,7 @@ function ProviderOnboarding() {
               <ShieldCheck className="size-4 text-primary" /> Background & ID check
             </div>
             <p className="mt-1 text-muted-foreground">
-              We use Checkr to verify your identity and run a nationwide background check. Turnaround
+              We use Certn to verify your identity and run a nationwide background check. Turnaround
               is typically 24–72 hours. You can browse and select jobs while it's pending, but you
               can't accept them until it clears.
             </p>
@@ -452,7 +452,7 @@ function ProviderOnboarding() {
               onChange={(e) => setConsentBg(e.target.checked)}
             />
             <span>
-              I authorize CareMatch and Checkr to verify my identity and run a background check for
+              I authorize CareMatch and Certn to verify my identity and run a background check for
               caregiver placement. I understand a passing result is required to accept bookings.
             </span>
           </label>

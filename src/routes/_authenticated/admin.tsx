@@ -1,4 +1,14 @@
-import { createFileRoute, Link, Outlet, redirect, useNavigate, useRouterState } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  Outlet,
+  redirect,
+  useNavigate,
+  useRouterState,
+} from "@tanstack/react-router";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import {
   Heart,
   LogOut,
@@ -20,18 +30,20 @@ import {
 
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { checkIsAdmin } from "@/lib/admin.functions";
+import { getMyStaffRoles } from "@/lib/admin.functions";
 import { RouteErrorBoundary } from "@/components/carematch";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminLayout,
   errorComponent: RouteErrorBoundary,
   beforeLoad: async () => {
-    // Gate the whole admin subtree — a non-admin who guesses the URL is
-    // bounced before any admin data ever loads.
+    // Gate the whole admin subtree — a signed-in user with none of the
+    // staff-type roles is bounced before any admin data ever loads.
+    // Individual pages/server functions further restrict to their own
+    // narrower role set (e.g. Finance requires admin/finance/staff).
     try {
-      const { isAdmin } = await checkIsAdmin();
-      if (!isAdmin) throw redirect({ to: "/dashboard" });
+      const { roles } = await getMyStaffRoles();
+      if (roles.length === 0) throw redirect({ to: "/dashboard" });
     } catch (e) {
       if (e && typeof e === "object" && "to" in e) throw e;
       throw redirect({ to: "/dashboard" });
@@ -39,7 +51,27 @@ export const Route = createFileRoute("/_authenticated/admin")({
   },
 });
 
-const nav: { to: string; label: string; icon: typeof Inbox; exact?: boolean }[] = [
+type NavItem = { to: string; label: string; icon: typeof Inbox; exact?: boolean };
+
+// Which roles (beyond plain "admin", which always sees everything) may open
+// each nav item — mirrors the role sets each page's server functions enforce.
+const NAV_ROLES: Record<string, readonly string[]> = {
+  "/admin": [],
+  "/admin/users": [],
+  "/admin/support": ["support", "staff"],
+  "/admin/success": ["success", "support", "staff"],
+  "/admin/finance": ["finance", "staff"],
+  "/admin/seniors": [],
+  "/admin/providers": [],
+  "/admin/bookings": [],
+  "/admin/trust-safety": ["trust_safety", "staff"],
+  "/admin/credentials": ["trust_safety", "staff"],
+  "/admin/analytics": [],
+  "/admin/audit": [],
+  "/admin/settings": [],
+};
+
+const nav: NavItem[] = [
   { to: "/admin", label: "Queue", icon: Inbox, exact: true },
   { to: "/admin/users", label: "Users", icon: UserCog },
   { to: "/admin/support", label: "Support", icon: Inbox },
@@ -55,12 +87,56 @@ const nav: { to: string; label: string; icon: typeof Inbox; exact?: boolean }[] 
   { to: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
-
+const ROLE_LABELS: Record<string, string> = {
+  admin: "Admin",
+  staff: "Staff",
+  support: "Support",
+  success: "Success",
+  finance: "Finance",
+  trust_safety: "Trust & Safety",
+};
 
 function AdminLayout() {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const isActive = (to: string, exact?: boolean) => (exact ? pathname === to : pathname.startsWith(to));
+  const isActive = (to: string, exact?: boolean) =>
+    exact ? pathname === to : pathname.startsWith(to);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const fetchStaffRoles = useServerFn(getMyStaffRoles);
+  const rolesQ = useQuery({
+    queryKey: ["admin", "my-staff-roles"],
+    queryFn: () => fetchStaffRoles(),
+  });
+  const heldRoles = new Set(rolesQ.data?.roles ?? []);
+  const isAdmin = heldRoles.has("admin");
+
+  const profileQ = useQuery({
+    queryKey: ["profile", "me"],
+    queryFn: async () => {
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) return null;
+      const { data } = await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("id", u.user.id)
+        .maybeSingle();
+      return data;
+    },
+  });
+
+  const visibleNav = nav.filter((n) => {
+    if (isAdmin) return true;
+    const allowed = NAV_ROLES[n.to] ?? [];
+    return allowed.some((r) => heldRoles.has(r));
+  });
+  const primaryRoleLabel =
+    ROLE_LABELS[
+      ["admin", "staff", "support", "success", "finance", "trust_safety"].find((r) =>
+        heldRoles.has(r),
+      ) ?? ""
+    ] ?? "Staff";
+  const displayName = profileQ.data?.full_name ?? "…";
 
   const signOut = async () => {
     await supabase.auth.signOut();
@@ -79,13 +155,17 @@ function AdminLayout() {
             CareMatch
           </Link>
           <p className="mt-3 rounded-lg bg-card px-3 py-2 text-xs">
-            <span className="font-semibold uppercase tracking-widest text-muted-foreground">Console</span>
+            <span className="font-semibold uppercase tracking-widest text-muted-foreground">
+              Console
+            </span>
             <br />
-            <span className="text-sm">Concierge · Agent</span>
+            <span className="text-sm">
+              {displayName} · {primaryRoleLabel}
+            </span>
           </p>
 
           <nav className="mt-6 grid gap-1">
-            {nav.map((n) => {
+            {visibleNav.map((n) => {
               const active = isActive(n.to, n.exact);
               return (
                 <Link
@@ -116,26 +196,40 @@ function AdminLayout() {
       <div className="min-w-0">
         {/* Top bar */}
         <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border bg-background/95 px-4 py-3 backdrop-blur lg:px-6">
-          <div className="flex flex-1 items-center gap-2 rounded-lg border border-input bg-card px-3 py-2">
-            <Search className="size-4 text-muted-foreground" />
-            <input
-              placeholder="Search seniors, providers, bookings, IDs…"
-              className="w-full bg-transparent text-sm outline-none"
-            />
-            <kbd className="hidden rounded border border-input px-1.5 py-0.5 text-[10px] text-muted-foreground lg:inline">⌘K</kbd>
-          </div>
-          <button
-            aria-label="Alerts"
-            className="relative grid size-10 place-items-center rounded-lg hover:bg-secondary"
-          >
-            <Bell className="size-5" />
-            <span className="absolute right-2 top-2 size-2 rounded-full bg-destructive" />
-          </button>
+          {isAdmin ? (
+            <>
+              <form
+                className="flex flex-1 items-center gap-2 rounded-lg border border-input bg-card px-3 py-2"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const value = searchTerm.trim();
+                  if (value) navigate({ to: "/admin/users", search: { q: value } });
+                }}
+              >
+                <Search className="size-4 text-muted-foreground" />
+                <input
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search users by name, email, or city…"
+                  className="w-full bg-transparent text-sm outline-none"
+                />
+              </form>
+              <Link
+                to="/admin/audit"
+                aria-label="Recent activity"
+                className="grid size-10 place-items-center rounded-lg hover:bg-secondary"
+              >
+                <Bell className="size-5" />
+              </Link>
+            </>
+          ) : (
+            <div className="flex-1" />
+          )}
           <div className="flex items-center gap-2 rounded-lg border border-input bg-card px-3 py-2 text-sm">
             <UserCog className="size-4 text-muted-foreground" />
-            <span className="hidden font-medium sm:inline">Agent · Priya K.</span>
+            <span className="hidden font-medium sm:inline">{displayName}</span>
             <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-primary">
-              Tier 2
+              {primaryRoleLabel}
             </span>
           </div>
         </header>
@@ -146,7 +240,7 @@ function AdminLayout() {
           className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden"
         >
           <ul className="flex items-stretch justify-around overflow-x-auto">
-            {nav.map((n) => {
+            {visibleNav.map((n) => {
               const active = isActive(n.to, n.exact);
               return (
                 <li key={n.to} className="flex-1 min-w-0">

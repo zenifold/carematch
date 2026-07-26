@@ -16,6 +16,24 @@ async function assertAdmin(context: { supabase: any; userId: string }) {
   if (!data) throw new Error("Forbidden");
 }
 
+async function writeAudit(
+  context: { supabase: any; userId: string },
+  entry: {
+    action: string;
+    entity?: string | null;
+    entity_id?: string | null;
+    payload?: Record<string, unknown>;
+  },
+) {
+  await context.supabase.from("admin_audit_log").insert({
+    actor_id: context.userId,
+    action: entry.action,
+    entity: entry.entity ?? null,
+    entity_id: entry.entity_id ?? null,
+    payload: entry.payload ?? {},
+  });
+}
+
 export type AdminOverview = {
   queue: {
     requested: number;
@@ -52,26 +70,46 @@ export const getAdminOverview = createServerFn({ method: "GET" })
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
 
-    const [requestedC, confirmedC, inProgressC, seniorsC, providersC, activeProvidersC, bookings7dC, recent, verifPendingC, incidentsOpenC, ticketsOpenC] =
-      await Promise.all([
-        sb.from("bookings").select("id", { count: "exact", head: true }).eq("status", "requested"),
-        sb.from("bookings").select("id", { count: "exact", head: true }).eq("status", "confirmed"),
-        sb.from("bookings").select("id", { count: "exact", head: true }).eq("status", "in_progress"),
-        sb.from("user_roles").select("user_id", { count: "exact", head: true }).eq("role", "senior"),
-        sb.from("providers").select("id", { count: "exact", head: true }),
-        sb.from("providers").select("id", { count: "exact", head: true }).eq("is_active", true),
-        sb.from("bookings").select("id", { count: "exact", head: true }).gte("scheduled_at", weekAgo.toISOString()),
-        sb
-          .from("bookings")
-          .select(
-            "id, scheduled_at, service_type, status, senior:profiles!bookings_senior_id_fkey(full_name), provider:providers!inner(profile:profiles!inner(full_name))",
-          )
-          .order("scheduled_at", { ascending: false })
-          .limit(10),
-        sb.from("verifications").select("id", { count: "exact", head: true }).eq("status", "pending"),
-        sb.from("incidents").select("id", { count: "exact", head: true }).in("status", ["open", "triaged"]),
-        sb.from("support_tickets").select("id", { count: "exact", head: true }).in("status", ["open", "pending"]),
-      ]);
+    const [
+      requestedC,
+      confirmedC,
+      inProgressC,
+      seniorsC,
+      providersC,
+      activeProvidersC,
+      bookings7dC,
+      recent,
+      verifPendingC,
+      incidentsOpenC,
+      ticketsOpenC,
+    ] = await Promise.all([
+      sb.from("bookings").select("id", { count: "exact", head: true }).eq("status", "requested"),
+      sb.from("bookings").select("id", { count: "exact", head: true }).eq("status", "confirmed"),
+      sb.from("bookings").select("id", { count: "exact", head: true }).eq("status", "in_progress"),
+      sb.from("user_roles").select("user_id", { count: "exact", head: true }).eq("role", "senior"),
+      sb.from("providers").select("id", { count: "exact", head: true }),
+      sb.from("providers").select("id", { count: "exact", head: true }).eq("is_active", true),
+      sb
+        .from("bookings")
+        .select("id", { count: "exact", head: true })
+        .gte("scheduled_at", weekAgo.toISOString()),
+      sb
+        .from("bookings")
+        .select(
+          "id, scheduled_at, service_type, status, senior:profiles!bookings_senior_id_fkey(full_name), provider:providers!inner(profile:profiles!inner(full_name))",
+        )
+        .order("scheduled_at", { ascending: false })
+        .limit(10),
+      sb.from("verifications").select("id", { count: "exact", head: true }).eq("status", "pending"),
+      sb
+        .from("incidents")
+        .select("id", { count: "exact", head: true })
+        .in("status", ["open", "triaged"]),
+      sb
+        .from("support_tickets")
+        .select("id", { count: "exact", head: true })
+        .in("status", ["open", "pending"]),
+    ]);
 
     if (recent.error) throw recent.error;
 
@@ -128,7 +166,11 @@ export const listAdminSeniors = createServerFn({ method: "GET" })
 
     const [profilesR, familyR, bookingsR] = await Promise.all([
       sb.from("profiles").select("id, full_name, city, monthly_budget_cents").in("id", ids),
-      sb.from("family_links").select("senior_id, approved").in("senior_id", ids).eq("approved", true),
+      sb
+        .from("family_links")
+        .select("senior_id, approved")
+        .in("senior_id", ids)
+        .eq("approved", true),
       sb
         .from("bookings")
         .select("senior_id, scheduled_at")
@@ -200,6 +242,34 @@ export const listAdminProviders = createServerFn({ method: "GET" })
     });
   });
 
+const SetProviderActiveInput = z.object({
+  provider_id: z.string().uuid(),
+  is_active: z.boolean(),
+});
+
+/**
+ * Admin can deactivate a provider (e.g. trust & safety action) even if the
+ * provider themselves hasn't — providers can also toggle their own via the
+ * "providers manage own" RLS policy, this is the admin override path.
+ */
+export const adminSetProviderActive = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => SetProviderActiveInput.parse(input))
+  .handler(async ({ data, context }): Promise<{ ok: true }> => {
+    await assertAdmin(context);
+    const { error } = await context.supabase
+      .from("providers")
+      .update({ is_active: data.is_active })
+      .eq("id", data.provider_id);
+    if (error) throw error;
+    await writeAudit(context, {
+      action: data.is_active ? "provider.activate" : "provider.deactivate",
+      entity: "providers",
+      entity_id: data.provider_id,
+    });
+    return { ok: true };
+  });
+
 export type AdminBooking = {
   id: string;
   scheduled_at: string;
@@ -246,6 +316,47 @@ export const listAdminBookings = createServerFn({ method: "GET" })
     }));
   });
 
+const ReassignBookingInput = z.object({
+  booking_id: z.string().uuid(),
+  provider_id: z.string().uuid(),
+});
+
+/**
+ * Reassigns a stuck booking (provider hasn't responded, or asked out) to a
+ * different provider and resets it to 'requested' so the new provider gets
+ * a fresh chance to accept. Only sensible for requested/confirmed bookings —
+ * completed/cancelled/in_progress visits can't be reassigned.
+ */
+export const adminReassignBooking = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => ReassignBookingInput.parse(input))
+  .handler(async ({ data, context }): Promise<{ ok: true }> => {
+    await assertAdmin(context);
+    const { data: booking, error: fetchErr } = await context.supabase
+      .from("bookings")
+      .select("status, provider_id")
+      .eq("id", data.booking_id)
+      .maybeSingle();
+    if (fetchErr) throw fetchErr;
+    if (!booking) throw new Error("Booking not found");
+    if (!["requested", "confirmed"].includes(booking.status)) {
+      throw new Error("Only requested or confirmed bookings can be reassigned");
+    }
+
+    const { error } = await context.supabase
+      .from("bookings")
+      .update({ provider_id: data.provider_id, status: "requested" })
+      .eq("id", data.booking_id);
+    if (error) throw error;
+    await writeAudit(context, {
+      action: "booking.reassign",
+      entity: "bookings",
+      entity_id: data.booking_id,
+      payload: { from_provider_id: booking.provider_id, to_provider_id: data.provider_id },
+    });
+    return { ok: true };
+  });
+
 export type AdminAnalytics = {
   supply: {
     providers_total: number;
@@ -276,7 +387,6 @@ export type AdminAnalytics = {
   service_mix_30d: { service_type: string; count: number }[];
 };
 
-
 export const getAdminAnalytics = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<AdminAnalytics> => {
@@ -284,33 +394,71 @@ export const getAdminAnalytics = createServerFn({ method: "GET" })
     const sb = context.supabase;
 
     const now = new Date();
-    const d7 = new Date(now); d7.setDate(d7.getDate() - 7);
-    const d30 = new Date(now); d30.setDate(d30.getDate() - 30);
+    const d7 = new Date(now);
+    d7.setDate(d7.getDate() - 7);
+    const d30 = new Date(now);
+    d30.setDate(d30.getDate() - 30);
     const yearStart = new Date(now.getFullYear(), 0, 1);
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
-    const d14 = new Date(now); d14.setDate(d14.getDate() - 14);
+    const d14 = new Date(now);
+    d14.setDate(d14.getDate() - 14);
 
-    const [providersAll, providersActive, tierB, tierS, tierG, b7, b30, ytdRows, mtdRows, uniqueRows, vPending, vPassed, vFailed, incOpen, inc7, trendRows, mixRows] =
-      await Promise.all([
-        sb.from("providers").select("id", { count: "exact", head: true }),
-        sb.from("providers").select("id", { count: "exact", head: true }).eq("is_active", true),
-        sb.from("providers").select("id", { count: "exact", head: true }).eq("tier", "bronze"),
-        sb.from("providers").select("id", { count: "exact", head: true }).eq("tier", "silver"),
-        sb.from("providers").select("id", { count: "exact", head: true }).eq("tier", "gold"),
-        sb.from("bookings").select("id", { count: "exact", head: true }).gte("scheduled_at", d7.toISOString()),
-        sb.from("bookings").select("id", { count: "exact", head: true }).gte("scheduled_at", d30.toISOString()),
-        sb.from("bookings").select("hourly_rate_cents, duration_minutes, status, scheduled_at").gte("scheduled_at", yearStart.toISOString()),
-        sb.from("bookings").select("hourly_rate_cents, duration_minutes, status").gte("scheduled_at", monthStart.toISOString()),
-        sb.from("bookings").select("senior_id").gte("scheduled_at", d30.toISOString()),
-        sb.from("verifications").select("id", { count: "exact", head: true }).eq("status", "pending"),
-        sb.from("verifications").select("id", { count: "exact", head: true }).eq("status", "passed"),
-        sb.from("verifications").select("id", { count: "exact", head: true }).eq("status", "failed"),
-        sb.from("incidents").select("id", { count: "exact", head: true }).in("status", ["open", "triaged"]),
-        sb.from("incidents").select("id", { count: "exact", head: true }).gte("created_at", d7.toISOString()),
-        sb.from("bookings").select("scheduled_at").gte("scheduled_at", d14.toISOString()),
-        sb.from("bookings").select("service_type").gte("scheduled_at", d30.toISOString()),
-      ]);
+    const [
+      providersAll,
+      providersActive,
+      tierB,
+      tierS,
+      tierG,
+      b7,
+      b30,
+      ytdRows,
+      mtdRows,
+      uniqueRows,
+      vPending,
+      vPassed,
+      vFailed,
+      incOpen,
+      inc7,
+      trendRows,
+      mixRows,
+    ] = await Promise.all([
+      sb.from("providers").select("id", { count: "exact", head: true }),
+      sb.from("providers").select("id", { count: "exact", head: true }).eq("is_active", true),
+      sb.from("providers").select("id", { count: "exact", head: true }).eq("tier", "bronze"),
+      sb.from("providers").select("id", { count: "exact", head: true }).eq("tier", "silver"),
+      sb.from("providers").select("id", { count: "exact", head: true }).eq("tier", "gold"),
+      sb
+        .from("bookings")
+        .select("id", { count: "exact", head: true })
+        .gte("scheduled_at", d7.toISOString()),
+      sb
+        .from("bookings")
+        .select("id", { count: "exact", head: true })
+        .gte("scheduled_at", d30.toISOString()),
+      sb
+        .from("bookings")
+        .select("hourly_rate_cents, duration_minutes, status, scheduled_at")
+        .gte("scheduled_at", yearStart.toISOString()),
+      sb
+        .from("bookings")
+        .select("hourly_rate_cents, duration_minutes, status")
+        .gte("scheduled_at", monthStart.toISOString()),
+      sb.from("bookings").select("senior_id").gte("scheduled_at", d30.toISOString()),
+      sb.from("verifications").select("id", { count: "exact", head: true }).eq("status", "pending"),
+      sb.from("verifications").select("id", { count: "exact", head: true }).eq("status", "passed"),
+      sb.from("verifications").select("id", { count: "exact", head: true }).eq("status", "failed"),
+      sb
+        .from("incidents")
+        .select("id", { count: "exact", head: true })
+        .in("status", ["open", "triaged"]),
+      sb
+        .from("incidents")
+        .select("id", { count: "exact", head: true })
+        .gte("created_at", d7.toISOString()),
+      sb.from("bookings").select("scheduled_at").gte("scheduled_at", d14.toISOString()),
+      sb.from("bookings").select("service_type").gte("scheduled_at", d30.toISOString()),
+    ]);
 
     const gmv = (rows: any[] | null) =>
       (rows ?? [])
@@ -322,7 +470,8 @@ export const getAdminAnalytics = createServerFn({ method: "GET" })
     // 14-day trend
     const dayBuckets = new Map<string, number>();
     for (let i = 13; i >= 0; i--) {
-      const d = new Date(now); d.setDate(d.getDate() - i);
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
       dayBuckets.set(d.toISOString().slice(0, 10), 0);
     }
     for (const r of trendRows.data ?? []) {
@@ -372,7 +521,6 @@ export const getAdminAnalytics = createServerFn({ method: "GET" })
     };
   });
 
-
 /**
  * Cheap-and-dirty check that runs in the admin layout `beforeLoad` so a
  * non-admin who guesses the URL is redirected before any admin data is
@@ -387,4 +535,31 @@ export const checkIsAdmin = createServerFn({ method: "GET" })
     });
     if (error) throw error;
     return { isAdmin: !!data };
+  });
+
+/**
+ * Coarse gate for the whole /admin subtree. Individual pages/server functions
+ * (Support, Success, Finance, Credentials, Trust & Safety) each further
+ * restrict to their own narrower role set — this only decides whether the
+ * console is reachable at all, so any staff-type role should pass.
+ */
+const ALL_STAFF_ROLES = [
+  "admin",
+  "staff",
+  "support",
+  "finance",
+  "success",
+  "trust_safety",
+] as const;
+
+export const getMyStaffRoles = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<{ roles: string[] }> => {
+    const { data, error } = await context.supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", context.userId)
+      .in("role", ALL_STAFF_ROLES);
+    if (error) throw error;
+    return { roles: (data ?? []).map((r: { role: string }) => r.role) };
   });

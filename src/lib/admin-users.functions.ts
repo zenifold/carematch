@@ -4,7 +4,17 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
 
 type AppRole = Database["public"]["Enums"]["app_role"];
-const ALL_ROLES: AppRole[] = ["senior", "family", "provider", "admin", "staff", "support", "finance", "success"];
+const ALL_ROLES: AppRole[] = [
+  "senior",
+  "family",
+  "provider",
+  "admin",
+  "staff",
+  "support",
+  "finance",
+  "success",
+  "trust_safety",
+];
 
 async function assertAdmin(context: { supabase: any; userId: string }) {
   const { data, error } = await context.supabase.rpc("has_role", {
@@ -134,7 +144,17 @@ export const listAdminUsers = createServerFn({ method: "GET" })
 
 const AddRoleInput = z.object({
   user_id: z.string().uuid(),
-  role: z.enum(["senior", "family", "provider", "admin", "staff", "support", "finance", "success"]),
+  role: z.enum([
+    "senior",
+    "family",
+    "provider",
+    "admin",
+    "staff",
+    "support",
+    "finance",
+    "success",
+    "trust_safety",
+  ]),
 });
 
 export const addUserRole = createServerFn({ method: "POST" })

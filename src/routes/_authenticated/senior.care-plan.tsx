@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
   Clock,
@@ -13,15 +13,14 @@ import {
   Coffee,
   Ban,
   Info,
+  Plus,
+  Loader2,
 } from "lucide-react";
-import {
-  PageSkeleton,
-  EmptyState,
-  ErrorState,
-  RouteErrorBoundary,
-} from "@/components/carematch";
+import { toast } from "sonner";
+import { PageSkeleton, EmptyState, ErrorState, RouteErrorBoundary } from "@/components/carematch";
 import { listMyVisits } from "@/lib/bookings.functions";
 import { supabase } from "@/integrations/supabase/client";
+import { appendCareNote, parseCareNotes } from "@/lib/care-notes";
 
 export const Route = createFileRoute("/_authenticated/senior/care-plan")({
   component: SeniorCarePlan,
@@ -45,15 +44,18 @@ function fmtMoney(cents: number) {
 
 function SeniorCarePlan() {
   const fetchVisits = useServerFn(listMyVisits);
+  const qc = useQueryClient();
 
   const profileQ = useQuery({
-    queryKey: ["senior", "profile-basics"],
+    queryKey: ["senior", "care-plan-fields"],
     queryFn: async () => {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) return null;
       const { data } = await supabase
         .from("profiles")
-        .select("full_name, city")
+        .select(
+          "id, full_name, city, care_medical_notes, care_home_notes, care_no_go_notes, care_notes",
+        )
         .eq("id", u.user.id)
         .maybeSingle();
       return data;
@@ -100,8 +102,8 @@ function SeniorCarePlan() {
         </p>
         <h1 className="mt-1 font-serif text-3xl">My care plan</h1>
         <p className="mt-2 text-base text-muted-foreground">
-          What you want help with, how you like it done, and this week's visits.
-          Caregivers see this before every visit.
+          What you want help with, how you like it done, and this week's visits. Caregivers see this
+          before every visit.
         </p>
       </div>
 
@@ -130,23 +132,26 @@ function SeniorCarePlan() {
         </Section>
 
         <Section icon={<Pill className="size-5 text-primary" />} title="Medical">
-          <Placeholder>
-            Conditions, allergies, and medications you want caregivers to know
-            about. Add them here so every caregiver sees the same thing.
-          </Placeholder>
+          <EditableNote
+            userId={profileQ.data?.id}
+            column="care_medical_notes"
+            initial={profileQ.data?.care_medical_notes ?? ""}
+            placeholder="Conditions, allergies, and medications you want caregivers to know about."
+            onSaved={() => qc.invalidateQueries({ queryKey: ["senior", "care-plan-fields"] })}
+          />
         </Section>
 
         <Section icon={<Home className="size-5 text-primary" />} title="At home">
-          <Placeholder>
-            How to get in, pets, stairs, and anything about your home a
-            caregiver should know before they arrive.
-          </Placeholder>
+          <EditableNote
+            userId={profileQ.data?.id}
+            column="care_home_notes"
+            initial={profileQ.data?.care_home_notes ?? ""}
+            placeholder="How to get in, pets, stairs, and anything about your home a caregiver should know before they arrive."
+            onSaved={() => qc.invalidateQueries({ queryKey: ["senior", "care-plan-fields"] })}
+          />
         </Section>
 
-        <Section
-          icon={<Coffee className="size-5 text-primary" />}
-          title="How I like things"
-        >
+        <Section icon={<Coffee className="size-5 text-primary" />} title="How I like things">
           {services.length > 0 ? (
             <div>
               <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
@@ -164,30 +169,26 @@ function SeniorCarePlan() {
               </div>
             </div>
           ) : (
-            <Placeholder>
-              Routines, meals, TV shows, and comfort notes go here.
-            </Placeholder>
+            <Placeholder>Routines, meals, TV shows, and comfort notes go here.</Placeholder>
           )}
         </Section>
 
-        <Section
-          icon={<Ban className="size-5 text-destructive" />}
-          title="Please don't"
-        >
-          <Placeholder>
-            Hard limits. Anything a caregiver should never do or bring up.
-            Caregivers always see this.
-          </Placeholder>
+        <Section icon={<Ban className="size-5 text-destructive" />} title="Please don't">
+          <EditableNote
+            userId={profileQ.data?.id}
+            column="care_no_go_notes"
+            initial={profileQ.data?.care_no_go_notes ?? ""}
+            placeholder="Hard limits. Anything a caregiver should never do or bring up. Caregivers always see this."
+            onSaved={() => qc.invalidateQueries({ queryKey: ["senior", "care-plan-fields"] })}
+          />
         </Section>
 
-        <Section
-          icon={<Info className="size-5 text-primary" />}
-          title="Notes for family"
-        >
-          <Placeholder>
-            Things you want your family to see but not caregivers. Private to
-            you and anyone you've linked.
-          </Placeholder>
+        <Section icon={<Info className="size-5 text-primary" />} title="Notes for family">
+          <NotesLedger
+            userId={profileQ.data?.id}
+            raw={profileQ.data?.care_notes ?? null}
+            onSaved={() => qc.invalidateQueries({ queryKey: ["senior", "care-plan-fields"] })}
+          />
         </Section>
       </div>
 
@@ -196,8 +197,7 @@ function SeniorCarePlan() {
           <div>
             <h2 className="font-serif text-2xl">This week</h2>
             <p className="text-sm text-muted-foreground">
-              {week.length} visit{week.length === 1 ? "" : "s"} planned ·{" "}
-              {fmtMoney(totalCents)}
+              {week.length} visit{week.length === 1 ? "" : "s"} planned · {fmtMoney(totalCents)}
             </p>
           </div>
           <Link
@@ -221,10 +221,7 @@ function SeniorCarePlan() {
               const at = new Date(v.scheduled_at);
               const pay = Math.round((v.hourly_rate_cents * v.duration_minutes) / 60);
               return (
-                <li
-                  key={v.id}
-                  className="grid grid-cols-[64px_1fr_auto] items-center gap-4 p-5"
-                >
+                <li key={v.id} className="grid grid-cols-[64px_1fr_auto] items-center gap-4 p-5">
                   <div className="text-center">
                     <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
                       {at.toLocaleDateString(undefined, { weekday: "short" })}
@@ -292,5 +289,177 @@ function Placeholder({ children }: { children: React.ReactNode }) {
     <p className="rounded-xl border border-dashed border-border/60 bg-secondary/30 p-3 text-sm text-muted-foreground">
       {children}
     </p>
+  );
+}
+
+const CARE_PLAN_COLUMNS = ["care_medical_notes", "care_home_notes", "care_no_go_notes"] as const;
+type CarePlanColumn = (typeof CARE_PLAN_COLUMNS)[number];
+
+function EditableNote({
+  userId,
+  column,
+  initial,
+  placeholder,
+  onSaved,
+}: {
+  userId: string | undefined;
+  column: CarePlanColumn;
+  initial: string;
+  placeholder: string;
+  onSaved: () => void;
+}) {
+  const [value, setValue] = useState(initial);
+  const [saving, setSaving] = useState(false);
+  const savedRef = useRef(initial);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    savedRef.current = initial;
+    setValue(initial);
+  }, [initial]);
+
+  const schedule = (next: string) => {
+    setValue(next);
+    if (timer.current) clearTimeout(timer.current);
+    if (!userId) return;
+    timer.current = setTimeout(async () => {
+      if (savedRef.current === next) return;
+      setSaving(true);
+      const value = next.trim() || null;
+      const { error } =
+        column === "care_medical_notes"
+          ? await supabase.from("profiles").update({ care_medical_notes: value }).eq("id", userId)
+          : column === "care_home_notes"
+            ? await supabase.from("profiles").update({ care_home_notes: value }).eq("id", userId)
+            : await supabase.from("profiles").update({ care_no_go_notes: value }).eq("id", userId);
+      setSaving(false);
+      if (error) {
+        toast.error("Couldn't save — try again.");
+        return;
+      }
+      savedRef.current = next;
+      onSaved();
+    }, 700);
+  };
+
+  useEffect(() => {
+    const t = timer.current;
+    return () => {
+      if (t) clearTimeout(t);
+    };
+  }, []);
+
+  return (
+    <div className="space-y-1.5">
+      <textarea
+        value={value}
+        onChange={(e) => schedule(e.target.value)}
+        placeholder={placeholder}
+        rows={3}
+        maxLength={2000}
+        className="w-full rounded-xl border border-input bg-background p-3 text-sm"
+      />
+      {saving && (
+        <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Loader2 className="size-3 animate-spin" /> Saving…
+        </p>
+      )}
+    </div>
+  );
+}
+
+function NotesLedger({
+  userId,
+  raw,
+  onSaved,
+}: {
+  userId: string | undefined;
+  raw: string | null;
+  onSaved: () => void;
+}) {
+  const entries = useMemo(() => parseCareNotes(raw), [raw]);
+  const [adding, setAdding] = useState(false);
+  const [draft, setDraft] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const submit = async () => {
+    if (!userId || !draft.trim()) return;
+    setBusy(true);
+    const next = appendCareNote(raw, draft);
+    const { error } = await supabase.from("profiles").update({ care_notes: next }).eq("id", userId);
+    setBusy(false);
+    if (error) {
+      toast.error("Couldn't save note — try again.");
+      return;
+    }
+    setDraft("");
+    setAdding(false);
+    onSaved();
+  };
+
+  return (
+    <div className="space-y-3">
+      {entries.length === 0 ? (
+        <Placeholder>
+          Things you want your family to see but not caregivers. Private to you and anyone you've
+          linked.
+        </Placeholder>
+      ) : (
+        <ul className="space-y-2">
+          {entries.map((e, i) => (
+            <li key={i} className="rounded-xl border border-border/60 bg-secondary/30 p-3">
+              {e.date && (
+                <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+                  {e.date}
+                </p>
+              )}
+              <p className="mt-0.5 whitespace-pre-wrap">{e.text}</p>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {adding ? (
+        <div className="space-y-2">
+          <textarea
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            rows={2}
+            maxLength={1000}
+            placeholder="e.g. Grandkids visiting Saturday, might want extra tidy-up."
+            className="w-full rounded-xl border border-input bg-background p-3 text-sm"
+          />
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={submit}
+              disabled={busy || !draft.trim()}
+              className="inline-flex min-h-9 items-center gap-1.5 rounded-full bg-primary px-4 text-xs font-semibold text-primary-foreground disabled:opacity-50"
+            >
+              {busy ? <Loader2 className="size-3.5 animate-spin" /> : null}
+              Add note
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setAdding(false);
+                setDraft("");
+              }}
+              className="inline-flex min-h-9 items-center rounded-full border border-input px-4 text-xs font-semibold hover:bg-secondary"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setAdding(true)}
+          className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-input px-4 text-xs font-semibold hover:bg-secondary"
+        >
+          <Plus className="size-3.5" /> Add a note
+        </button>
+      )}
+    </div>
   );
 }

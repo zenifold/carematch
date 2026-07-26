@@ -2,7 +2,16 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Download, HandHeart, Sliders, UserPlus, Wallet } from "lucide-react";
+import {
+  CheckCircle2,
+  Download,
+  HandHeart,
+  Loader2,
+  Sliders,
+  UserPlus,
+  Wallet,
+} from "lucide-react";
+import { toast } from "sonner";
 import {
   PageSkeleton,
   EmptyState,
@@ -17,6 +26,9 @@ import {
   getSeniorEditPermission,
   listMyLinkedSeniors,
   listVisitsForSenior,
+  markVisitPaid,
+  markVisitUnpaid,
+  updateSeniorBudget,
 } from "@/lib/family.functions";
 import type { VisitRow } from "@/lib/bookings.functions";
 import { BudgetBar } from "@/components/carematch/BudgetBar";
@@ -99,7 +111,13 @@ function FamilyBudget() {
 
   if (linksQ.isPending) return <PageSkeleton title="budget" cards={3} />;
   if (linksQ.isError)
-    return <ErrorState title="We couldn't load your budget" error={linksQ.error} onRetry={() => linksQ.refetch()} />;
+    return (
+      <ErrorState
+        title="We couldn't load your budget"
+        error={linksQ.error}
+        onRetry={() => linksQ.refetch()}
+      />
+    );
 
   if (!primary) {
     return (
@@ -133,14 +151,19 @@ function FamilyBudget() {
     return (
       <div className="space-y-6">
         <Header />
-        <ErrorState title="We couldn't load the budget" error={budgetQ.error} onRetry={() => budgetQ.refetch()} />
+        <ErrorState
+          title="We couldn't load the budget"
+          error={budgetQ.error}
+          onRetry={() => budgetQ.refetch()}
+        />
       </div>
     );
 
   const b = budgetQ.data!;
   const max = Math.max(1, ...b.by_month.map((m) => m.cents));
   const budget = b.monthly_budget_cents ?? 0;
-  const utilization = budget > 0 ? Math.min(100, Math.round((b.month_to_date_cents / budget) * 100)) : null;
+  const utilization =
+    budget > 0 ? Math.min(100, Math.round((b.month_to_date_cents / budget) * 100)) : null;
   const noData = b.by_month.every((m) => m.cents === 0) && b.by_provider.length === 0;
 
   const delta = b.month_to_date_cents - b.last_month_cents;
@@ -160,26 +183,31 @@ function FamilyBudget() {
       {budget > 0 && (
         <section className="surface-card p-5 lg:p-6">
           <BudgetBar spent={b.month_to_date_cents} budget={budget} label="This month" />
-          {deltaLabel && (
-            <p className="mt-3 text-sm text-muted-foreground">{deltaLabel}</p>
-          )}
+          {deltaLabel && <p className="mt-3 text-sm text-muted-foreground">{deltaLabel}</p>}
           <div className="mt-4">
             {canEdit ? (
-              <Link
-                to="/family/settings"
-                className="inline-flex min-h-10 items-center gap-2 rounded-full border border-border px-4 text-sm font-semibold hover:bg-secondary"
-              >
-                <Sliders className="size-4" /> Adjust monthly plan
-              </Link>
+              <BudgetDirectEditor
+                seniorId={primary.senior_id}
+                currentCents={budget}
+                onSaved={() => budgetQ.refetch()}
+              />
             ) : (
-              <BudgetRequestTrigger seniorId={primary.senior_id} seniorName={primary.full_name} currentCents={budget} />
+              <BudgetRequestTrigger
+                seniorId={primary.senior_id}
+                seniorName={primary.full_name}
+                currentCents={budget}
+              />
             )}
           </div>
         </section>
       )}
 
       <section className="grid gap-3 sm:grid-cols-3">
-        <Kpi label="Month to date" value={fmtMoney(b.month_to_date_cents)} hint={deltaLabel ?? undefined} />
+        <Kpi
+          label="Month to date"
+          value={fmtMoney(b.month_to_date_cents)}
+          hint={deltaLabel ?? undefined}
+        />
         <Kpi label="Last month" value={fmtMoney(b.last_month_cents)} />
         <Kpi
           label="Monthly budget"
@@ -242,7 +270,9 @@ function FamilyBudget() {
                       <tr key={p.provider_id}>
                         <td className="px-5 py-3 font-medium">{p.provider_name ?? "Caregiver"}</td>
                         <td className="px-5 py-3 tabular-nums">{p.hours.toFixed(1)}h</td>
-                        <td className="px-5 py-3 text-right font-semibold tabular-nums">{fmtMoney(p.cents)}</td>
+                        <td className="px-5 py-3 text-right font-semibold tabular-nums">
+                          {fmtMoney(p.cents)}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -253,84 +283,11 @@ function FamilyBudget() {
         </>
       )}
 
-      {(() => {
-        const completed = (visitsQ.data ?? []).filter((v) => v.status === "completed");
-        if (completed.length === 0) return null;
-        const byWeek = new Map<string, VisitRow[]>();
-        for (const v of completed) {
-          const k = weekKey(v.scheduled_at);
-          const arr = byWeek.get(k) ?? [];
-          arr.push(v);
-          byWeek.set(k, arr);
-        }
-        const weeks = Array.from(byWeek.entries())
-          .sort((a, b) => (a[0] < b[0] ? 1 : -1))
-          .slice(0, 5);
-        const seniorName = primary.full_name ?? "Senior";
-        return (
-          <section className="surface-card overflow-hidden">
-            <div className="border-b border-border p-5">
-              <h2 className="font-serif text-2xl">Transactions</h2>
-              <p className="text-sm text-muted-foreground">Grouped by week · last 5 weeks</p>
-            </div>
-            <ul className="divide-y divide-border">
-              {weeks.map(([key, items]) => {
-                const total = items.reduce(
-                  (s, v) => s + (v.hourly_rate_cents * v.duration_minutes) / 60,
-                  0,
-                );
-                return (
-                  <li key={key} className="p-5">
-                    <div className="flex items-baseline justify-between">
-                      <p className="font-semibold">{weekLabel(key)}</p>
-                      <p className="font-serif text-lg tabular-nums">{fmtMoney(total)}</p>
-                    </div>
-                    <ul className="mt-3 space-y-2">
-                      {items.map((v) => {
-                        const cents = (v.hourly_rate_cents * v.duration_minutes) / 60;
-                        return (
-                          <li
-                            key={v.id}
-                            className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-secondary/30 p-3"
-                          >
-                            <div className="min-w-0">
-                              <p className="text-sm font-medium">
-                                {v.provider_name ?? "Caregiver"} · {v.service_type}
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                {new Date(v.scheduled_at).toLocaleDateString(undefined, {
-                                  weekday: "short",
-                                  month: "short",
-                                  day: "numeric",
-                                })}{" "}
-                                · {(v.duration_minutes / 60).toFixed(1)}h
-                              </p>
-                            </div>
-                            <div className="flex items-center gap-3">
-                              <span className="text-sm font-semibold tabular-nums">
-                                {fmtMoney(cents)}
-                              </span>
-                              <button
-                                type="button"
-                                onClick={() => downloadReceipt(v, seniorName)}
-                                className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-xs font-semibold hover:bg-card"
-                              >
-                                <Download className="size-3.5" /> Receipt
-                              </button>
-                            </div>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </li>
-                );
-              })}
-            </ul>
-          </section>
-        );
-      })()}
-
-
+      <Statement
+        visits={visitsQ.data ?? []}
+        seniorName={primary.full_name ?? "Senior"}
+        onChanged={() => visitsQ.refetch()}
+      />
 
       <section className="surface-card p-5 lg:p-6">
         <div className="flex items-start gap-3">
@@ -390,7 +347,9 @@ function BudgetRequestTrigger({
           <div className="space-y-2">
             <div className="flex items-center justify-between text-muted-foreground">
               <span>Current</span>
-              <span className="font-semibold text-foreground">${(currentCents / 100).toLocaleString()}/mo</span>
+              <span className="font-semibold text-foreground">
+                ${(currentCents / 100).toLocaleString()}/mo
+              </span>
             </div>
             <label className="block">
               Proposed
@@ -421,5 +380,249 @@ function Kpi({ label, value, hint }: { label: string; value: string; hint?: stri
       <p className="mt-1 font-serif text-2xl">{value}</p>
       {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
     </div>
+  );
+}
+
+function BudgetDirectEditor({
+  seniorId,
+  currentCents,
+  onSaved,
+}: {
+  seniorId: string;
+  currentCents: number;
+  onSaved: () => void;
+}) {
+  const saveBudget = useServerFn(updateSeniorBudget);
+  const [editing, setEditing] = useState(false);
+  const [dollars, setDollars] = useState(Math.round(currentCents / 100));
+  const [busy, setBusy] = useState(false);
+
+  if (!editing) {
+    return (
+      <button
+        type="button"
+        onClick={() => {
+          setDollars(Math.round(currentCents / 100));
+          setEditing(true);
+        }}
+        className="inline-flex min-h-10 items-center gap-2 rounded-full border border-border px-4 text-sm font-semibold hover:bg-secondary"
+      >
+        <Sliders className="size-4" /> Adjust monthly plan
+      </button>
+    );
+  }
+
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <span className="text-muted-foreground">$</span>
+      <input
+        type="number"
+        min={0}
+        step={50}
+        value={dollars}
+        onChange={(e) => setDollars(Number(e.target.value) || 0)}
+        className="w-32 rounded-xl border border-input bg-background p-2 text-sm"
+      />
+      <span className="text-sm text-muted-foreground">/ month</span>
+      <button
+        type="button"
+        disabled={busy}
+        onClick={async () => {
+          setBusy(true);
+          try {
+            await saveBudget({
+              data: {
+                senior_id: seniorId,
+                monthly_budget_cents: Math.max(0, Math.round(dollars * 100)),
+              },
+            });
+            toast.success("Monthly plan updated");
+            setEditing(false);
+            onSaved();
+          } catch (err) {
+            toast.error(err instanceof Error ? err.message : "Couldn't save");
+          } finally {
+            setBusy(false);
+          }
+        }}
+        className="inline-flex min-h-9 items-center gap-1.5 rounded-full bg-primary px-4 text-xs font-semibold text-primary-foreground disabled:opacity-50"
+      >
+        {busy ? <Loader2 className="size-3.5 animate-spin" /> : null}
+        Save
+      </button>
+      <button
+        type="button"
+        onClick={() => setEditing(false)}
+        className="inline-flex min-h-9 items-center rounded-full border border-input px-4 text-xs font-semibold hover:bg-secondary"
+      >
+        Cancel
+      </button>
+    </div>
+  );
+}
+
+function downloadStatementCsv(visits: VisitRow[], seniorName: string) {
+  const header = ["Date", "Caregiver", "Service", "Hours", "Amount", "Status"];
+  const rows = visits.map((v) => {
+    const cents = Math.round((v.hourly_rate_cents * v.duration_minutes) / 60);
+    return [
+      new Date(v.scheduled_at).toLocaleDateString(),
+      v.provider_name ?? "Caregiver",
+      v.service_type,
+      (v.duration_minutes / 60).toFixed(2),
+      (cents / 100).toFixed(2),
+      v.payment_status,
+    ];
+  });
+  const csv = [header, ...rows]
+    .map((r) => r.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
+    .join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${seniorName.replace(/\s+/g, "-").toLowerCase()}-statement.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function Statement({
+  visits,
+  seniorName,
+  onChanged,
+}: {
+  visits: VisitRow[];
+  seniorName: string;
+  onChanged: () => void;
+}) {
+  const fetchMarkPaid = useServerFn(markVisitPaid);
+  const fetchMarkUnpaid = useServerFn(markVisitUnpaid);
+  const [busyId, setBusyId] = useState<string | null>(null);
+
+  const completed = visits.filter((v) => v.status === "completed");
+  if (completed.length === 0) return null;
+
+  const balanceDueCents = completed
+    .filter((v) => v.payment_status !== "paid")
+    .reduce((s, v) => s + Math.round((v.hourly_rate_cents * v.duration_minutes) / 60), 0);
+
+  const byWeek = new Map<string, VisitRow[]>();
+  for (const v of completed) {
+    const k = weekKey(v.scheduled_at);
+    const arr = byWeek.get(k) ?? [];
+    arr.push(v);
+    byWeek.set(k, arr);
+  }
+  const weeks = Array.from(byWeek.entries())
+    .sort((a, b) => (a[0] < b[0] ? 1 : -1))
+    .slice(0, 5);
+
+  const toggle = async (v: VisitRow) => {
+    setBusyId(v.id);
+    try {
+      if (v.payment_status === "paid") {
+        await fetchMarkUnpaid({ data: { booking_id: v.id } });
+      } else {
+        await fetchMarkPaid({ data: { booking_id: v.id } });
+      }
+      onChanged();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Couldn't update payment status");
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  return (
+    <section className="surface-card overflow-hidden">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border p-5">
+        <div>
+          <h2 className="font-serif text-2xl">Statement</h2>
+          <p className="text-sm text-muted-foreground">
+            Balance due{" "}
+            <span className="font-semibold text-foreground">{fmtMoney(balanceDueCents)}</span> · no
+            card on file, no autopay — mark visits paid once you've settled up outside the app.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => downloadStatementCsv(completed, seniorName)}
+          className="inline-flex min-h-10 items-center gap-2 rounded-full border border-border px-4 text-sm font-semibold hover:bg-secondary"
+        >
+          <Download className="size-4" /> Export statement
+        </button>
+      </div>
+      <ul className="divide-y divide-border">
+        {weeks.map(([key, items]) => {
+          const total = items.reduce(
+            (s, v) => s + (v.hourly_rate_cents * v.duration_minutes) / 60,
+            0,
+          );
+          return (
+            <li key={key} className="p-5">
+              <div className="flex items-baseline justify-between">
+                <p className="font-semibold">{weekLabel(key)}</p>
+                <p className="font-serif text-lg tabular-nums">{fmtMoney(total)}</p>
+              </div>
+              <ul className="mt-3 space-y-2">
+                {items.map((v) => {
+                  const cents = (v.hourly_rate_cents * v.duration_minutes) / 60;
+                  const paid = v.payment_status === "paid";
+                  return (
+                    <li
+                      key={v.id}
+                      className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-secondary/30 p-3"
+                    >
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium">
+                          {v.provider_name ?? "Caregiver"} · {v.service_type}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(v.scheduled_at).toLocaleDateString(undefined, {
+                            weekday: "short",
+                            month: "short",
+                            day: "numeric",
+                          })}{" "}
+                          · {(v.duration_minutes / 60).toFixed(1)}h
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-semibold tabular-nums">
+                          {fmtMoney(cents)}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => downloadReceipt(v, seniorName)}
+                          className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-xs font-semibold hover:bg-card"
+                        >
+                          <Download className="size-3.5" /> Receipt
+                        </button>
+                        <button
+                          type="button"
+                          disabled={busyId === v.id}
+                          onClick={() => toggle(v)}
+                          className={`inline-flex items-center gap-1 rounded-full border px-3 py-1.5 text-xs font-semibold disabled:opacity-50 ${
+                            paid
+                              ? "border-emerald-300/60 bg-emerald-50 text-emerald-800"
+                              : "border-border hover:bg-card"
+                          }`}
+                        >
+                          {busyId === v.id ? (
+                            <Loader2 className="size-3.5 animate-spin" />
+                          ) : (
+                            <CheckCircle2 className="size-3.5" />
+                          )}
+                          {paid ? "Paid" : "Mark paid"}
+                        </button>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
   );
 }

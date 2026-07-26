@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { sendTemplateEmail } from "@/lib/email-templates/send-email";
 
 /**
  * Provider re-engagement drip runner.
@@ -35,16 +36,8 @@ async function trySendEmail(
   templateData: Record<string, unknown>,
   idempotencyKey: string,
 ): Promise<{ sent: boolean; reason?: string }> {
-  // Lazy-import so this route builds cleanly before the email domain / helper exists.
   try {
-    // Dynamic path so TS doesn't require the module to exist before the email helper is scaffolded.
-    const modPath = "@/lib/email-templates/send-email";
-    const mod: any = await import(/* @vite-ignore */ modPath).catch(() => null);
-    if (!mod?.sendTemplateEmail) return { sent: false, reason: "email_not_scaffolded" };
-    const result = await mod.sendTemplateEmail(templateCode, to, {
-      templateData,
-      idempotencyKey,
-    });
+    const result = await sendTemplateEmail(templateCode, to, { templateData, idempotencyKey });
     return { sent: !!result?.sent, reason: result?.reason };
   } catch (err) {
     console.error(`[provider-reengagement] send failed for ${templateCode}:`, err);
@@ -111,7 +104,7 @@ export const Route = createFileRoute("/api/public/hooks/provider-reengagement")(
 
             let sendOutcome: { sent: boolean; reason?: string } = {
               sent: false,
-              reason: "email_not_scaffolded",
+              reason: "no_provider_configured",
             };
             if (email) {
               sendOutcome = await trySendEmail(
@@ -124,7 +117,7 @@ export const Route = createFileRoute("/api/public/hooks/provider-reengagement")(
 
             if (sendOutcome.sent) results.sent += 1;
             else if (sendOutcome.reason === "recipient_suppressed") results.suppressed += 1;
-            else if (sendOutcome.reason === "email_not_scaffolded") results.would_send += 1;
+            else if (sendOutcome.reason === "no_provider_configured") results.would_send += 1;
             else results.failed += 1;
 
             // Advance the stage regardless of send outcome so we don't loop.

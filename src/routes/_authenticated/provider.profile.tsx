@@ -31,7 +31,6 @@ export const Route = createFileRoute("/_authenticated/provider/profile")({
   errorComponent: RouteErrorBoundary,
 });
 
-
 const VERIFICATION_LABELS: Record<string, string> = {
   id_check: "Identity (Government ID)",
   background_check: "Background check",
@@ -54,14 +53,52 @@ function ProfilePage() {
   const { data: provider, refetch } = useQuery({
     queryKey: ["provider", userId],
     enabled: !!userId,
-    queryFn: async () => (await supabase.from("providers").select("*").eq("id", userId!).maybeSingle()).data,
+    queryFn: async () =>
+      (await supabase.from("providers").select("*").eq("id", userId!).maybeSingle()).data,
   });
 
   useEffect(() => {
     if (userId && provider === null) {
-      supabase.from("providers").upsert({ id: userId }).then(() => refetch());
+      supabase
+        .from("providers")
+        .upsert({ id: userId })
+        .then(() => refetch());
     }
   }, [userId, provider, refetch]);
+
+  const { data: availability, refetch: refetchAvailability } = useQuery({
+    queryKey: ["provider", "availability", userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("provider_availability")
+        .select("weekday, active")
+        .eq("provider_id", userId!);
+      return data ?? [];
+    },
+  });
+  const [savingWeekday, setSavingWeekday] = useState<number | null>(null);
+  const toggleAvailability = async (weekday: number) => {
+    if (!userId) return;
+    const current = availability?.find((a) => a.weekday === weekday);
+    setSavingWeekday(weekday);
+    const { error } = await supabase.from("provider_availability").upsert(
+      {
+        provider_id: userId,
+        weekday,
+        active: !(current?.active ?? false),
+        start_time: "08:00",
+        end_time: "20:00",
+      },
+      { onConflict: "provider_id,weekday" },
+    );
+    setSavingWeekday(null);
+    if (error) {
+      toast.error("Couldn't update availability");
+      return;
+    }
+    refetchAvailability();
+  };
 
   const [headline, setHeadline] = useState("");
   const [bio, setBio] = useState("");
@@ -104,9 +141,7 @@ function ProfilePage() {
   const toggleCapability = async (code: string) => {
     if (!fullQ.data) return;
     setSavingCaps(true);
-    const current = new Set(
-      fullQ.data.capabilities.filter((c) => c.opted_in).map((c) => c.code),
-    );
+    const current = new Set(fullQ.data.capabilities.filter((c) => c.opted_in).map((c) => c.code));
     if (current.has(code)) current.delete(code);
     else current.add(code);
     try {
@@ -165,7 +200,6 @@ function ProfilePage() {
   const tier = (provider?.tier ?? "bronze") as string;
   const serviceTier = fullQ.data?.provider.service_tier ?? 0;
 
-
   const saveProfile = async () => {
     if (!userId) return;
     const { error } = await supabase.from("providers").upsert({
@@ -201,19 +235,26 @@ function ProfilePage() {
           <p className="mt-4 text-sm text-muted-foreground">Loading verifications…</p>
         ) : (verifsQ.data ?? []).length === 0 ? (
           <p className="mt-4 rounded-lg border border-dashed border-border p-4 text-sm text-muted-foreground">
-            You have no verifications on file yet. Start with an ID check and background check to activate your listing.
+            You have no verifications on file yet. Start with an ID check and background check to
+            activate your listing.
           </p>
         ) : (
           <ul className="mt-4 space-y-2">
             {(verifsQ.data ?? []).map((v) => {
               const label = VERIFICATION_LABELS[v.kind] ?? v.kind;
               const expiring =
-                v.status === "passed" && v.expires_on && daysUntil(v.expires_on) <= 30 && daysUntil(v.expires_on) > 0;
+                v.status === "passed" &&
+                v.expires_on &&
+                daysUntil(v.expires_on) <= 30 &&
+                daysUntil(v.expires_on) > 0;
               const state: "passed" | "expiring" | "failed" | "expired" | "pending" = expiring
                 ? "expiring"
                 : (v.status as "passed" | "failed" | "expired" | "pending");
               return (
-                <li key={v.id} className="flex items-center justify-between rounded-lg border border-border p-3 text-sm">
+                <li
+                  key={v.id}
+                  className="flex items-center justify-between rounded-lg border border-border p-3 text-sm"
+                >
                   <div className="flex items-center gap-2">
                     {state === "passed" ? (
                       <CheckCircle2 className="size-4 text-emerald-600" />
@@ -231,17 +272,17 @@ function ProfilePage() {
                       state === "passed"
                         ? "text-emerald-700"
                         : state === "expiring"
-                        ? "text-amber-700"
-                        : state === "failed" || state === "expired"
-                        ? "text-destructive"
-                        : "text-muted-foreground"
+                          ? "text-amber-700"
+                          : state === "failed" || state === "expired"
+                            ? "text-destructive"
+                            : "text-muted-foreground"
                     }`}
                   >
                     {state === "expiring"
                       ? `Renew by ${new Date(v.expires_on!).toLocaleDateString()}`
                       : v.verified_on
-                      ? new Date(v.verified_on).toLocaleDateString()
-                      : v.status}
+                        ? new Date(v.verified_on).toLocaleDateString()
+                        : v.status}
                   </span>
                 </li>
               );
@@ -282,7 +323,9 @@ function ProfilePage() {
               value={rate}
               onChange={(e) => setRate(Number(e.target.value))}
             />
-            <p className="mt-1 text-xs text-muted-foreground">Local band: $22–$36/hr for companionship</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Local band: $22–$36/hr for companionship
+            </p>
           </div>
           <div>
             <Label htmlFor="area">Service area</Label>
@@ -392,7 +435,9 @@ function ProfilePage() {
                     </div>
                     <span className="text-xs text-muted-foreground">
                       {c.status}
-                      {c.expires_on ? ` · expires ${new Date(c.expires_on).toLocaleDateString()}` : ""}
+                      {c.expires_on
+                        ? ` · expires ${new Date(c.expires_on).toLocaleDateString()}`
+                        : ""}
                     </span>
                   </li>
                 ))}
@@ -403,22 +448,33 @@ function ProfilePage() {
                 Add a credential you already hold
               </p>
               <div className="flex flex-wrap gap-2">
-                {["pca", "hha", "cna", "cpr", "first_aid", "tb_test", "phlebotomy", "med_tech", "lpn", "rn", "driver_license", "auto_insurance"].map(
-                  (k) => {
-                    const already = fullQ.data.credentials.some((c) => c.kind === k);
-                    return (
-                      <button
-                        key={k}
-                        disabled={already || addingCred === k}
-                        onClick={() => addCredential(k)}
-                        className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-3 py-1 text-xs font-semibold hover:border-primary/40 disabled:opacity-50"
-                      >
-                        <Plus className="size-3" /> {k.replace(/_/g, " ")}
-                        {already ? " ✓" : ""}
-                      </button>
-                    );
-                  },
-                )}
+                {[
+                  "pca",
+                  "hha",
+                  "cna",
+                  "cpr",
+                  "first_aid",
+                  "tb_test",
+                  "phlebotomy",
+                  "med_tech",
+                  "lpn",
+                  "rn",
+                  "driver_license",
+                  "auto_insurance",
+                ].map((k) => {
+                  const already = fullQ.data.credentials.some((c) => c.kind === k);
+                  return (
+                    <button
+                      key={k}
+                      disabled={already || addingCred === k}
+                      onClick={() => addCredential(k)}
+                      className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-3 py-1 text-xs font-semibold hover:border-primary/40 disabled:opacity-50"
+                    >
+                      <Plus className="size-3" /> {k.replace(/_/g, " ")}
+                      {already ? " ✓" : ""}
+                    </button>
+                  );
+                })}
               </div>
               <p className="mt-2 text-xs text-muted-foreground">
                 Adds a pending row for staff review. Upload the document below for faster approval.
@@ -429,20 +485,40 @@ function ProfilePage() {
               <p className="mb-3 text-sm font-semibold">Upload credential document</p>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div>
-                  <Label htmlFor="uk" className="text-xs">Type</Label>
+                  <Label htmlFor="uk" className="text-xs">
+                    Type
+                  </Label>
                   <select
                     id="uk"
                     value={uploadKind}
                     onChange={(e) => setUploadKind(e.target.value)}
                     className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
                   >
-                    {["cna", "pca", "hha", "cpr", "first_aid", "tb_test", "phlebotomy", "med_tech", "lpn", "rn", "driver_license", "auto_insurance", "id_verification"].map((k) => (
-                      <option key={k} value={k}>{k.replace(/_/g, " ")}</option>
+                    {[
+                      "cna",
+                      "pca",
+                      "hha",
+                      "cpr",
+                      "first_aid",
+                      "tb_test",
+                      "phlebotomy",
+                      "med_tech",
+                      "lpn",
+                      "rn",
+                      "driver_license",
+                      "auto_insurance",
+                      "id_verification",
+                    ].map((k) => (
+                      <option key={k} value={k}>
+                        {k.replace(/_/g, " ")}
+                      </option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <Label htmlFor="us" className="text-xs">Issuing state</Label>
+                  <Label htmlFor="us" className="text-xs">
+                    Issuing state
+                  </Label>
                   <Input
                     id="us"
                     value={uploadState}
@@ -452,7 +528,9 @@ function ProfilePage() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="ue" className="text-xs">Expires (optional)</Label>
+                  <Label htmlFor="ue" className="text-xs">
+                    Expires (optional)
+                  </Label>
                   <Input
                     id="ue"
                     type="date"
@@ -461,7 +539,9 @@ function ProfilePage() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="uf" className="text-xs">File (PDF or image)</Label>
+                  <Label htmlFor="uf" className="text-xs">
+                    File (PDF or image)
+                  </Label>
                   <Input
                     id="uf"
                     type="file"
@@ -483,20 +563,32 @@ function ProfilePage() {
         </>
       )}
 
-
-
       <section className="rounded-2xl border border-border bg-card p-5">
         <h2 className="font-serif text-xl">Availability</h2>
-        <p className="mt-1 text-sm text-muted-foreground">Which days can you accept new bookings?</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Which days can you accept new bookings?
+        </p>
         <div className="mt-3 flex flex-wrap gap-2">
-          {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
-            <button
-              key={d}
-              className="rounded-lg border border-primary bg-primary/10 px-3 py-2 text-sm font-semibold text-primary"
-            >
-              {d}
-            </button>
-          ))}
+          {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d, weekday) => {
+            const row = availability?.find((a) => a.weekday === weekday);
+            const active = row?.active ?? true;
+            return (
+              <button
+                key={d}
+                type="button"
+                disabled={savingWeekday === weekday}
+                onClick={() => toggleAvailability(weekday)}
+                aria-pressed={active}
+                className={`rounded-lg border px-3 py-2 text-sm font-semibold disabled:opacity-50 ${
+                  active
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border bg-background text-muted-foreground"
+                }`}
+              >
+                {d}
+              </button>
+            );
+          })}
         </div>
       </section>
     </div>

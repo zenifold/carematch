@@ -2,14 +2,19 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+const TRUST_SAFETY_STAFF = ["admin", "trust_safety", "staff"] as const;
+
+async function isTrustSafetyStaff(context: { supabase: any; userId: string }) {
+  const { data, error } = await context.supabase.rpc("has_any_role", {
+    _user_id: context.userId,
+    _roles: TRUST_SAFETY_STAFF,
+  });
+  if (error) throw error;
+  return !!data;
+}
+
 export type IncidentCategory =
-  | "no_show"
-  | "safety"
-  | "abuse"
-  | "theft"
-  | "quality"
-  | "billing"
-  | "other";
+  "no_show" | "safety" | "abuse" | "theft" | "quality" | "billing" | "other";
 export type IncidentStatus = "open" | "triaged" | "resolved" | "dismissed";
 
 export type IncidentRow = {
@@ -97,11 +102,7 @@ export const listMyIncidents = createServerFn({ method: "GET" })
 export const listAllIncidents = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<IncidentRow[]> => {
-    const { data: isAdmin } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "admin",
-    });
-    if (!isAdmin) throw new Error("Forbidden");
+    if (!(await isTrustSafetyStaff(context))) throw new Error("Forbidden");
 
     const { data, error } = await context.supabase
       .from("incidents")
@@ -113,9 +114,7 @@ export const listAllIncidents = createServerFn({ method: "GET" })
     const rows = data ?? [];
     const ids = Array.from(
       new Set(
-        rows.flatMap((r) =>
-          [r.reporter_id, r.subject_user_id].filter((v): v is string => !!v),
-        ),
+        rows.flatMap((r) => [r.reporter_id, r.subject_user_id].filter((v): v is string => !!v)),
       ),
     );
     let byId = new Map<string, string | null>();
@@ -132,7 +131,7 @@ export const listAllIncidents = createServerFn({ method: "GET" })
       reporter_name: byId.get(r.reporter_id) ?? null,
       booking_id: r.booking_id,
       subject_user_id: r.subject_user_id,
-      subject_name: r.subject_user_id ? byId.get(r.subject_user_id) ?? null : null,
+      subject_name: r.subject_user_id ? (byId.get(r.subject_user_id) ?? null) : null,
       category: r.category as IncidentCategory,
       status: r.status as IncidentStatus,
       severity: r.severity,
@@ -148,11 +147,7 @@ export const updateIncident = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => UpdateSchema.parse(input))
   .handler(async ({ data, context }) => {
-    const { data: isAdmin } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "admin",
-    });
-    if (!isAdmin) throw new Error("Forbidden");
+    if (!(await isTrustSafetyStaff(context))) throw new Error("Forbidden");
 
     const patch: {
       status?: IncidentStatus;
@@ -173,7 +168,6 @@ export const updateIncident = createServerFn({ method: "POST" })
     }
     if (data.severity !== undefined) patch.severity = data.severity;
     if (data.resolution_notes !== undefined) patch.resolution_notes = data.resolution_notes ?? null;
-
 
     const { error } = await context.supabase.from("incidents").update(patch).eq("id", data.id);
     if (error) throw error;
