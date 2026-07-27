@@ -2,7 +2,14 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ShieldCheck, Loader2, ExternalLink, AlertTriangle, CheckCircle2, RotateCcw } from "lucide-react";
+import {
+  ShieldCheck,
+  Loader2,
+  ExternalLink,
+  AlertTriangle,
+  CheckCircle2,
+  RotateCcw,
+} from "lucide-react";
 import { toast } from "sonner";
 import { getMyIdv, startIdvSession } from "@/lib/idv.functions";
 import { Button } from "@/components/ui/button";
@@ -15,20 +22,31 @@ export const Route = createFileRoute("/_authenticated/provider/identity-verifica
 
 function statusCopy(status: string) {
   switch (status) {
-    case "not_started": return "You haven't started identity verification yet.";
-    case "processing": return "We're reviewing your ID and selfie. Usually takes under a minute.";
-    case "requires_input": return "We need another photo or a clearer image. Continue below.";
-    case "verified": return "Identity verified. You can now start your background check.";
-    case "canceled": return "Verification was canceled. Start again below.";
-    case "failed": return "Verification failed. Please try again or contact support.";
-    default: return status;
+    case "not_started":
+      return "You haven't started identity verification yet.";
+    case "processing":
+      return "We're reviewing your ID and selfie. Usually takes under a minute.";
+    case "requires_input":
+      return "We need another photo or a clearer image. Continue below.";
+    case "verified":
+      return "Identity verified. You can now start your background check.";
+    case "canceled":
+      return "Verification was canceled. Start again below.";
+    case "failed":
+      return "Verification failed. Please try again or contact support.";
+    default:
+      return status;
   }
 }
 
 function IdvPage() {
   const getFn = useServerFn(getMyIdv);
   const startFn = useServerFn(startIdvSession);
-  const q = useQuery({ queryKey: ["provider", "idv"], queryFn: () => getFn(), refetchInterval: 8000 });
+  const q = useQuery({
+    queryKey: ["provider", "idv"],
+    queryFn: () => getFn(),
+    refetchInterval: 8000,
+  });
   const [busy, setBusy] = useState(false);
 
   const row = q.data?.row;
@@ -52,7 +70,12 @@ function IdvPage() {
     }
   };
 
-  if (q.isLoading) return <div className="p-6"><Loader2 className="size-5 animate-spin" /></div>;
+  if (q.isLoading)
+    return (
+      <div className="p-6">
+        <Loader2 className="size-5 animate-spin" />
+      </div>
+    );
 
   return (
     <div className="mx-auto max-w-2xl space-y-6 p-6">
@@ -83,11 +106,20 @@ function IdvPage() {
         {status !== "verified" && (
           <div className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              You'll scan a government ID (driver's license, state ID, or passport) and take a short liveness selfie.
-              Takes about 90 seconds on your phone.
+              You'll scan a government ID (driver's license, state ID, or passport) and take a short
+              liveness selfie. Takes about 90 seconds on your phone.
+            </p>
+            <p className="text-xs text-muted-foreground">
+              This is a different, automated check from the ID photos you uploaded earlier during
+              onboarding — this one confirms you're a real, live person holding the ID right now,
+              and is required before your background check can clear.
             </p>
             <Button onClick={start} disabled={busy} className="w-full">
-              {busy ? <Loader2 className="mr-2 size-4 animate-spin" /> : status === "processing" || status === "requires_input" ? <ExternalLink className="mr-2 size-4" /> : null}
+              {busy ? (
+                <Loader2 className="mr-2 size-4 animate-spin" />
+              ) : status === "processing" || status === "requires_input" ? (
+                <ExternalLink className="mr-2 size-4" />
+              ) : null}
               {status === "not_started" || status === "canceled" || status === "failed"
                 ? "Start identity verification"
                 : "Continue verification"}
@@ -114,8 +146,8 @@ function IdvPage() {
       </div>
 
       <div className="text-xs text-muted-foreground">
-        Verification is powered by Stripe Identity. Your photos and personal details are handled by Stripe and never
-        stored on CareMatch's servers beyond a pass/fail record.
+        Verification is powered by Stripe Identity. Your photos and personal details are handled by
+        Stripe and never stored on CareMatch's servers beyond a pass/fail record.
       </div>
     </div>
   );
