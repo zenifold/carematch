@@ -1,0 +1,21 @@
+name = "carematch"
+compatibility_date = "2026-07-24"
+compatibility_flags = ["nodejs_compat"]
+
+# `main` and `[assets]` are intentionally omitted — Nitro's cloudflare-module
+# preset always regenerates these with paths correct relative to
+# .output/server at build time (see .output/server/wrangler.json after
+# `npm run build`); anything set here for those two is silently overridden.
+
+# Non-secret config. Real secrets (SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY,
+# STRIPE_SECRET_KEY, etc.) are set via `wrangler secret put <NAME>` instead —
+# never put them here, this file is committed to git.
+[vars]
+SUPABASE_URL = "https://wcjahuathjuzocvpmewu.supabase.co"
+SUPABASE_PROJECT_ID = "wcjahuathjuzocvpmewu"
+SUPABASE_PUBLISHABLE_KEY = "sb_publishable_zZKtE4bhhKEjSAardvcmwQ_5skfgwt0"
+VITE_SUPABASE_URL = "https://wcjahuathjuzocvpmewu.supabase.co"
+VITE_SUPABASE_PROJECT_ID = "wcjahuathjuzocvpmewu"
+VITE_SUPABASE_PUBLISHABLE_KEY = "sb_publishable_zZKtE4bhhKEjSAardvcmwQ_5skfgwt0"
+BACKGROUND_CHECK_VENDOR = "manual"
+IDV_VENDOR = "manual"
