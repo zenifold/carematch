@@ -26,7 +26,6 @@ import {
   PHONE_HREF,
 } from "@/components/marketing/PageShell";
 
-
 type ServiceTier = {
   key: string;
   name: string;
@@ -37,15 +36,78 @@ type ServiceTier = {
 };
 
 const TIERS: ServiceTier[] = [
-  { key: "companionship", name: "Companionship & check-ins", providerLow: 18, providerHigh: 30, feePct: 18, blurb: "A friendly visit — conversation, walks, activities." },
-  { key: "errands", name: "Errands & grocery runs", providerLow: 18, providerHigh: 28, feePct: 18, blurb: "Shopping, pharmacy pickups, post office." },
-  { key: "transport", name: "Rides to appointments", providerLow: 20, providerHigh: 32, feePct: 18, blurb: "Door-to-door rides. Plus IRS-standard mileage." },
-  { key: "mealprep", name: "Meal prep & light cooking", providerLow: 20, providerHigh: 32, feePct: 18, blurb: "A home-cooked meal, dishes done, fridge stocked." },
-  { key: "cleaning", name: "House cleaning & laundry", providerLow: 25, providerHigh: 40, feePct: 18, blurb: "Weekly, bi-weekly, or one-time refreshes." },
-  { key: "techhelp", name: "Tech help & setup", providerLow: 22, providerHigh: 38, feePct: 18, blurb: "Phone, tablet, TV, video calls with family." },
-  { key: "personal", name: "Personal care (CNA / HHA)", providerLow: 28, providerHigh: 50, feePct: 18, blurb: "Bathing, dressing, mobility support." },
-  { key: "handyman", name: "Handyman & small repairs", providerLow: 45, providerHigh: 90, feePct: 18, blurb: "Grab bars, minor fixes, installs." },
-  { key: "nursing", name: "Skilled nursing", providerLow: 45, providerHigh: 80, feePct: 15, blurb: "Licensed RN / LPN visits." },
+  {
+    key: "companionship",
+    name: "Companionship & check-ins",
+    providerLow: 18,
+    providerHigh: 30,
+    feePct: 18,
+    blurb: "A friendly visit — conversation, walks, activities.",
+  },
+  {
+    key: "errands",
+    name: "Errands & grocery runs",
+    providerLow: 18,
+    providerHigh: 28,
+    feePct: 18,
+    blurb: "Shopping, pharmacy pickups, post office.",
+  },
+  {
+    key: "transport",
+    name: "Rides to appointments",
+    providerLow: 20,
+    providerHigh: 32,
+    feePct: 18,
+    blurb: "Door-to-door rides. Plus IRS-standard mileage.",
+  },
+  {
+    key: "mealprep",
+    name: "Meal prep & light cooking",
+    providerLow: 20,
+    providerHigh: 32,
+    feePct: 18,
+    blurb: "A home-cooked meal, dishes done, fridge stocked.",
+  },
+  {
+    key: "cleaning",
+    name: "House cleaning & laundry",
+    providerLow: 25,
+    providerHigh: 40,
+    feePct: 18,
+    blurb: "Weekly, bi-weekly, or one-time refreshes.",
+  },
+  {
+    key: "techhelp",
+    name: "Tech help & setup",
+    providerLow: 22,
+    providerHigh: 38,
+    feePct: 18,
+    blurb: "Phone, tablet, TV, video calls with family.",
+  },
+  {
+    key: "personal",
+    name: "Personal care (CNA / HHA)",
+    providerLow: 28,
+    providerHigh: 50,
+    feePct: 18,
+    blurb: "Bathing, dressing, mobility support.",
+  },
+  {
+    key: "handyman",
+    name: "Handyman & small repairs",
+    providerLow: 45,
+    providerHigh: 90,
+    feePct: 18,
+    blurb: "Grab bars, minor fixes, installs.",
+  },
+  {
+    key: "nursing",
+    name: "Skilled nursing",
+    providerLow: 45,
+    providerHigh: 80,
+    feePct: 15,
+    blurb: "Licensed RN / LPN visits.",
+  },
 ];
 
 const money = (n: number) =>
@@ -83,7 +145,7 @@ export const Route = createFileRoute("/pricing")({
             name: "How much does the provider keep?",
             acceptedAnswer: {
               "@type": "Answer",
-              text: "Providers keep 82–85% of their listed hourly rate. They set their own rates, set their own schedule, and can raise or lower them anytime. Payouts land in their Stripe Express account within 24–48 hours of visit check-out.",
+              text: "Providers keep 82–85% of their listed hourly rate. They set their own rates, set their own schedule, and can raise or lower them anytime. Payouts run every Monday by direct deposit to the bank account on file.",
             },
           },
           {
@@ -117,7 +179,6 @@ function PricingPage() {
 
   const tier = useMemo(() => TIERS.find((t) => t.key === tierKey)!, [tierKey]);
 
-
   // Keep rate within tier bounds when tier changes
   const boundedRate = Math.max(tier.providerLow, Math.min(tier.providerHigh, rate));
   const providerSubtotal = boundedRate * hours;
@@ -144,7 +205,8 @@ function PricingPage() {
               Pick a service. Slide the rate. See the total.
             </h2>
             <p className="mt-3 text-lg text-muted-foreground">
-              This is exactly what you'll see on a provider's card before you book — provider rate, hours, service fee, and total upfront.
+              This is exactly what you'll see on a provider's card before you book — provider rate,
+              hours, service fee, and total upfront.
             </p>
 
             <div className="mt-8 surface-card space-y-6 p-6">
@@ -162,14 +224,19 @@ function PricingPage() {
                   className="mt-2 w-full rounded-2xl border border-border bg-background px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   {TIERS.map((t) => (
-                    <option key={t.key} value={t.key}>{t.name}</option>
+                    <option key={t.key} value={t.key}>
+                      {t.name}
+                    </option>
                   ))}
                 </select>
               </div>
 
               <div>
                 <div className="flex items-baseline justify-between">
-                  <label htmlFor="rate" className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                  <label
+                    htmlFor="rate"
+                    className="text-sm font-semibold uppercase tracking-wider text-muted-foreground"
+                  >
                     Provider hourly rate
                   </label>
                   <span className="font-serif text-2xl text-primary">{money(boundedRate)}/hr</span>
@@ -193,10 +260,15 @@ function PricingPage() {
 
               <div>
                 <div className="flex items-baseline justify-between">
-                  <label htmlFor="hours" className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                  <label
+                    htmlFor="hours"
+                    className="text-sm font-semibold uppercase tracking-wider text-muted-foreground"
+                  >
                     Visit length
                   </label>
-                  <span className="font-serif text-2xl text-primary">{hours} {hours === 1 ? "hour" : "hours"}</span>
+                  <span className="font-serif text-2xl text-primary">
+                    {hours} {hours === 1 ? "hour" : "hours"}
+                  </span>
                 </div>
                 <input
                   id="hours"
@@ -215,14 +287,18 @@ function PricingPage() {
           <div className="lg:col-span-7">
             <div className="surface-card overflow-hidden">
               <div className="bg-primary/5 px-6 py-5">
-                <p className="text-sm font-semibold uppercase tracking-wider text-primary">Visit summary</p>
+                <p className="text-sm font-semibold uppercase tracking-wider text-primary">
+                  Visit summary
+                </p>
                 <p className="mt-1 font-serif text-2xl">{tier.name}</p>
                 <p className="text-base text-muted-foreground">{tier.blurb}</p>
               </div>
               <dl className="divide-y divide-border">
                 <div className="flex items-baseline justify-between px-6 py-4">
                   <dt className="text-base text-muted-foreground">Provider rate</dt>
-                  <dd className="text-lg">{money(boundedRate)}/hr × {hours} hrs</dd>
+                  <dd className="text-lg">
+                    {money(boundedRate)}/hr × {hours} hrs
+                  </dd>
                 </div>
                 <div className="flex items-baseline justify-between px-6 py-4">
                   <dt className="text-base text-muted-foreground">Subtotal</dt>
@@ -288,7 +364,9 @@ function PricingPage() {
                         <p className="font-semibold">{t.name}</p>
                         <p className="text-sm text-muted-foreground">{t.blurb}</p>
                       </td>
-                      <td className="px-4 py-4 text-base">${t.providerLow}–${t.providerHigh}/hr</td>
+                      <td className="px-4 py-4 text-base">
+                        ${t.providerLow}–${t.providerHigh}/hr
+                      </td>
                       <td className="px-4 py-4 text-base">{t.feePct}%</td>
                       <td className="rounded-r-2xl px-4 py-4 text-base font-semibold text-primary">
                         {money(seniorLow)}–{money(seniorHigh)}/hr
@@ -309,14 +387,31 @@ function PricingPage() {
       <section className="mx-auto max-w-6xl px-5 py-16 lg:px-10">
         <h2 className="font-serif text-3xl tracking-tight">What the service fee buys</h2>
         <p className="mt-3 text-lg text-muted-foreground">
-          We call it a service &amp; protection fee — not a commission — because every dollar goes into the trust layer around your visit.
+          We call it a service &amp; protection fee — not a commission — because every dollar goes
+          into the trust layer around your visit.
         </p>
         <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {[
-            { icon: ShieldCheck, title: "5-stage verification", body: "ID, background, credentials, monthly re-checks, live check-in." },
-            { icon: Receipt, title: "Insurance & protection", body: "Platform-backed coverage for theft, damage, and dispute resolution." },
-            { icon: Users, title: "Family visibility", body: "Family dashboard, real-time visit updates, and shared care plan." },
-            { icon: Sparkles, title: "Payment guarantee", body: "Card held at booking, released only after verified check-out." },
+            {
+              icon: ShieldCheck,
+              title: "5-stage verification",
+              body: "ID, background, credentials, monthly re-checks, live check-in.",
+            },
+            {
+              icon: Receipt,
+              title: "Insurance & protection",
+              body: "Platform-backed coverage for theft, damage, and dispute resolution.",
+            },
+            {
+              icon: Users,
+              title: "Family visibility",
+              body: "Family dashboard, real-time visit updates, and shared care plan.",
+            },
+            {
+              icon: Sparkles,
+              title: "Payment guarantee",
+              body: "Card held at booking, released only after verified check-out.",
+            },
           ].map((f) => (
             <div key={f.title} className="surface-card p-6">
               <span className="grid size-12 place-items-center rounded-2xl bg-primary/10 text-primary">
@@ -382,23 +477,50 @@ function PricingPage() {
               <ul className="mt-6 space-y-3 text-sm">
                 {compareTab === "carematch" && (
                   <>
-                    <li className="flex justify-between"><span className="text-muted-foreground">Provider rate</span><span>$24/hr × 16 hrs</span></li>
-                    <li className="flex justify-between"><span className="text-muted-foreground">Service fee (18%)</span><span>$69</span></li>
-                    <li className="flex justify-between border-t border-border pt-3 font-semibold"><span>You pay</span><span className="text-primary">$472/mo</span></li>
+                    <li className="flex justify-between">
+                      <span className="text-muted-foreground">Provider rate</span>
+                      <span>$24/hr × 16 hrs</span>
+                    </li>
+                    <li className="flex justify-between">
+                      <span className="text-muted-foreground">Service fee (18%)</span>
+                      <span>$69</span>
+                    </li>
+                    <li className="flex justify-between border-t border-border pt-3 font-semibold">
+                      <span>You pay</span>
+                      <span className="text-primary">$472/mo</span>
+                    </li>
                   </>
                 )}
                 {compareTab === "agency" && (
                   <>
-                    <li className="flex justify-between"><span className="text-muted-foreground">Agency rate</span><span>$36–$42/hr × 16 hrs</span></li>
-                    <li className="flex justify-between"><span className="text-muted-foreground">Assessment fee</span><span>~$150 one-time</span></li>
-                    <li className="flex justify-between border-t border-border pt-3 font-semibold"><span>You pay</span><span>~$624/mo</span></li>
+                    <li className="flex justify-between">
+                      <span className="text-muted-foreground">Agency rate</span>
+                      <span>$36–$42/hr × 16 hrs</span>
+                    </li>
+                    <li className="flex justify-between">
+                      <span className="text-muted-foreground">Assessment fee</span>
+                      <span>~$150 one-time</span>
+                    </li>
+                    <li className="flex justify-between border-t border-border pt-3 font-semibold">
+                      <span>You pay</span>
+                      <span>~$624/mo</span>
+                    </li>
                   </>
                 )}
                 {compareTab === "offplatform" && (
                   <>
-                    <li className="flex justify-between"><span className="text-muted-foreground">Cash rate</span><span>$22/hr × 16 hrs</span></li>
-                    <li className="flex justify-between"><span className="text-muted-foreground">Insurance & taxes</span><span className="text-destructive">Your responsibility</span></li>
-                    <li className="flex justify-between border-t border-border pt-3 font-semibold"><span>You pay</span><span>$360/mo + risk</span></li>
+                    <li className="flex justify-between">
+                      <span className="text-muted-foreground">Cash rate</span>
+                      <span>$22/hr × 16 hrs</span>
+                    </li>
+                    <li className="flex justify-between">
+                      <span className="text-muted-foreground">Insurance & taxes</span>
+                      <span className="text-destructive">Your responsibility</span>
+                    </li>
+                    <li className="flex justify-between border-t border-border pt-3 font-semibold">
+                      <span>You pay</span>
+                      <span>$360/mo + risk</span>
+                    </li>
                   </>
                 )}
               </ul>
@@ -410,7 +532,12 @@ function PricingPage() {
               </p>
               <ul className="mt-4 divide-y divide-border">
                 {[
-                  { label: "Background check + monthly re-check", cm: true, ag: "once", off: false },
+                  {
+                    label: "Background check + monthly re-check",
+                    cm: true,
+                    ag: "once",
+                    off: false,
+                  },
                   { label: "Live selfie + GPS check-in at door", cm: true, ag: false, off: false },
                   { label: "Insurance for theft, damage, injury", cm: true, ag: true, off: false },
                   { label: "You keep the same helper", cm: true, ag: "sometimes", off: true },
@@ -420,7 +547,11 @@ function PricingPage() {
                   { label: "Taxes & 1099 handled for you", cm: true, ag: true, off: false },
                 ].map((row) => {
                   const val =
-                    compareTab === "carematch" ? row.cm : compareTab === "agency" ? row.ag : row.off;
+                    compareTab === "carematch"
+                      ? row.cm
+                      : compareTab === "agency"
+                        ? row.ag
+                        : row.off;
                   return (
                     <li key={row.label} className="flex items-center justify-between gap-4 py-3">
                       <span className="text-base">{row.label}</span>
@@ -446,18 +577,26 @@ function PricingPage() {
         </div>
       </section>
 
-
       {/* Partners & Health — separate pricing model */}
       <section className="border-y border-border bg-secondary/40">
         <div className="mx-auto max-w-6xl px-5 py-16 lg:px-10">
-          <p className="text-sm font-semibold uppercase tracking-wider text-primary">Partners & Health rails</p>
+          <p className="text-sm font-semibold uppercase tracking-wider text-primary">
+            Partners & Health rails
+          </p>
           <h2 className="mt-2 font-serif text-3xl tracking-tight">
             Different services, different pricing model.
           </h2>
           <p className="mt-3 max-w-3xl text-lg text-muted-foreground">
             The marketplace fee above applies to independent providers you book directly. For{" "}
-            <Link to="/services/partners" className="font-medium text-primary hover:underline">Partners</Link> (personal care via licensed home care agencies) and{" "}
-            <Link to="/services/healthcare" className="font-medium text-primary hover:underline">Healthcare</Link> (skilled nursing referrals), the agency bills you directly. CareMatch is compensated by the agency, not by you.
+            <Link to="/services/partners" className="font-medium text-primary hover:underline">
+              Partners
+            </Link>{" "}
+            (personal care via licensed home care agencies) and{" "}
+            <Link to="/services/healthcare" className="font-medium text-primary hover:underline">
+              Healthcare
+            </Link>{" "}
+            (skilled nursing referrals), the agency bills you directly. CareMatch is compensated by
+            the agency, not by you.
           </p>
 
           <div className="mt-8 grid gap-6 md:grid-cols-2">
@@ -468,7 +607,9 @@ function PricingPage() {
                 </span>
                 <h3 className="text-2xl font-semibold">Partners</h3>
               </div>
-              <p className="mt-3 text-base text-muted-foreground">Licensed home care agencies deliver personal care. You pay the agency at their rate.</p>
+              <p className="mt-3 text-base text-muted-foreground">
+                Licensed home care agencies deliver personal care. You pay the agency at their rate.
+              </p>
               <dl className="mt-5 divide-y divide-border">
                 <div className="flex items-baseline justify-between py-3">
                   <dt className="text-base text-muted-foreground">You pay</dt>
@@ -484,7 +625,8 @@ function PricingPage() {
                 </div>
               </dl>
               <p className="mt-4 text-sm text-muted-foreground">
-                Established metros may migrate to a small revenue share (8–15% of gross for the first 6–12 months of the client relationship). Never marked up to you.
+                Established metros may migrate to a small revenue share (8–15% of gross for the
+                first 6–12 months of the client relationship). Never marked up to you.
               </p>
             </div>
 
@@ -495,7 +637,9 @@ function PricingPage() {
                 </span>
                 <h3 className="text-2xl font-semibold">Health</h3>
               </div>
-              <p className="mt-3 text-base text-muted-foreground">Skilled nursing and therapy referrals go to Medicare-certified home health agencies.</p>
+              <p className="mt-3 text-base text-muted-foreground">
+                Skilled nursing and therapy referrals go to Medicare-certified home health agencies.
+              </p>
               <dl className="mt-5 divide-y divide-border">
                 <div className="flex items-baseline justify-between py-3">
                   <dt className="text-base text-muted-foreground">You pay</dt>
@@ -511,27 +655,31 @@ function PricingPage() {
                 </div>
               </dl>
               <p className="mt-4 text-sm text-muted-foreground">
-                Flat fees only — never a percentage of Medicare reimbursement. Referrals comply with the federal Anti-Kickback Statute and applicable state law.
+                Flat fees only — never a percentage of Medicare reimbursement. Referrals comply with
+                the federal Anti-Kickback Statute and applicable state law.
               </p>
             </div>
           </div>
 
           <p className="mt-6 text-sm text-muted-foreground">
-            <span className="font-semibold text-foreground">Why this matters to you:</span> you pay the same hourly rate you'd pay the agency directly. CareMatch never adds a markup — the agency pays our small referral fee, not you.
+            <span className="font-semibold text-foreground">Why this matters to you:</span> you pay
+            the same hourly rate you'd pay the agency directly. CareMatch never adds a markup — the
+            agency pays our small referral fee, not you.
           </p>
-
         </div>
       </section>
-
 
       {/* Membership */}
       <section className="border-y border-border bg-primary/5">
         <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 lg:grid-cols-2 lg:px-10">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-wider text-primary">Optional membership</p>
+            <p className="text-sm font-semibold uppercase tracking-wider text-primary">
+              Optional membership
+            </p>
             <h2 className="mt-2 font-serif text-3xl tracking-tight">CareMatch Plus — $29/month</h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              For families booking regular care. Waives service fees on the first $200 of bookings each month and unlocks priority access to top-rated providers.
+              For families booking regular care. Waives service fees on the first $200 of bookings
+              each month and unlocks priority access to top-rated providers.
             </p>
             <ul className="mt-6 space-y-3">
               {[
@@ -550,14 +698,25 @@ function PricingPage() {
           <div className="surface-card p-6">
             <p className="font-semibold">When Plus pays for itself</p>
             <p className="mt-2 text-base text-muted-foreground">
-              At an 18% service fee, waiving fees on $200/month saves $36. Plus costs $29. Break-even is one recurring visit a month.
+              At an 18% service fee, waiving fees on $200/month saves $36. Plus costs $29.
+              Break-even is one recurring visit a month.
             </p>
             <div className="mt-6 rounded-2xl bg-secondary/50 p-5 font-mono text-sm">
-              <div className="flex justify-between"><span>Bookings/month</span><span>$200.00</span></div>
-              <div className="flex justify-between"><span>Fees waived (18%)</span><span>−$36.00</span></div>
-              <div className="flex justify-between"><span>Plus membership</span><span>+$29.00</span></div>
+              <div className="flex justify-between">
+                <span>Bookings/month</span>
+                <span>$200.00</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Fees waived (18%)</span>
+                <span>−$36.00</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Plus membership</span>
+                <span>+$29.00</span>
+              </div>
               <div className="mt-2 flex justify-between border-t border-border pt-2 font-semibold">
-                <span>Net savings</span><span className="text-primary">$7.00 / mo</span>
+                <span>Net savings</span>
+                <span className="text-primary">$7.00 / mo</span>
               </div>
             </div>
           </div>
@@ -571,10 +730,10 @@ function PricingPage() {
             <h2 className="font-serif text-3xl tracking-tight">Payment flow</h2>
             <ol className="mt-6 space-y-4">
               {[
-                "You book → card is authorized (not charged).",
-                "Provider checks in at the door → charge captures.",
-                "Provider checks out after the visit → funds release to their account within 24–48 hours.",
-                "Recurring visits auto-charge weekly or monthly. Pause anytime.",
+                "You book a visit — no card details required up front.",
+                "Provider checks in and out → the exact time and cost are logged automatically.",
+                "You get an itemized invoice the moment the visit ends, before you're asked to pay.",
+                "No auto-charging, no card held on file. Pause or cancel anytime.",
               ].map((step, i) => (
                 <li key={step} className="flex items-start gap-4">
                   <span className="grid size-9 shrink-0 place-items-center rounded-full bg-primary/10 font-serif text-primary">
@@ -600,7 +759,8 @@ function PricingPage() {
                 <div>
                   <p className="font-semibold">Inside 24 hours</p>
                   <p className="text-base text-muted-foreground">
-                    50% of the visit is charged — half goes to the provider for their reserved time, half to CareMatch.
+                    50% of the visit is charged — half goes to the provider for their reserved time,
+                    half to CareMatch.
                   </p>
                 </div>
               </li>
@@ -609,7 +769,8 @@ function PricingPage() {
                 <div>
                   <p className="font-semibold">Recurring visits</p>
                   <p className="text-base text-muted-foreground">
-                    Pause the schedule anytime. No penalty. Provider blackout dates skip the week with no charge.
+                    Pause the schedule anytime. No penalty. Provider blackout dates skip the week
+                    with no charge.
                   </p>
                 </div>
               </li>
@@ -623,12 +784,15 @@ function PricingPage() {
         <div className="mx-auto max-w-6xl px-5 py-14 lg:px-10">
           <div className="flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-wider text-primary">For caregivers</p>
+              <p className="text-sm font-semibold uppercase tracking-wider text-primary">
+                For caregivers
+              </p>
               <h2 className="mt-2 font-serif text-2xl tracking-tight">
-                Set your rate. Keep 82–85%. Get paid within 48 hours.
+                Set your rate. Keep 82–85%. Get paid every Monday.
               </h2>
               <p className="mt-2 text-base text-muted-foreground">
-                You choose your rate, your schedule, and the visits you accept. We handle payments, insurance, and 1099s.
+                You choose your rate, your schedule, and the visits you accept. We handle payments,
+                insurance, and 1099s.
               </p>
             </div>
             <Link
@@ -679,7 +843,7 @@ function PricingPage() {
               },
               {
                 q: "How much does the provider actually keep?",
-                a: "Providers keep 82–85% of their listed hourly rate. They set their own rates, set their own schedule, and can raise them anytime. Payouts land within 24–48 hours of check-out.",
+                a: "Providers keep 82–85% of their listed hourly rate. They set their own rates, set their own schedule, and can raise them anytime. Payouts run every Monday by direct deposit.",
               },
               {
                 q: "Do I need CareMatch Plus to book?",
@@ -728,7 +892,6 @@ function PricingPage() {
       </section>
 
       <CTASection />
-
     </PageShell>
   );
 }

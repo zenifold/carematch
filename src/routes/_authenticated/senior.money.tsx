@@ -363,8 +363,8 @@ function SeniorMoney() {
 
       <div className="mt-8 rounded-2xl bg-sage-50 p-5 text-sm text-sage-700">
         <p>
-          Every visit is only charged after check-out. Refunds are one tap — no arguments, no hold
-          music.
+          Every visit is billed only after check-out, based on the actual time logged — never
+          before. Questions about a charge or a refund go straight to a real person, no hold music.
         </p>
         <Link
           to="/senior/help"
