@@ -2,13 +2,9 @@
 // This file is client-safe (no vendor SDKs, no secrets). Adapter
 // implementations live in *.server.ts files.
 
-export type VendorId = "certn" | "checkr" | "yardstik" | "goodhire";
+export type VendorId = "certn" | "checkr" | "yardstik" | "goodhire" | "manual";
 
-export type PackageTier =
-  | "basic"
-  | "basic_plus"
-  | "enhanced"
-  | "enhanced_plus_mvr";
+export type PackageTier = "basic" | "basic_plus" | "enhanced" | "enhanced_plus_mvr";
 
 export type NormalizedStatus =
   | "created"
@@ -72,9 +68,11 @@ export type VendorAdapter = {
 };
 
 export function getActiveVendor(): VendorId {
-  const v = (process.env.BACKGROUND_CHECK_VENDOR ?? "certn").toLowerCase();
-  if (v === "certn" || v === "checkr" || v === "yardstik" || v === "goodhire") {
+  const v = (process.env.BACKGROUND_CHECK_VENDOR ?? "manual").toLowerCase();
+  if (v === "certn" || v === "checkr" || v === "yardstik" || v === "goodhire" || v === "manual") {
     return v;
   }
-  return "certn";
+  // No vendor configured (or an unrecognized value) — fall back to manual
+  // review rather than crashing on a vendor call with no API key.
+  return "manual";
 }

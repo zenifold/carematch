@@ -18,16 +18,38 @@ export const Route = createFileRoute("/_authenticated/provider/background-check"
   errorComponent: RouteErrorBoundary,
 });
 
-function statusCopy(status: string) {
+function statusCopy(status: string, vendor?: string) {
+  if (vendor === "manual") {
+    switch (status) {
+      case "pending_vendor":
+        return "Submitted — our team is reviewing it directly and will follow up.";
+      case "clear":
+        return "All clear.";
+      case "canceled":
+        return "Canceled.";
+      case "error":
+        return "Something went wrong. Please contact support.";
+      default:
+        return status;
+    }
+  }
   switch (status) {
-    case "invitation_sent": return "Invitation sent — check your email.";
-    case "pending_candidate_info": return "Waiting for you to complete the vendor form.";
-    case "pending_vendor": return "In progress with our verification partner. Usually 1–3 business days.";
-    case "clear": return "All clear.";
-    case "consider": return "Under review — a member of our team will reach out.";
-    case "canceled": return "Canceled.";
-    case "error": return "Something went wrong. Please contact support.";
-    default: return status;
+    case "invitation_sent":
+      return "Invitation sent — check your email.";
+    case "pending_candidate_info":
+      return "Waiting for you to complete the vendor form.";
+    case "pending_vendor":
+      return "In progress with our verification partner. Usually 1–3 business days.";
+    case "clear":
+      return "All clear.";
+    case "consider":
+      return "Under review — a member of our team will reach out.";
+    case "canceled":
+      return "Canceled.";
+    case "error":
+      return "Something went wrong. Please contact support.";
+    default:
+      return status;
   }
 }
 
@@ -37,12 +59,20 @@ function BackgroundCheckPage() {
   const eventsFn = useServerFn(listMyBackgroundCheckEvents);
 
   const q = useQuery({ queryKey: ["provider", "bg-check"], queryFn: () => bgFn() });
-  const eventsQ = useQuery({ queryKey: ["provider", "bg-check-events"], queryFn: () => eventsFn() });
+  const eventsQ = useQuery({
+    queryKey: ["provider", "bg-check-events"],
+    queryFn: () => eventsFn(),
+  });
 
   const [ssn, setSsn] = useState("");
   const [busy, setBusy] = useState(false);
 
-  if (q.isLoading) return <div className="p-6"><Loader2 className="size-5 animate-spin" /></div>;
+  if (q.isLoading)
+    return (
+      <div className="p-6">
+        <Loader2 className="size-5 animate-spin" />
+      </div>
+    );
   if (q.error) return <div className="p-6 text-sm text-destructive">Could not load status.</div>;
 
   const start = async () => {
@@ -80,8 +110,8 @@ function BackgroundCheckPage() {
             <div>
               <p className="font-semibold">Verify your identity first</p>
               <p className="mt-1 text-muted-foreground">
-                We use a secure ID scan and liveness selfie to confirm you are who you say you are. This must be
-                completed before we run a background check.
+                We use a secure ID scan and liveness selfie to confirm you are who you say you are.
+                This must be completed before we run a background check.
               </p>
               <Link
                 to="/provider/identity-verification"
@@ -119,8 +149,10 @@ function BackgroundCheckPage() {
           <div>
             <p className="font-semibold">Ready to start</p>
             <p className="text-sm text-muted-foreground">
-              Package: <span className="font-medium text-foreground">{q.data.tier_label}</span> ·
-              Est. cost ${((q.data.estimated_cost_cents ?? 0) / 100).toFixed(2)}
+              Package: <span className="font-medium text-foreground">{q.data.tier_label}</span>
+              {q.data.active_vendor !== "manual" && (
+                <> · Est. cost ${((q.data.estimated_cost_cents ?? 0) / 100).toFixed(2)}</>
+              )}
             </p>
           </div>
           <div className="space-y-2">
@@ -133,12 +165,14 @@ function BackgroundCheckPage() {
               autoComplete="off"
             />
             <p className="text-xs text-muted-foreground">
-              Sent directly to our verification partner. We keep only the last 4 digits.
+              {q.data.active_vendor === "manual"
+                ? "Used only to confirm your submission — reviewed by our team, never stored."
+                : "Sent directly to our verification partner. We keep only the last 4 digits."}
             </p>
           </div>
           <Button onClick={start} disabled={busy} className="w-full">
             {busy ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
-            Start background check
+            {q.data.active_vendor === "manual" ? "Submit for review" : "Start background check"}
           </Button>
         </div>
       )}
@@ -148,10 +182,10 @@ function BackgroundCheckPage() {
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-sm text-muted-foreground">Current status</p>
-              <p className="text-xl font-semibold capitalize">
-                {row.status.replace(/_/g, " ")}
+              <p className="text-xl font-semibold capitalize">{row.status.replace(/_/g, " ")}</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {statusCopy(row.status, row.vendor)}
               </p>
-              <p className="mt-1 text-sm text-muted-foreground">{statusCopy(row.status)}</p>
             </div>
             {row.status === "clear" && row.adjudication === "cleared" && (
               <CheckCircle2 className="size-6 text-emerald-600" />
@@ -189,7 +223,9 @@ function BackgroundCheckPage() {
             {eventsQ.data.map((e, i) => (
               <li key={i} className="flex items-center justify-between">
                 <span>{e.event_type}</span>
-                <span className="text-muted-foreground">{new Date(e.received_at).toLocaleString()}</span>
+                <span className="text-muted-foreground">
+                  {new Date(e.received_at).toLocaleString()}
+                </span>
               </li>
             ))}
           </ul>

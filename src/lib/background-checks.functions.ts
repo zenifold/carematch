@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { tierEstimateCents, tierLabel } from "./background-check/packages.server";
-import type { PackageTier } from "./background-check/vendor";
+import { getActiveVendor, type PackageTier } from "./background-check/vendor";
 
 export type BgCheckRow = {
   id: string;
@@ -37,9 +37,21 @@ export const getMyBackgroundCheck = createServerFn({ method: "GET" })
 
     // Also compute readiness so UI can show/hide the "start" tile.
     const [{ data: id }, { data: docs }, { data: idv }] = await Promise.all([
-      context.supabase.from("provider_identity").select("identity_completed_at").eq("provider_id", context.userId).maybeSingle(),
-      context.supabase.from("provider_documents").select("kind, status").eq("provider_id", context.userId).in("status", ["uploaded", "accepted"]),
-      context.supabase.from("provider_identity_verifications" as any).select("status").eq("provider_id", context.userId).maybeSingle(),
+      context.supabase
+        .from("provider_identity")
+        .select("identity_completed_at")
+        .eq("provider_id", context.userId)
+        .maybeSingle(),
+      context.supabase
+        .from("provider_documents")
+        .select("kind, status")
+        .eq("provider_id", context.userId)
+        .in("status", ["uploaded", "accepted"]),
+      context.supabase
+        .from("provider_identity_verifications" as any)
+        .select("status")
+        .eq("provider_id", context.userId)
+        .maybeSingle(),
     ]);
     const docKinds = new Set((docs ?? []).map((d: any) => d.kind));
     const idv_verified = (idv as any)?.status === "verified";
@@ -52,8 +64,15 @@ export const getMyBackgroundCheck = createServerFn({ method: "GET" })
 
     // Get capability info for tier preview.
     const [{ data: provider }, { data: caps }] = await Promise.all([
-      context.supabase.from("providers").select("service_tier").eq("id", context.userId).maybeSingle(),
-      context.supabase.from("provider_capabilities").select("capability_code").eq("provider_id", context.userId),
+      context.supabase
+        .from("providers")
+        .select("service_tier")
+        .eq("id", context.userId)
+        .maybeSingle(),
+      context.supabase
+        .from("provider_capabilities")
+        .select("capability_code")
+        .eq("provider_id", context.userId),
     ]);
     const { pickPackageTier } = await import("./background-check/packages.server");
     const tier = pickPackageTier({
@@ -61,13 +80,16 @@ export const getMyBackgroundCheck = createServerFn({ method: "GET" })
       capabilities: (caps ?? []).map((c: any) => c.capability_code),
     });
 
+    const activeVendor = getActiveVendor();
+
     return {
       row: (data ?? null) as BgCheckRow | null,
       identity_ready,
       idv_verified,
       tier,
       tier_label: tierLabel(tier),
-      estimated_cost_cents: tierEstimateCents(tier),
+      estimated_cost_cents: activeVendor === "manual" ? 0 : tierEstimateCents(tier),
+      active_vendor: activeVendor,
     };
   });
 
@@ -84,17 +106,26 @@ export const startBackgroundCheck = createServerFn({ method: "POST" })
     const uid = context.userId;
 
     // Load identity + capabilities under RLS.
-    const [{ data: id }, { data: provider }, { data: caps }, { data: existing }, { data: idv }] = await Promise.all([
-      context.supabase.from("provider_identity").select("*").eq("provider_id", uid).maybeSingle(),
-      context.supabase.from("providers").select("service_tier").eq("id", uid).maybeSingle(),
-      context.supabase.from("provider_capabilities").select("capability_code").eq("provider_id", uid),
-      context.supabase.from("provider_background_checks" as any)
-        .select("id, status")
-        .eq("provider_id", uid)
-        .in("status", ["created", "invitation_sent", "pending_candidate_info", "pending_vendor"])
-        .maybeSingle(),
-      context.supabase.from("provider_identity_verifications" as any).select("status").eq("provider_id", uid).maybeSingle(),
-    ]);
+    const [{ data: id }, { data: provider }, { data: caps }, { data: existing }, { data: idv }] =
+      await Promise.all([
+        context.supabase.from("provider_identity").select("*").eq("provider_id", uid).maybeSingle(),
+        context.supabase.from("providers").select("service_tier").eq("id", uid).maybeSingle(),
+        context.supabase
+          .from("provider_capabilities")
+          .select("capability_code")
+          .eq("provider_id", uid),
+        context.supabase
+          .from("provider_background_checks" as any)
+          .select("id, status")
+          .eq("provider_id", uid)
+          .in("status", ["created", "invitation_sent", "pending_candidate_info", "pending_vendor"])
+          .maybeSingle(),
+        context.supabase
+          .from("provider_identity_verifications" as any)
+          .select("status")
+          .eq("provider_id", uid)
+          .maybeSingle(),
+      ]);
 
     if ((idv as any)?.status !== "verified") {
       throw new Error("Complete digital identity verification before starting a background check.");
@@ -105,19 +136,45 @@ export const startBackgroundCheck = createServerFn({ method: "POST" })
     if (existing) {
       throw new Error("A background check is already in progress.");
     }
-    if (!id.legal_first_name || !id.legal_last_name || !id.date_of_birth || !id.current_address || !id.phone || !id.email) {
+    if (
+      !id.legal_first_name ||
+      !id.legal_last_name ||
+      !id.date_of_birth ||
+      !id.current_address ||
+      !id.phone ||
+      !id.email
+    ) {
       throw new Error("Missing identity fields — please review your identity submission.");
     }
 
     const { pickPackageTier } = await import("./background-check/packages.server");
-    const { getAdapter } = await import("./background-check/adapters/index.server");
-    const { getActiveVendor } = await import("./background-check/vendor");
 
     const tier = pickPackageTier({
       service_tier: (provider as any)?.service_tier ?? 0,
       capabilities: (caps ?? []).map((c: any) => c.capability_code),
     });
     const vendorId = getActiveVendor();
+
+    if (vendorId === "manual") {
+      // No vendor configured — queue for manual admin review instead of
+      // calling out to a vendor API that doesn't exist yet.
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: row, error: insErr } = await supabaseAdmin
+        .from("provider_background_checks" as any)
+        .insert({
+          provider_id: uid,
+          vendor: "manual",
+          package_code: `manual-${tier}`,
+          package_tier: tier,
+          status: "pending_vendor",
+        })
+        .select("id")
+        .single();
+      if (insErr) throw insErr;
+      return { id: (row as any).id as string, invitation_url: "" };
+    }
+
+    const { getAdapter } = await import("./background-check/adapters/index.server");
     const adapter = getAdapter(vendorId);
     const packageCode = adapter.packageCodeFor(tier);
     const addr = id.current_address as any;
@@ -144,9 +201,10 @@ export const startBackgroundCheck = createServerFn({ method: "POST" })
           postal: addr.postal,
           country: addr.country ?? "US",
         },
-        drivers_license: id.drivers_license_number && id.drivers_license_state
-          ? { number: id.drivers_license_number, state: id.drivers_license_state }
-          : null,
+        drivers_license:
+          id.drivers_license_number && id.drivers_license_state
+            ? { number: id.drivers_license_number, state: id.drivers_license_state }
+            : null,
       });
       candidateId = created.candidateId;
       orderResult = await adapter.orderCheck({
@@ -199,10 +257,12 @@ async function requireStaff(context: any) {
   if (!data) throw new Error("Forbidden");
 }
 
-const ListFilters = z.object({
-  status: z.string().optional(),
-  vendor: z.string().optional(),
-}).partial();
+const ListFilters = z
+  .object({
+    status: z.string().optional(),
+    vendor: z.string().optional(),
+  })
+  .partial();
 
 export const adminListBackgroundChecks = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -211,14 +271,16 @@ export const adminListBackgroundChecks = createServerFn({ method: "GET" })
     await requireStaff(context);
     let q = context.supabase
       .from("provider_background_checks" as any)
-      .select("id, provider_id, vendor, status, adjudication, package_tier, package_code, invitation_url, ordered_at, completed_at, cost_cents, error_message, created_at")
+      .select(
+        "id, provider_id, vendor, status, adjudication, package_tier, package_code, invitation_url, ordered_at, completed_at, cost_cents, error_message, created_at",
+      )
       .order("created_at", { ascending: false })
       .limit(200);
     if (data.status) q = q.eq("status", data.status);
     if (data.vendor) q = q.eq("vendor", data.vendor);
     const { data: rows, error } = await q;
     if (error) throw error;
-    return ((rows ?? []) as unknown) as BgCheckRow[];
+    return (rows ?? []) as unknown as BgCheckRow[];
   });
 
 const AdjudicateInput = z.object({
@@ -232,12 +294,21 @@ export const adminAdjudicate = createServerFn({ method: "POST" })
   .inputValidator((i: unknown) => AdjudicateInput.parse(i))
   .handler(async ({ data, context }) => {
     await requireStaff(context);
+    // "cleared" must also promote status to "clear" — the credential
+    // writeback trigger only fires on the (status='clear', adjudication=
+    // 'cleared') combination, so without this a "Clear" click silently
+    // never unlocked the provider.
+    const patch: Record<string, unknown> = {
+      adjudication: data.decision,
+      error_message: data.note ?? null,
+    };
+    if (data.decision === "cleared") {
+      patch.status = "clear";
+      patch.completed_at = new Date().toISOString();
+    }
     const { error } = await context.supabase
       .from("provider_background_checks" as any)
-      .update({
-        adjudication: data.decision,
-        error_message: data.note ?? null,
-      })
+      .update(patch)
       .eq("id", data.id);
     if (error) throw error;
     return { ok: true };
@@ -279,5 +350,5 @@ export const listMyBackgroundCheckEvents = createServerFn({ method: "GET" })
       .eq("background_check_id", (check as any).id)
       .order("received_at", { ascending: false })
       .limit(50);
-    return ((events ?? []) as unknown) as Array<{ event_type: string; received_at: string }>;
+    return (events ?? []) as unknown as Array<{ event_type: string; received_at: string }>;
   });
