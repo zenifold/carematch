@@ -20,7 +20,21 @@ export const Route = createFileRoute("/_authenticated/provider/identity-verifica
   errorComponent: RouteErrorBoundary,
 });
 
-function statusCopy(status: string) {
+function statusCopy(status: string, vendor?: string) {
+  if (vendor === "manual") {
+    switch (status) {
+      case "not_started":
+        return "You haven't submitted for review yet.";
+      case "processing":
+        return "Submitted — our team is reviewing your ID and selfie directly.";
+      case "verified":
+        return "Identity verified. You can now start your background check.";
+      case "failed":
+        return "We couldn't verify your identity. Please contact support.";
+      default:
+        return status;
+    }
+  }
   switch (status) {
     case "not_started":
       return "You haven't started identity verification yet.";
@@ -51,6 +65,8 @@ function IdvPage() {
 
   const row = q.data?.row;
   const status = row?.status ?? "not_started";
+  const vendor = q.data?.active_vendor ?? row?.vendor;
+  const isManual = vendor === "manual";
 
   const start = async () => {
     setBusy(true);
@@ -61,6 +77,9 @@ function IdvPage() {
         window.location.href = res.hosted_url;
       } else if (res.status === "verified") {
         toast.success("Already verified.");
+        await q.refetch();
+      } else {
+        toast.success("Submitted for review.");
         await q.refetch();
       }
     } catch (err: any) {
@@ -89,7 +108,7 @@ function IdvPage() {
           <div>
             <p className="text-sm text-muted-foreground">Current status</p>
             <p className="text-xl font-semibold capitalize">{status.replace(/_/g, " ")}</p>
-            <p className="mt-1 text-sm text-muted-foreground">{statusCopy(status)}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{statusCopy(status, vendor)}</p>
           </div>
           {status === "verified" && <CheckCircle2 className="size-6 text-emerald-600" />}
           {(status === "requires_input" || status === "failed") && (
@@ -105,24 +124,37 @@ function IdvPage() {
 
         {status !== "verified" && (
           <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">
-              You'll scan a government ID (driver's license, state ID, or passport) and take a short
-              liveness selfie. Takes about 90 seconds on your phone.
-            </p>
-            <p className="text-xs text-muted-foreground">
-              This is a different, automated check from the ID photos you uploaded earlier during
-              onboarding — this one confirms you're a real, live person holding the ID right now,
-              and is required before your background check can clear.
-            </p>
-            <Button onClick={start} disabled={busy} className="w-full">
+            {isManual ? (
+              <p className="text-sm text-muted-foreground">
+                Our team reviews the ID and selfie you already uploaded during onboarding directly —
+                no extra scan needed. Tap below to queue it for review.
+              </p>
+            ) : (
+              <>
+                <p className="text-sm text-muted-foreground">
+                  You'll scan a government ID (driver's license, state ID, or passport) and take a
+                  short liveness selfie. Takes about 90 seconds on your phone.
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  This is a different, automated check from the ID photos you uploaded earlier
+                  during onboarding — this one confirms you're a real, live person holding the ID
+                  right now, and is required before your background check can clear.
+                </p>
+              </>
+            )}
+            <Button onClick={start} disabled={busy || status === "processing"} className="w-full">
               {busy ? (
                 <Loader2 className="mr-2 size-4 animate-spin" />
-              ) : status === "processing" || status === "requires_input" ? (
+              ) : !isManual && (status === "processing" || status === "requires_input") ? (
                 <ExternalLink className="mr-2 size-4" />
               ) : null}
-              {status === "not_started" || status === "canceled" || status === "failed"
-                ? "Start identity verification"
-                : "Continue verification"}
+              {status === "processing"
+                ? isManual
+                  ? "Submitted — awaiting review"
+                  : "Continue verification"
+                : isManual
+                  ? "Submit for review"
+                  : "Start identity verification"}
             </Button>
             {(status === "processing" || status === "requires_input") && (
               <button
@@ -146,8 +178,9 @@ function IdvPage() {
       </div>
 
       <div className="text-xs text-muted-foreground">
-        Verification is powered by Stripe Identity. Your photos and personal details are handled by
-        Stripe and never stored on CareMatch's servers beyond a pass/fail record.
+        {isManual
+          ? "During early access, a member of our team reviews your ID and selfie directly instead of an automated scan."
+          : "Verification is powered by Stripe Identity. Your photos and personal details are handled by Stripe and never stored on CareMatch's servers beyond a pass/fail record."}
       </div>
     </div>
   );

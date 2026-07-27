@@ -3,6 +3,21 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getActiveIdvVendor } from "@/lib/idv/vendor";
 
+async function upsertManualIdvRow(userId: string) {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { error } = await supabaseAdmin.from("provider_identity_verifications" as any).upsert(
+    {
+      provider_id: userId,
+      vendor: "manual",
+      status: "processing",
+      hosted_url: null,
+      last_error: null,
+    } as any,
+    { onConflict: "provider_id,vendor" },
+  );
+  if (error) throw new Error(error.message);
+}
+
 const StartSchema = z.object({
   returnUrl: z.string().url().optional(),
 });
@@ -13,11 +28,13 @@ export const getMyIdv = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data, error } = await supabase
       .from("provider_identity_verifications" as any)
-      .select("id, status, hosted_url, vendor, vendor_session_id, last_error, verified_at, updated_at, created_at")
+      .select(
+        "id, status, hosted_url, vendor, vendor_session_id, last_error, verified_at, updated_at, created_at",
+      )
       .eq("provider_id", userId)
       .maybeSingle();
     if (error) throw new Error(error.message);
-    return { row: data as any };
+    return { row: data as any, active_vendor: getActiveIdvVendor() };
   });
 
 export const startIdvSession = createServerFn({ method: "POST" })
@@ -61,10 +78,20 @@ export const startIdvSession = createServerFn({ method: "POST" })
     }
 
     const vendor = getActiveIdvVendor();
+
+    if (vendor === "manual") {
+      // No vendor configured — queue for manual admin review (see the
+      // credentials queue) instead of calling out to a vendor API that
+      // doesn't exist yet.
+      await upsertManualIdvRow(userId);
+      return { hosted_url: null, status: "processing" as const, already: false };
+    }
+
     const { getIdvAdapter } = await import("@/lib/idv/adapters/index.server");
     const adapter = getIdvAdapter(vendor);
 
-    const returnUrl = data.returnUrl ?? "https://carematcher.lovable.app/provider/identity-verification";
+    const returnUrl =
+      data.returnUrl ?? "https://carematcher.lovable.app/provider/identity-verification";
     const session = await adapter.createSession({
       providerId: userId,
       email,

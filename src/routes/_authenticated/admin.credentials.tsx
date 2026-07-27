@@ -8,6 +8,7 @@ import {
   listCredentialQueue,
   decideCredential,
   signCredentialDocument,
+  listIdentityDocuments,
   type PendingCredential,
 } from "@/lib/admin-credentials.functions";
 import { adminListBackgroundChecks, adminAdjudicate } from "@/lib/background-checks.functions";
@@ -24,6 +25,7 @@ function CredentialsQueue() {
   const listFn = useServerFn(listCredentialQueue);
   const decideFn = useServerFn(decideCredential);
   const signFn = useServerFn(signCredentialDocument);
+  const docsFn = useServerFn(listIdentityDocuments);
 
   const [status, setStatus] = useState<"pending" | "passed" | "failed" | "expired">("pending");
   const [selected, setSelected] = useState<PendingCredential | null>(null);
@@ -33,6 +35,12 @@ function CredentialsQueue() {
   const q = useQuery({
     queryKey: ["admin", "credentials", status],
     queryFn: () => listFn({ data: { status } }),
+  });
+
+  const docsQ = useQuery({
+    queryKey: ["admin", "identity-documents", selected?.provider_id],
+    queryFn: () => docsFn({ data: { providerId: selected!.provider_id } }),
+    enabled: selected?.kind === "id_verification",
   });
 
   const rows = q.data ?? [];
@@ -96,12 +104,15 @@ function CredentialsQueue() {
           ) : (
             <ul className="divide-y divide-border">
               {rows.map((r) => {
-                const ageDays = Math.floor((Date.now() - new Date(r.created_at).getTime()) / (1000 * 60 * 60 * 24));
-                const ageChip = ageDays >= 3
-                  ? { cls: "bg-destructive/15 text-destructive", label: `${ageDays}d` }
-                  : ageDays >= 1
-                    ? { cls: "bg-amber-500/15 text-amber-700", label: `${ageDays}d` }
-                    : { cls: "bg-emerald-500/15 text-emerald-700", label: "<24h" };
+                const ageDays = Math.floor(
+                  (Date.now() - new Date(r.created_at).getTime()) / (1000 * 60 * 60 * 24),
+                );
+                const ageChip =
+                  ageDays >= 3
+                    ? { cls: "bg-destructive/15 text-destructive", label: `${ageDays}d` }
+                    : ageDays >= 1
+                      ? { cls: "bg-amber-500/15 text-amber-700", label: `${ageDays}d` }
+                      : { cls: "bg-emerald-500/15 text-emerald-700", label: "<24h" };
                 return (
                   <li key={r.id}>
                     <button
@@ -119,13 +130,17 @@ function CredentialsQueue() {
                         </div>
                         <div className="truncate text-xs text-muted-foreground">
                           {r.issuing_state ? `${r.issuing_state} · ` : ""}
-                          {r.issued_on ? `issued ${new Date(r.issued_on).toLocaleDateString()} · ` : ""}
+                          {r.issued_on
+                            ? `issued ${new Date(r.issued_on).toLocaleDateString()} · `
+                            : ""}
                           submitted {new Date(r.created_at).toLocaleDateString()}
                         </div>
                       </div>
                       <div className="flex flex-col items-end gap-1">
                         {status === "pending" && (
-                          <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${ageChip.cls}`}>
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${ageChip.cls}`}
+                          >
                             {ageChip.label}
                           </span>
                         )}
@@ -158,7 +173,35 @@ function CredentialsQueue() {
               <dd>{selected.issuing_state ?? "—"}</dd>
             </dl>
 
-            {selected.document_path ? (
+            {selected.kind === "id_verification" ? (
+              <div className="mb-3">
+                <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                  Uploaded photos
+                </p>
+                {docsQ.isLoading ? (
+                  <p className="text-xs text-muted-foreground">Loading…</p>
+                ) : docsQ.data && docsQ.data.length > 0 ? (
+                  <ul className="space-y-1">
+                    {docsQ.data.map((d) => (
+                      <li key={d.storage_path}>
+                        <button
+                          onClick={() => openDoc(d.storage_path)}
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+                        >
+                          <FileText className="size-3" /> {d.kind.replace(/_/g, " ")}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-xs italic text-muted-foreground">No photos uploaded.</p>
+                )}
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Compare the government ID photo against the selfie before approving — this is a
+                  manual document match, not an automated liveness check.
+                </p>
+              </div>
+            ) : selected.document_path ? (
               <button
                 onClick={() => openDoc(selected.document_path!)}
                 className="mb-3 inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
@@ -257,14 +300,32 @@ function BackgroundChecksSection() {
                   {new Date(r.ordered_at).toLocaleDateString()}
                 </td>
                 <td className="px-3 py-2 space-x-1">
-                  <Button size="sm" variant="outline" onClick={() => adj(r.id, "cleared")}>Clear</Button>
-                  <Button size="sm" variant="outline" onClick={() => adj(r.id, "pre_adverse_action")}>Pre-adverse</Button>
-                  <Button size="sm" variant="destructive" onClick={() => adj(r.id, "adverse_action")}>Adverse</Button>
+                  <Button size="sm" variant="outline" onClick={() => adj(r.id, "cleared")}>
+                    Clear
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => adj(r.id, "pre_adverse_action")}
+                  >
+                    Pre-adverse
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => adj(r.id, "adverse_action")}
+                  >
+                    Adverse
+                  </Button>
                 </td>
               </tr>
             ))}
             {(q.data ?? []).length === 0 && (
-              <tr><td colSpan={7} className="px-3 py-6 text-center text-muted-foreground">No background checks yet.</td></tr>
+              <tr>
+                <td colSpan={7} className="px-3 py-6 text-center text-muted-foreground">
+                  No background checks yet.
+                </td>
+              </tr>
             )}
           </tbody>
         </table>
@@ -272,4 +333,3 @@ function BackgroundChecksSection() {
     </section>
   );
 }
-

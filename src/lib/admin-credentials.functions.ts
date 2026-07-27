@@ -77,11 +77,12 @@ export const decideCredential = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     if (!(await isStaff(context))) throw new Error("Forbidden");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const now = new Date().toISOString();
     const { data: row, error: rErr } = await supabaseAdmin
       .from("provider_credentials")
       .update({
         status: data.decision,
-        verified_at: new Date().toISOString(),
+        verified_at: now,
         verified_by: context.userId,
         notes: data.note ?? null,
       } as never)
@@ -90,6 +91,22 @@ export const decideCredential = createServerFn({ method: "POST" })
       .maybeSingle();
     if (rErr) throw rErr;
     if (!row) throw new Error("Credential not found");
+
+    // Approving an id_verification credential manually is the only signal
+    // that unlocks the background-check gate, since that gate reads
+    // provider_identity_verifications.status, not provider_credentials —
+    // these live in separate tables with no automated link in this direction.
+    if (row.kind === "id_verification" && data.decision === "passed") {
+      await supabaseAdmin.from("provider_identity_verifications" as any).upsert(
+        {
+          provider_id: row.provider_id,
+          vendor: "manual",
+          status: "verified",
+          verified_at: now,
+        } as any,
+        { onConflict: "provider_id,vendor" },
+      );
+    }
 
     await supabaseAdmin.from("admin_audit_log").insert({
       actor_id: context.userId,
@@ -119,4 +136,31 @@ export const signCredentialDocument = createServerFn({ method: "POST" })
       .createSignedUrl(data.path, 60 * 10);
     if (error) throw error;
     return { url: signed.signedUrl };
+  });
+
+/**
+ * All uploaded ID/selfie photos for a provider, for manually comparing the
+ * government ID photo against the liveness selfie during id_verification
+ * review — a single document_path isn't enough to actually compare the two.
+ */
+const ListDocsInput = z.object({ providerId: z.string().uuid() });
+
+export const listIdentityDocuments = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) => ListDocsInput.parse(i))
+  .handler(async ({ data, context }) => {
+    if (!(await isStaff(context))) throw new Error("Forbidden");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows, error } = await supabaseAdmin
+      .from("provider_documents")
+      .select("kind, storage_path, status, uploaded_at")
+      .eq("provider_id", data.providerId)
+      .order("uploaded_at", { ascending: false });
+    if (error) throw error;
+    return (rows ?? []) as Array<{
+      kind: string;
+      storage_path: string;
+      status: string;
+      uploaded_at: string;
+    }>;
   });

@@ -1,14 +1,9 @@
 // Shared types for identity verification vendor adapters (client-safe).
 
-export type IdvVendorId = "stripe_identity" | "persona" | "veriff";
+export type IdvVendorId = "stripe_identity" | "persona" | "veriff" | "manual";
 
 export type IdvStatus =
-  | "not_started"
-  | "processing"
-  | "requires_input"
-  | "verified"
-  | "canceled"
-  | "failed";
+  "not_started" | "processing" | "requires_input" | "verified" | "canceled" | "failed";
 
 export type IdvNormalizedEvent = {
   vendorSessionId: string;
@@ -38,7 +33,9 @@ export type IdvAdapter = {
 };
 
 export function getActiveIdvVendor(): IdvVendorId {
-  const v = (process.env.IDV_VENDOR ?? "stripe_identity").toLowerCase();
-  if (v === "stripe_identity" || v === "persona" || v === "veriff") return v;
-  return "stripe_identity";
+  const v = (process.env.IDV_VENDOR ?? "manual").toLowerCase();
+  if (v === "stripe_identity" || v === "persona" || v === "veriff" || v === "manual") return v;
+  // No vendor configured (or an unrecognized value) — fall back to manual
+  // review rather than crashing on a vendor call with no API key.
+  return "manual";
 }
