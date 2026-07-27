@@ -82,7 +82,6 @@ function toVisitCard(row: VisitRow): VisitCardData {
   };
 }
 
-
 function SeniorHome() {
   const navigate = useNavigate();
   const fetchVisits = useServerFn(listMyVisits);
@@ -131,9 +130,7 @@ function SeniorHome() {
         r.status !== "cancelled" &&
         new Date(r.scheduled_at).getTime() >= now - 4 * 60 * 60 * 1000,
     )
-    .sort(
-      (a, b) => new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime(),
-    )[0];
+    .sort((a, b) => new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime())[0];
 
   // Recent regulars = distinct providers from last 5 completed visits.
   const regulars = (() => {
@@ -183,7 +180,6 @@ function SeniorHome() {
     return { date: d, count };
   });
 
-
   // Budget: this month's completed spend against profile budget.
   const monthStart = new Date();
   monthStart.setDate(1);
@@ -192,8 +188,7 @@ function SeniorHome() {
     rows
       .filter(
         (r) =>
-          r.status === "completed" &&
-          new Date(r.scheduled_at).getTime() >= monthStart.getTime(),
+          r.status === "completed" && new Date(r.scheduled_at).getTime() >= monthStart.getTime(),
       )
       .reduce((s, r) => s + (r.hourly_rate_cents * r.duration_minutes) / 60, 0) / 100,
   );
@@ -202,9 +197,7 @@ function SeniorHome() {
   return (
     <div>
       <div className="rounded-3xl bg-sage-50 p-7">
-        <p className="text-sm font-medium uppercase tracking-widest text-sage-700">
-          Welcome
-        </p>
+        <p className="text-sm font-medium uppercase tracking-widest text-sage-700">Welcome</p>
         <h1 className="mt-1 font-serif text-4xl tracking-tight">{firstName}</h1>
         {(unread > 0 || pendingConfirm > 0 || upcomingThisWeek > 0) && (
           <div className="mt-4 flex flex-wrap gap-2">
@@ -248,8 +241,8 @@ function SeniorHome() {
                 isToday
                   ? "border-primary bg-primary/10 text-primary"
                   : count > 0
-                  ? "border-sage-300 bg-sage-50 text-sage-800"
-                  : "border-border bg-card text-muted-foreground"
+                    ? "border-sage-300 bg-sage-50 text-sage-800"
+                    : "border-border bg-card text-muted-foreground"
               }`}
             >
               <span className="text-[10px] font-bold uppercase tracking-wider">
@@ -275,19 +268,21 @@ function SeniorHome() {
       {/* Quick actions */}
       <div className="mt-6 grid grid-cols-4 gap-3">
         <QuickAction to="/senior/book" icon={<Plus className="size-6" />} label="Book" />
-        <QuickAction to="/senior/messages" icon={<MessageCircle className="size-6" />} label="Messages" badge={unread} />
+        <QuickAction
+          to="/senior/messages"
+          icon={<MessageCircle className="size-6" />}
+          label="Messages"
+          badge={unread}
+        />
         <QuickAction to="/senior/people" icon={<Users className="size-6" />} label="People" />
         <QuickAction to="/senior/help" icon={<HelpCircle className="size-6" />} label="Help" />
       </div>
 
       <div className="mt-6 grid gap-6">
-
         {needsRating && (
           <button
             type="button"
-            onClick={() =>
-              navigate({ to: "/senior/visits/$id", params: { id: needsRating.id } })
-            }
+            onClick={() => navigate({ to: "/senior/visits/$id", params: { id: needsRating.id } })}
             className="flex items-center gap-4 rounded-3xl border-2 border-primary/40 bg-primary/5 p-5 text-left transition-transform active:scale-[0.99]"
           >
             <span className="grid size-14 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground">
@@ -295,7 +290,8 @@ function SeniorHome() {
             </span>
             <span className="flex-1">
               <span className="block font-serif text-xl">
-                How was your visit with {needsRating.provider_name?.split(" ")[0] ?? "your caregiver"}?
+                How was your visit with{" "}
+                {needsRating.provider_name?.split(" ")[0] ?? "your caregiver"}?
               </span>
               <span className="mt-1 block text-sm text-muted-foreground">
                 Tap to rate — takes 5 seconds.
@@ -314,9 +310,7 @@ function SeniorHome() {
             <VisitCard
               visit={toVisitCard(nextVisit)}
               onCall={() => window.location.assign("tel:18002273628")}
-              onChange={() =>
-                navigate({ to: "/senior/visits/$id", params: { id: nextVisit.id } })
-              }
+              onChange={() => navigate({ to: "/senior/visits/$id", params: { id: nextVisit.id } })}
             />
           </div>
         ) : (
@@ -326,19 +320,16 @@ function SeniorHome() {
           />
         )}
 
-
         <Link
           to="/senior/book"
-          className="flex aspect-square w-full flex-col items-center justify-center gap-4 rounded-3xl border-4 border-dashed border-accent bg-accent/10 transition-transform active:scale-[0.98]"
+          className="flex w-full flex-col items-center justify-center gap-3 rounded-3xl border-4 border-dashed border-accent bg-accent/10 px-6 py-10 transition-transform active:scale-[0.98]"
           aria-label="Get new help"
         >
-          <span className="grid size-20 place-items-center rounded-full bg-accent text-accent-foreground shadow-soft">
-            <Plus className="size-10" />
+          <span className="grid size-16 place-items-center rounded-full bg-accent text-accent-foreground shadow-soft">
+            <Plus className="size-8" />
           </span>
           <span className="font-serif text-3xl">Get help</span>
-          <span className="text-base text-muted-foreground">
-            Cleaning, errands, company, care
-          </span>
+          <span className="text-base text-muted-foreground">Cleaning, errands, company, care</span>
         </Link>
 
         <section>
@@ -418,7 +409,6 @@ function SeniorHome() {
           </div>
         </section>
       </div>
-
     </div>
   );
 }
@@ -436,7 +426,6 @@ function QuickAction({
 }) {
   return (
     <Link
-      
       to={to as any}
       className="relative flex min-h-24 flex-col items-center justify-center gap-2 rounded-2xl border border-border bg-card p-3 text-center transition active:scale-[0.98] hover:bg-secondary"
     >

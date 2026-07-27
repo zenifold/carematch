@@ -19,6 +19,7 @@ type Props = {
   visit: VisitCardData;
   onCall?: () => void;
   onChange?: () => void;
+  changeLabel?: string;
   className?: string;
 };
 
@@ -30,7 +31,7 @@ const STATUS_META: Record<VisitStatus, { label: string; tone: string }> = {
   issue: { label: "Needs attention", tone: "bg-destructive/10 text-destructive" },
 };
 
-export function VisitCard({ visit, onCall, onChange, className = "" }: Props) {
+export function VisitCard({ visit, onCall, onChange, changeLabel, className = "" }: Props) {
   const status = STATUS_META[visit.status];
   const fmt = (n: number) =>
     n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
@@ -91,7 +92,7 @@ export function VisitCard({ visit, onCall, onChange, className = "" }: Props) {
               onClick={onChange}
               className="inline-flex min-h-12 flex-1 items-center justify-center rounded-full border border-input bg-card px-5 py-3 text-lg font-semibold hover:bg-secondary"
             >
-              Change
+              {changeLabel ?? "Change"}
             </button>
           )}
         </div>

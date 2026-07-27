@@ -2,9 +2,22 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, CalendarClock, CheckCircle2, MapPin, Phone, RotateCw, ShieldCheck } from "lucide-react";
+import {
+  ArrowLeft,
+  CalendarClock,
+  CheckCircle2,
+  MapPin,
+  Phone,
+  RotateCw,
+  ShieldCheck,
+} from "lucide-react";
 import { toast } from "sonner";
-import { getVisitDetail, rateVisit, cancelBooking, rescheduleBooking } from "@/lib/bookings.functions";
+import {
+  getVisitDetail,
+  rateVisit,
+  cancelBooking,
+  rescheduleBooking,
+} from "@/lib/bookings.functions";
 import {
   VoiceInput,
   VerificationBadge,
@@ -29,7 +42,11 @@ function initialsFrom(name: string | null): string {
   return (parts[0]?.[0] ?? "") + (parts[1]?.[0] ?? "");
 }
 
-function phaseFromVisit(status: string, checkedIn: string | null, checkedOut: string | null): Phase {
+function phaseFromVisit(
+  status: string,
+  checkedIn: string | null,
+  checkedOut: string | null,
+): Phase {
   if (checkedOut || status === "completed") return "review";
   if (checkedIn || status === "in_progress") return "arrived";
   return "enroute";
@@ -78,8 +95,7 @@ function VisitDay() {
   });
 
   const reschedule = useMutation({
-    mutationFn: (scheduled_at: string) =>
-      rescheduleFn({ data: { id, scheduled_at } }),
+    mutationFn: (scheduled_at: string) => rescheduleFn({ data: { id, scheduled_at } }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["visit-detail", id] });
       qc.invalidateQueries({ queryKey: ["senior", "visits"] });
@@ -112,8 +128,6 @@ function VisitDay() {
       })
     : arriveLabel;
   const alreadyRated = !!visit.senior_rating;
-
-
 
   return (
     <div>
@@ -224,9 +238,7 @@ function VisitDay() {
             <div className="mt-4">
               <VerificationBadge stage="arrival" date={arrivedLabel} size="sm" />
             </div>
-            <p className="mt-5 rounded-2xl bg-primary/10 p-4 text-lg">
-              Visit in progress
-            </p>
+            <p className="mt-5 rounded-2xl bg-primary/10 p-4 text-lg">Visit in progress</p>
           </>
         )}
 

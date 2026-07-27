@@ -115,6 +115,7 @@ import { Route as AuthenticatedAdminCredentialsRouteImport } from './routes/_aut
 import { Route as AuthenticatedAdminBookingsRouteImport } from './routes/_authenticated/admin.bookings'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin.audit'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin.analytics'
+import { Route as AuthenticatedSeniorVisitsIndexRouteImport } from './routes/_authenticated/senior.visits.index'
 import { Route as AuthenticatedSeniorMessagesIndexRouteImport } from './routes/_authenticated/senior.messages.index'
 import { Route as AuthenticatedOnboardingProviderIndexRouteImport } from './routes/_authenticated/onboarding.provider.index'
 import { Route as ApiPublicHooksProviderReengagementRouteImport } from './routes/api/public/hooks/provider-reengagement'
@@ -716,6 +717,12 @@ const AuthenticatedAdminAnalyticsRoute =
     path: '/analytics',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedSeniorVisitsIndexRoute =
+  AuthenticatedSeniorVisitsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedSeniorVisitsRoute,
+  } as any)
 const AuthenticatedSeniorMessagesIndexRoute =
   AuthenticatedSeniorMessagesIndexRouteImport.update({
     id: '/',
@@ -893,6 +900,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/provider-reengagement': typeof ApiPublicHooksProviderReengagementRoute
   '/onboarding/provider/': typeof AuthenticatedOnboardingProviderIndexRoute
   '/senior/messages/': typeof AuthenticatedSeniorMessagesIndexRoute
+  '/senior/visits/': typeof AuthenticatedSeniorVisitsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -985,7 +993,6 @@ export interface FileRoutesByTo {
   '/senior/money': typeof AuthenticatedSeniorMoneyRoute
   '/senior/people': typeof AuthenticatedSeniorPeopleRoute
   '/senior/profile': typeof AuthenticatedSeniorProfileRoute
-  '/senior/visits': typeof AuthenticatedSeniorVisitsRouteWithChildren
   '/api/public/training-postback': typeof ApiPublicTrainingPostbackRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/family': typeof AuthenticatedFamilyIndexRoute
@@ -1001,6 +1008,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/provider-reengagement': typeof ApiPublicHooksProviderReengagementRoute
   '/onboarding/provider': typeof AuthenticatedOnboardingProviderIndexRoute
   '/senior/messages': typeof AuthenticatedSeniorMessagesIndexRoute
+  '/senior/visits': typeof AuthenticatedSeniorVisitsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -1120,6 +1128,7 @@ export interface FileRoutesById {
   '/api/public/hooks/provider-reengagement': typeof ApiPublicHooksProviderReengagementRoute
   '/_authenticated/onboarding/provider/': typeof AuthenticatedOnboardingProviderIndexRoute
   '/_authenticated/senior/messages/': typeof AuthenticatedSeniorMessagesIndexRoute
+  '/_authenticated/senior/visits/': typeof AuthenticatedSeniorVisitsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -1239,6 +1248,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/provider-reengagement'
     | '/onboarding/provider/'
     | '/senior/messages/'
+    | '/senior/visits/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -1331,7 +1341,6 @@ export interface FileRouteTypes {
     | '/senior/money'
     | '/senior/people'
     | '/senior/profile'
-    | '/senior/visits'
     | '/api/public/training-postback'
     | '/admin'
     | '/family'
@@ -1347,6 +1356,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/provider-reengagement'
     | '/onboarding/provider'
     | '/senior/messages'
+    | '/senior/visits'
   id:
     | '__root__'
     | '/'
@@ -1465,6 +1475,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/provider-reengagement'
     | '/_authenticated/onboarding/provider/'
     | '/_authenticated/senior/messages/'
+    | '/_authenticated/senior/visits/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -2234,6 +2245,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAnalyticsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/senior/visits/': {
+      id: '/_authenticated/senior/visits/'
+      path: '/'
+      fullPath: '/senior/visits/'
+      preLoaderRoute: typeof AuthenticatedSeniorVisitsIndexRouteImport
+      parentRoute: typeof AuthenticatedSeniorVisitsRoute
+    }
     '/_authenticated/senior/messages/': {
       id: '/_authenticated/senior/messages/'
       path: '/'
@@ -2450,11 +2468,13 @@ const AuthenticatedSeniorMessagesRouteWithChildren =
 
 interface AuthenticatedSeniorVisitsRouteChildren {
   AuthenticatedSeniorVisitsIdRoute: typeof AuthenticatedSeniorVisitsIdRoute
+  AuthenticatedSeniorVisitsIndexRoute: typeof AuthenticatedSeniorVisitsIndexRoute
 }
 
 const AuthenticatedSeniorVisitsRouteChildren: AuthenticatedSeniorVisitsRouteChildren =
   {
     AuthenticatedSeniorVisitsIdRoute: AuthenticatedSeniorVisitsIdRoute,
+    AuthenticatedSeniorVisitsIndexRoute: AuthenticatedSeniorVisitsIndexRoute,
   }
 
 const AuthenticatedSeniorVisitsRouteWithChildren =
@@ -2659,3 +2679,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
