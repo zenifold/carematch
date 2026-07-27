@@ -41,8 +41,7 @@ export function SeniorFamilyInvites() {
   });
 
   const createM = useMutation({
-    mutationFn: (input: { email?: string; permission: Perm }) =>
-      createFn({ data: input }),
+    mutationFn: (input: { email?: string; permission: Perm }) => createFn({ data: input }),
     onSuccess: (invite) => {
       qc.invalidateQueries({ queryKey: ["senior", "family-invites"] });
       const link = inviteLink(invite.code);
@@ -75,8 +74,8 @@ export function SeniorFamilyInvites() {
         </div>
         <h2 className="mt-1 font-serif text-2xl">Invite a family member</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Share a code so a family member can see your visits and help coordinate care. You
-          control what they can do.
+          Share a code so a family member can see your visits and help coordinate care. You control
+          what they can do.
         </p>
       </div>
 
@@ -111,13 +110,19 @@ export function SeniorFamilyInvites() {
           disabled={createM.isPending}
           className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-soft hover:bg-primary/90 disabled:opacity-60"
         >
-          {createM.isPending ? <Loader2 className="size-4 animate-spin" /> : <UserPlus className="size-4" />}
+          {createM.isPending ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <UserPlus className="size-4" />
+          )}
           Generate invite
         </button>
       </form>
 
       {invitesQ.isPending ? (
-        <div className="border-t border-border p-5 text-sm text-muted-foreground">Loading invites…</div>
+        <div className="border-t border-border p-5 text-sm text-muted-foreground">
+          Loading invites…
+        </div>
       ) : active.length === 0 && past.length === 0 ? (
         <div className="border-t border-border p-5 text-sm text-muted-foreground">
           No invites yet. Generate one above and share the link or code.
@@ -144,7 +149,7 @@ export function SeniorFamilyInvites() {
                       day{daysLeft === 1 ? "" : "s"}
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <button
                       type="button"
                       onClick={() => {

@@ -256,12 +256,12 @@ function SeniorMoney() {
                   key={r.id}
                   className="flex items-start justify-between gap-4 rounded-2xl border border-border bg-card p-5"
                 >
-                  <div className="flex items-start gap-3">
-                    <span className="mt-1 grid size-10 place-items-center rounded-full bg-primary/10 text-primary">
+                  <div className="flex min-w-0 flex-1 items-start gap-3">
+                    <span className="mt-1 grid size-10 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
                       <CalendarClock className="size-5" />
                     </span>
-                    <div>
-                      <p className="text-base font-semibold">
+                    <div className="min-w-0">
+                      <p className="truncate text-base font-semibold">
                         {r.provider_name ?? "Caregiver TBD"} · {Math.round(r.duration_minutes / 60)}
                         h
                       </p>
@@ -280,7 +280,7 @@ function SeniorMoney() {
                       <p className="text-xs text-muted-foreground">Charged after check-out</p>
                     </div>
                   </div>
-                  <p className="font-serif text-xl">~{fmt(computeVisitCost(r))}</p>
+                  <p className="shrink-0 font-serif text-xl">~{fmt(computeVisitCost(r))}</p>
                 </li>
               );
             })}
@@ -323,12 +323,12 @@ function SeniorMoney() {
                           key={r.id}
                           className="flex items-start justify-between gap-4 rounded-2xl border border-border bg-card p-5"
                         >
-                          <div className="flex items-start gap-3">
-                            <span className="mt-1 grid size-10 place-items-center rounded-full bg-primary/10 text-primary">
+                          <div className="flex min-w-0 flex-1 items-start gap-3">
+                            <span className="mt-1 grid size-10 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
                               <CheckCircle2 className="size-5" />
                             </span>
-                            <div>
-                              <p className="text-base font-semibold">
+                            <div className="min-w-0">
+                              <p className="truncate text-base font-semibold">
                                 {r.provider_name ?? "Caregiver"} ·{" "}
                                 {Math.round(r.duration_minutes / 60)}h
                               </p>
@@ -349,7 +349,7 @@ function SeniorMoney() {
                               </button>
                             </div>
                           </div>
-                          <p className="font-serif text-xl">{fmt(amount)}</p>
+                          <p className="shrink-0 font-serif text-xl">{fmt(amount)}</p>
                         </li>
                       );
                     })}

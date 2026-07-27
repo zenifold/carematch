@@ -4,12 +4,7 @@ import { useEffect } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { listMyConversations } from "@/lib/messages.functions";
-import {
-  PageSkeleton,
-  EmptyState,
-  ErrorState,
-  RouteErrorBoundary,
-} from "@/components/carematch";
+import { PageSkeleton, EmptyState, ErrorState, RouteErrorBoundary } from "@/components/carematch";
 import { MessageCircle } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/senior/messages/")({
@@ -89,15 +84,11 @@ function MessagesList() {
   useEffect(() => {
     const channel = supabase
       .channel("senior-conversations")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "conversations" },
-        () => convosQ.refetch(),
+      .on("postgres_changes", { event: "*", schema: "public", table: "conversations" }, () =>
+        convosQ.refetch(),
       )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "messages" },
-        () => unreadQ.refetch(),
+      .on("postgres_changes", { event: "*", schema: "public", table: "messages" }, () =>
+        unreadQ.refetch(),
       )
       .subscribe();
     return () => {
@@ -123,7 +114,7 @@ function MessagesList() {
   const sorted = [...rows].sort((a, b) => {
     const ua = unreadMap[a.id] ?? 0;
     const ub = unreadMap[b.id] ?? 0;
-    if ((ua > 0) !== (ub > 0)) return ua > 0 ? -1 : 1;
+    if (ua > 0 !== ub > 0) return ua > 0 ? -1 : 1;
     const ta = a.last_message_at ? new Date(a.last_message_at).getTime() : 0;
     const tb = b.last_message_at ? new Date(b.last_message_at).getTime() : 0;
     return tb - ta;

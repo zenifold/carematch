@@ -71,7 +71,12 @@ function MessageThread() {
       .channel(`messages:${id}`)
       .on(
         "postgres_changes",
-        { event: "INSERT", schema: "public", table: "messages", filter: `conversation_id=eq.${id}` },
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+          filter: `conversation_id=eq.${id}`,
+        },
         (payload) => {
           qc.setQueryData<MessageRow[] | undefined>(key, (prev) => {
             const row = payload.new as MessageRow;

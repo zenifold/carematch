@@ -155,9 +155,7 @@ function SeniorPeople() {
                   </span>
                   <div className="min-w-0">
                     <p className="truncate text-xl font-semibold">{p.name}</p>
-                    <p className="truncate text-base text-muted-foreground">
-                      {p.serviceType}
-                    </p>
+                    <p className="truncate text-base text-muted-foreground">{p.serviceType}</p>
                     <p className="mt-1 text-sm text-muted-foreground">
                       {p.visitCount} visit{p.visitCount === 1 ? "" : "s"} · last {p.lastVisit}
                     </p>
