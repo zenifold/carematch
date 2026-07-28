@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   Phone,
   Menu,
@@ -32,6 +32,25 @@ const audienceLinks: NavLink[] = [
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [signInOpen, setSignInOpen] = useState(false);
+  const signInRef = useRef<HTMLDivElement>(null);
+
+  // Click-outside-to-close instead of onBlur+setTimeout: blur fires the
+  // instant focus moves to a portal Link (mousedown, before its own click
+  // completes), so a timed blur-close can race the very click it's meant to
+  // allow — the classic "first tap on a dropdown item does nothing" bug.
+  // Listening for outside clicks only doesn't fire until well after the
+  // Link's own click has already navigated.
+  useEffect(() => {
+    if (!signInOpen) return;
+    const onPointerDown = (e: PointerEvent) => {
+      if (signInRef.current && !signInRef.current.contains(e.target as Node)) {
+        setSignInOpen(false);
+      }
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, [signInOpen]);
+
   const portals = [
     { to: "/senior", label: "Senior portal", description: "For older adults" },
     { to: "/family", label: "Family portal", description: "For family coordinators" },
@@ -59,10 +78,9 @@ export function SiteHeader() {
               {l.label}
             </Link>
           ))}
-          <div className="relative">
+          <div className="relative" ref={signInRef}>
             <button
               onClick={() => setSignInOpen((o) => !o)}
-              onBlur={() => setTimeout(() => setSignInOpen(false), 150)}
               aria-expanded={signInOpen}
               className="inline-flex items-center gap-1 rounded-full px-2.5 py-1.5 text-xs font-medium text-foreground hover:bg-secondary"
             >
