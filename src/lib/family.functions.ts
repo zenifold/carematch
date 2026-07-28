@@ -322,12 +322,16 @@ export const updateSeniorBudget = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<{ ok: true }> => {
     const { data: link } = await context.supabase
       .from("family_links")
-      .select("senior_id")
+      .select("senior_id, permission")
       .eq("senior_id", data.senior_id)
       .eq("family_id", context.userId)
       .eq("approved", true)
       .maybeSingle();
-    if (!link) throw new Error("Forbidden");
+    // family_can_edit is a senior-wide switch, not per-member — without also
+    // checking this member's own link tier, a "view only" or "modify" family
+    // member could bypass the change-request flow entirely and edit the
+    // budget directly, since only "financial" is meant to skip approval.
+    if (!link || link.permission !== "financial") throw new Error("Forbidden");
 
     const { data: prefs } = await context.supabase
       .from("senior_preferences")

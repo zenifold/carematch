@@ -95,7 +95,10 @@ function FamilyBudget() {
     enabled: !!primary,
     queryFn: () => fetchPerm({ data: { senior_id: primary!.senior_id } }),
   });
-  const canEdit = permQ.data?.can_edit ?? false;
+  // family_can_edit is a senior-wide switch; direct (unapproved) budget edits
+  // are additionally restricted to the "financial" tier — view/modify family
+  // members go through change requests instead (see updateSeniorBudget).
+  const canEdit = (permQ.data?.can_edit ?? false) && primary?.permission === "financial";
 
   const budgetQ = useQuery({
     queryKey: ["family", "budget", primary?.senior_id ?? ""],
