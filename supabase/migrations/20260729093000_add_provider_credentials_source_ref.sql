@@ -1,0 +1,13 @@
+-- bg_check_writeback_credential() and idv_writeback_credential() both write
+-- source_ref onto provider_credentials whenever a background check clears
+-- or an identity verification completes — but the column was never actually
+-- added to the table. Since both are AFTER INSERT/UPDATE triggers on
+-- provider_background_checks / provider_identity_verifications, any real
+-- vendor webhook reporting a pass would fail this INSERT and roll back the
+-- status update that triggered it. This means BACKGROUND_CHECK_VENDOR and
+-- IDV_VENDOR could never actually be turned on: the moment either real
+-- vendor confirmed a caregiver passed, the write-back to provider_credentials
+-- (the thing recompute_provider_verification_state actually reads) would
+-- silently fail every time. Found auditing every function/trigger's column
+-- references against the live schema.
+ALTER TABLE public.provider_credentials ADD COLUMN IF NOT EXISTS source_ref text;
