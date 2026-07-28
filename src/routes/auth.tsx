@@ -338,8 +338,13 @@ function AuthPage() {
       </header>
 
       <main className="mx-auto grid max-w-7xl gap-0 px-4 pb-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-14 lg:px-10">
-        {/* LEFT — Form */}
-        <section className="order-1 lg:order-1">
+        {/* LEFT — Form. Mobile shows the trust/hero image first (order-2
+            below) — same reasoning as the desktop side-by-side layout,
+            just stacked instead of side-by-side: a stranger sizing up
+            whether to trust this site with a password shouldn't have to
+            scroll past a whole form to see the one thing (a real person's
+            face + quote) doing that work. */}
+        <section className="order-2 lg:order-1">
           <div className="mx-auto max-w-xl">
             {mode === "signup" && (
               <StepIndicator step={step} total={totalSteps} />
@@ -473,8 +478,8 @@ function AuthPage() {
           </div>
         </section>
 
-        {/* RIGHT — Role image + quote */}
-        <aside className="order-2 lg:order-2">
+        {/* RIGHT on desktop, FIRST on mobile — role image + quote */}
+        <aside className="order-1 mb-6 lg:order-2 lg:mb-0">
           <div className="relative overflow-hidden rounded-3xl border border-border bg-warm-cream lg:sticky lg:top-6 lg:h-[calc(100dvh-3rem)]">
             <img
               key={activeRole.image}
@@ -482,8 +487,11 @@ function AuthPage() {
               alt={activeRole.label}
               width={1024}
               height={1536}
-              loading="lazy"
-              className="h-72 w-full object-cover transition-opacity duration-500 sm:h-96 lg:h-full"
+              // Eager, not lazy — on mobile this is now the first thing in
+              // the DOM (see the section above), i.e. the actual LCP
+              // candidate, not an off-screen image lazy-load was meant for.
+              fetchPriority="high"
+              className="h-64 w-full object-cover object-top transition-opacity duration-500 sm:h-96 lg:h-full"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-foreground/20 to-transparent" />
             <div className="absolute inset-x-0 bottom-0 space-y-4 p-6 text-primary-foreground sm:p-8">
