@@ -32,11 +32,20 @@ export const Route = createFileRoute("/_authenticated/provider/profile")({
 });
 
 const VERIFICATION_LABELS: Record<string, string> = {
-  id_check: "Identity (Government ID)",
+  id_verification: "Identity (Government ID)",
   background_check: "Background check",
-  license_check: "Professional license",
-  references: "Reference calls",
-  insurance: "Liability insurance",
+  tb_test: "TB test",
+  cpr: "CPR certification",
+  first_aid: "First aid certification",
+  pca: "PCA certification",
+  hha: "HHA certification",
+  cna: "CNA certification",
+  med_tech: "Medication technician certification",
+  phlebotomy: "Phlebotomy certification",
+  lpn: "LPN license",
+  rn: "RN license",
+  driver_license: "Driver's license",
+  auto_insurance: "Auto insurance",
 };
 
 function daysUntil(iso: string) {

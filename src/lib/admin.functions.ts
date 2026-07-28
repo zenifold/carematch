@@ -100,7 +100,7 @@ export const getAdminOverview = createServerFn({ method: "GET" })
         )
         .order("scheduled_at", { ascending: false })
         .limit(10),
-      sb.from("verifications").select("id", { count: "exact", head: true }).eq("status", "pending"),
+      sb.from("provider_credentials").select("id", { count: "exact", head: true }).eq("status", "pending"),
       sb
         .from("incidents")
         .select("id", { count: "exact", head: true })
@@ -220,13 +220,29 @@ export const listAdminProviders = createServerFn({ method: "GET" })
     const { data, error } = await sb
       .from("providers")
       .select(
-        "id, headline, tier, is_active, hourly_rate_cents, years_experience, service_area, profile:profiles!inner(full_name), verifications(status)",
+        "id, headline, tier, is_active, hourly_rate_cents, years_experience, service_area, profile:profiles!inner(full_name)",
       )
       .order("created_at", { ascending: false });
     if (error) throw error;
 
+    const ids = (data ?? []).map((row: any) => row.id);
+    // provider_credentials.provider_id references profiles(id), not
+    // providers(id), so PostgREST can't auto-embed it under `providers` —
+    // fetch separately and group in code instead.
+    const { data: credRows, error: credErr } = ids.length
+      ? await sb.from("provider_credentials").select("provider_id, status").in("provider_id", ids)
+      : { data: [] as { provider_id: string; status: string }[], error: null };
+    if (credErr) throw credErr;
+
+    const credsByProvider = new Map<string, { status: string }[]>();
+    for (const c of credRows ?? []) {
+      const list = credsByProvider.get(c.provider_id) ?? [];
+      list.push({ status: c.status });
+      credsByProvider.set(c.provider_id, list);
+    }
+
     return (data ?? []).map((row: any) => {
-      const verifs = (row.verifications ?? []) as { status: string }[];
+      const creds = credsByProvider.get(row.id) ?? [];
       return {
         id: row.id,
         full_name: row.profile?.full_name ?? null,
@@ -236,8 +252,8 @@ export const listAdminProviders = createServerFn({ method: "GET" })
         hourly_rate_cents: row.hourly_rate_cents,
         years_experience: row.years_experience,
         service_area: row.service_area,
-        verifications_passed: verifs.filter((v) => v.status === "passed").length,
-        verifications_total: verifs.length,
+        verifications_passed: creds.filter((c) => c.status === "passed").length,
+        verifications_total: creds.length,
       };
     });
   });
@@ -445,9 +461,9 @@ export const getAdminAnalytics = createServerFn({ method: "GET" })
         .select("hourly_rate_cents, duration_minutes, status")
         .gte("scheduled_at", monthStart.toISOString()),
       sb.from("bookings").select("senior_id").gte("scheduled_at", d30.toISOString()),
-      sb.from("verifications").select("id", { count: "exact", head: true }).eq("status", "pending"),
-      sb.from("verifications").select("id", { count: "exact", head: true }).eq("status", "passed"),
-      sb.from("verifications").select("id", { count: "exact", head: true }).eq("status", "failed"),
+      sb.from("provider_credentials").select("id", { count: "exact", head: true }).eq("status", "pending"),
+      sb.from("provider_credentials").select("id", { count: "exact", head: true }).eq("status", "passed"),
+      sb.from("provider_credentials").select("id", { count: "exact", head: true }).eq("status", "failed"),
       sb
         .from("incidents")
         .select("id", { count: "exact", head: true })

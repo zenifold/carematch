@@ -176,7 +176,7 @@ export const exportUserData = createServerFn({ method: "POST" })
       supabaseAdmin.from("notifications").select("*").eq("user_id", uid),
       supabaseAdmin.from("incidents").select("*").eq("reporter_id", uid),
       supabaseAdmin.from("payment_ledger").select("*").or(`senior_id.eq.${uid},provider_id.eq.${uid}`),
-      supabaseAdmin.from("verifications").select("*").eq("provider_id", uid),
+      supabaseAdmin.from("provider_credentials").select("*").eq("provider_id", uid),
     ]);
 
 

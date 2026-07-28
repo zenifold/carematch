@@ -56,15 +56,14 @@ export type ProviderVerification = {
   status: string;
   verified_on: string | null;
   expires_on: string | null;
-  vendor: string | null;
 };
 
 export const listMyVerifications = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<ProviderVerification[]> => {
     const { data, error } = await context.supabase
-      .from("verifications")
-      .select("id, kind, status, verified_on, expires_on, vendor")
+      .from("provider_credentials")
+      .select("id, kind, status, verified_on:verified_at, expires_on")
       .eq("provider_id", context.userId)
       .order("created_at", { ascending: true });
     if (error) throw error;
