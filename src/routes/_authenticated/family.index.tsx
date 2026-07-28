@@ -14,12 +14,7 @@ import {
   Clock,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  PageSkeleton,
-  EmptyState,
-  ErrorState,
-  RouteErrorBoundary,
-} from "@/components/carematch";
+import { PageSkeleton, EmptyState, ErrorState, RouteErrorBoundary } from "@/components/carematch";
 import { listMyLinkedSeniors, listVisitsForSenior } from "@/lib/family.functions";
 import { getUnreadMessageCount } from "@/lib/messages.functions";
 
@@ -54,7 +49,10 @@ function FamilyOverview() {
   const fetchLinks = useServerFn(listMyLinkedSeniors);
   const fetchVisits = useServerFn(listVisitsForSenior);
   const fetchUnread = useServerFn(getUnreadMessageCount);
-  const unreadQ = useQuery({ queryKey: ["messages", "unread-count"], queryFn: () => fetchUnread() });
+  const unreadQ = useQuery({
+    queryKey: ["messages", "unread-count"],
+    queryFn: () => fetchUnread(),
+  });
 
   const profileQ = useQuery({
     queryKey: ["profile"],
@@ -103,12 +101,8 @@ function FamilyOverview() {
     return (
       <div className="space-y-8">
         <div>
-          <p className="text-xs uppercase tracking-widest text-muted-foreground">
-            Family portal
-          </p>
-          <h1 className="mt-1 font-serif text-3xl tracking-tight lg:text-4xl">
-            Hi {firstName}
-          </h1>
+          <p className="text-xs uppercase tracking-widest text-muted-foreground">Family portal</p>
+          <h1 className="mt-1 font-serif text-3xl tracking-tight lg:text-4xl">Hi {firstName}</h1>
         </div>
         <EmptyState
           icon={<UserPlus className="size-6" />}
@@ -145,16 +139,12 @@ function FamilyOverview() {
   monthStart.setHours(0, 0, 0, 0);
   const spentCents = rows
     .filter(
-      (r) =>
-        r.status === "completed" &&
-        new Date(r.scheduled_at).getTime() >= monthStart.getTime(),
+      (r) => r.status === "completed" && new Date(r.scheduled_at).getTime() >= monthStart.getTime(),
     )
     .reduce((s, r) => s + (r.hourly_rate_cents * r.duration_minutes) / 60, 0);
   const budgetCents = primary?.monthly_budget_cents ?? 120000;
   const visitsThisMonth = rows.filter(
-    (r) =>
-      r.status === "completed" &&
-      new Date(r.scheduled_at).getTime() >= monthStart.getTime(),
+    (r) => r.status === "completed" && new Date(r.scheduled_at).getTime() >= monthStart.getTime(),
   ).length;
   const activeProviders = new Set(rows.map((r) => r.provider_id)).size;
 
@@ -183,8 +173,7 @@ function FamilyOverview() {
   }
 
   const cancelledRecent = rows.filter(
-    (r) =>
-      r.status === "cancelled" && new Date(r.scheduled_at).getTime() >= weekAgo,
+    (r) => r.status === "cancelled" && new Date(r.scheduled_at).getTime() >= weekAgo,
   ).length;
   if (cancelledRecent > 0) {
     flags.push({
@@ -196,8 +185,7 @@ function FamilyOverview() {
   }
 
   const completedRecent = rows.filter(
-    (r) =>
-      r.status === "completed" && new Date(r.scheduled_at).getTime() >= weekAgo,
+    (r) => r.status === "completed" && new Date(r.scheduled_at).getTime() >= weekAgo,
   ).length;
   if (completedRecent > 0) {
     flags.push({
@@ -208,9 +196,7 @@ function FamilyOverview() {
     });
   }
 
-  const anyRecentActivity = rows.some(
-    (r) => new Date(r.scheduled_at).getTime() >= threeWeeksAgo,
-  );
+  const anyRecentActivity = rows.some((r) => new Date(r.scheduled_at).getTime() >= threeWeeksAgo);
   if (!anyRecentActivity && rows.length > 0) {
     flags.push({
       tone: "warn",
@@ -237,14 +223,11 @@ function FamilyOverview() {
           <div className="flex items-start gap-3">
             <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-primary" />
             <div>
-              <p className="text-xs font-bold uppercase tracking-widest text-primary">
-                Last visit
-              </p>
+              <p className="text-xs font-bold uppercase tracking-widest text-primary">Last visit</p>
               {lastCompleted ? (
                 <>
                   <p className="mt-1 font-medium">
-                    {lastCompleted.provider_name ?? "Caregiver"} —{" "}
-                    {lastCompleted.service_type}
+                    {lastCompleted.provider_name ?? "Caregiver"} — {lastCompleted.service_type}
                   </p>
                   <p className="text-sm text-muted-foreground">
                     {new Date(lastCompleted.scheduled_at).toLocaleString(undefined, {
@@ -265,17 +248,13 @@ function FamilyOverview() {
                 Verification
               </p>
               <p className="mt-1 font-medium">All active caregivers verified</p>
-              <p className="text-sm text-muted-foreground">
-                CareMatch renews checks automatically
-              </p>
+              <p className="text-sm text-muted-foreground">CareMatch renews checks automatically</p>
             </div>
           </div>
           <div className="flex items-start gap-3">
             <Calendar className="mt-0.5 size-5 shrink-0 text-primary" />
             <div>
-              <p className="text-xs font-bold uppercase tracking-widest text-primary">
-                Next visit
-              </p>
+              <p className="text-xs font-bold uppercase tracking-widest text-primary">Next visit</p>
               {nextUpcoming ? (
                 <>
                   <p className="mt-1 font-medium">
@@ -331,7 +310,6 @@ function FamilyOverview() {
       {/* 7-day mini calendar */}
       <SevenDayStrip rows={rows} />
 
-
       {flags.length > 0 && (
         <section className="space-y-2">
           <h2 className="font-serif text-xl">Worth a look</h2>
@@ -384,7 +362,7 @@ function FamilyOverview() {
           to="/family/budget"
           icon={<Wallet className="size-5" />}
           label="Budget & funds"
-          hint="Add funds or set autopay"
+          hint="Track spend, request a plan change"
         />
       </section>
 
@@ -495,9 +473,7 @@ function StatCard({
   return (
     <div className="surface-card p-5">
       <div className="flex items-center justify-between">
-        <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-          {label}
-        </p>
+        <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{label}</p>
         <Icon className="size-4 text-muted-foreground" />
       </div>
       <p className="mt-3 font-serif text-3xl">{value}</p>
@@ -533,11 +509,7 @@ function QuickAction({
   );
 }
 
-function SevenDayStrip({
-  rows,
-}: {
-  rows: { scheduled_at: string; status: string }[];
-}) {
+function SevenDayStrip({ rows }: { rows: { scheduled_at: string; status: string }[] }) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const days = Array.from({ length: 7 }, (_, i) => {
@@ -571,9 +543,7 @@ function SevenDayStrip({
             <div
               key={i}
               className={`rounded-2xl border-2 p-2 text-center ${
-                isToday
-                  ? "border-primary bg-primary/10"
-                  : "border-border bg-card"
+                isToday ? "border-primary bg-primary/10" : "border-border bg-card"
               }`}
             >
               <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
@@ -586,9 +556,7 @@ function SevenDayStrip({
                 {Array.from({ length: Math.min(d.count, 3) }).map((_, k) => (
                   <span
                     key={k}
-                    className={`size-1.5 rounded-full ${
-                      isToday ? "bg-primary" : "bg-sage-500"
-                    }`}
+                    className={`size-1.5 rounded-full ${isToday ? "bg-primary" : "bg-sage-500"}`}
                   />
                 ))}
                 {d.count === 0 && <span className="text-xs text-muted-foreground/60">·</span>}

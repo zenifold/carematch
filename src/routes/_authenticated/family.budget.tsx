@@ -182,7 +182,7 @@ function FamilyBudget() {
 
       {budget > 0 && (
         <section className="surface-card p-5 lg:p-6">
-          <BudgetBar spent={b.month_to_date_cents} budget={budget} label="This month" />
+          <BudgetBar spent={b.month_to_date_cents / 100} budget={budget / 100} label="This month" />
           {deltaLabel && <p className="mt-3 text-sm text-muted-foreground">{deltaLabel}</p>}
           <div className="mt-4">
             {canEdit ? (

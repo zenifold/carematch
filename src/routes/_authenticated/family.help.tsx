@@ -45,7 +45,9 @@ function FamilyHelp() {
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-xs uppercase tracking-widest text-muted-foreground">We're here for you</p>
+        <p className="text-xs uppercase tracking-widest text-muted-foreground">
+          We're here for you
+        </p>
         <h1 className="mt-1 font-serif text-3xl lg:text-4xl">Help &amp; concierge</h1>
         <p className="mt-2 max-w-2xl text-muted-foreground">
           Human concierge for billing, care plan, and escalation. Emergencies always call 911 first.
@@ -55,7 +57,9 @@ function FamilyHelp() {
       <section className="surface-card p-5 lg:p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-xs uppercase tracking-widest text-muted-foreground">Concierge line</p>
+            <p className="text-xs uppercase tracking-widest text-muted-foreground">
+              Concierge line
+            </p>
             <a
               href={`tel:${CONCIERGE_TEL}`}
               className="mt-1 block font-serif text-3xl text-primary hover:underline"
@@ -63,7 +67,8 @@ function FamilyHelp() {
               {CONCIERGE_DISPLAY}
             </a>
             <p className="mt-1 text-sm text-muted-foreground">
-              7 days · 7am–10pm local time. After-hours pages an on-call coordinator for urgent issues.
+              7 days · 7am–10pm local time. After-hours pages an on-call coordinator for urgent
+              issues.
             </p>
           </div>
           <a
@@ -76,10 +81,30 @@ function FamilyHelp() {
       </section>
 
       <section className="grid gap-3 sm:grid-cols-2">
-        <QuickLink to="/family/budget" icon={<Wallet className="size-5" />} title="Billing question" body="Refunds, invoices, statements, autopay." />
-        <QuickLink to="/family/care-plan" icon={<ClipboardList className="size-5" />} title="Update care plan" body="Meds, allergies, home info, preferences." />
-        <QuickLink to="/family/messages" icon={<MessageCircle className="size-5" />} title="Message a caregiver" body="Send a note to the current care team." />
-        <QuickLink to="/family/visits" icon={<AlertTriangle className="size-5" />} title="Flag a visit concern" body="Report an issue about a recent visit." />
+        <QuickLink
+          to="/family/budget"
+          icon={<Wallet className="size-5" />}
+          title="Billing question"
+          body="Refunds, invoices, statements."
+        />
+        <QuickLink
+          to="/family/care-plan"
+          icon={<ClipboardList className="size-5" />}
+          title="Update care plan"
+          body="Meds, allergies, home info, preferences."
+        />
+        <QuickLink
+          to="/family/messages"
+          icon={<MessageCircle className="size-5" />}
+          title="Message a caregiver"
+          body="Send a note to the current care team."
+        />
+        <QuickLink
+          to="/family/visits"
+          icon={<AlertTriangle className="size-5" />}
+          title="Flag a visit concern"
+          body="Report an issue about a recent visit."
+        />
       </section>
 
       <section className="surface-card p-5 lg:p-6">
@@ -109,7 +134,11 @@ function FamilyHelp() {
                 disabled={!canSend}
                 className="inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground shadow-soft hover:bg-primary/90 disabled:opacity-50"
               >
-                {send.isPending ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
+                {send.isPending ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <Send className="size-4" />
+                )}
                 Send message
               </button>
             </div>
@@ -120,10 +149,22 @@ function FamilyHelp() {
   );
 }
 
-function QuickLink({ to, icon, title, body }: { to: string; icon: React.ReactNode; title: string; body: string }) {
+function QuickLink({
+  to,
+  icon,
+  title,
+  body,
+}: {
+  to: string;
+  icon: React.ReactNode;
+  title: string;
+  body: string;
+}) {
   return (
     <Link to={to} className="surface-card flex gap-3 p-4 hover:shadow-soft">
-      <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">{icon}</span>
+      <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
+        {icon}
+      </span>
       <div>
         <p className="font-semibold">{title}</p>
         <p className="text-sm text-muted-foreground">{body}</p>
