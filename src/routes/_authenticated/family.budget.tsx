@@ -1,15 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
   CheckCircle2,
+  CreditCard,
   Download,
   HandHeart,
   Loader2,
   Sliders,
   UserPlus,
   Wallet,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -30,6 +32,11 @@ import {
   markVisitUnpaid,
   updateSeniorBudget,
 } from "@/lib/family.functions";
+import {
+  getPaymentMethodStatus,
+  removePaymentMethod,
+  startAddPaymentMethod,
+} from "@/lib/family-payments.functions";
 import type { VisitRow } from "@/lib/bookings.functions";
 import { BudgetBar } from "@/components/carematch/BudgetBar";
 
@@ -205,6 +212,8 @@ function FamilyBudget() {
         </section>
       )}
 
+      {canEdit && <PaymentMethodCard seniorId={primary.senior_id} />}
+
       <section className="grid gap-3 sm:grid-cols-3">
         <Kpi
           label="Month to date"
@@ -373,6 +382,93 @@ function BudgetRequestTrigger({
         }
       />
     </>
+  );
+}
+
+function PaymentMethodCard({ seniorId }: { seniorId: string }) {
+  const qc = useQueryClient();
+  const statusFn = useServerFn(getPaymentMethodStatus);
+  const statusQ = useQuery({
+    queryKey: ["family", "payment-method", seniorId],
+    queryFn: () => statusFn({ data: { senior_id: seniorId } }),
+  });
+
+  const startFn = useServerFn(startAddPaymentMethod);
+  const start = useMutation({
+    mutationFn: () =>
+      startFn({
+        data: {
+          senior_id: seniorId,
+          returnUrl: `${window.location.origin}/family/budget`,
+        },
+      }),
+    onSuccess: (res) => {
+      window.location.href = res.url;
+    },
+    onError: (err) =>
+      toast.error(err instanceof Error ? err.message : "Couldn't start payment setup"),
+  });
+
+  const removeFn = useServerFn(removePaymentMethod);
+  const remove = useMutation({
+    mutationFn: () => removeFn({ data: { senior_id: seniorId } }),
+    onSuccess: () => {
+      toast.success("Card removed");
+      qc.invalidateQueries({ queryKey: ["family", "payment-method", seniorId] });
+    },
+    onError: (err) => toast.error(err instanceof Error ? err.message : "Couldn't remove card"),
+  });
+
+  if (statusQ.isPending) return null;
+  const s = statusQ.data;
+
+  return (
+    <section className="surface-card p-5 lg:p-6">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <h2 className="font-serif text-lg">Payment method</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            No membership, no fee to book — this card is only charged after a visit is checked
+            out, for that visit's cost.
+          </p>
+        </div>
+        <CreditCard className="size-6 shrink-0 text-muted-foreground" />
+      </div>
+
+      {!s?.configured ? (
+        <p className="mt-4 text-sm text-muted-foreground">Payments aren't set up yet.</p>
+      ) : s.has_payment_method ? (
+        <div className="mt-4 flex items-center justify-between rounded-xl border border-border bg-secondary/40 px-4 py-3">
+          <p className="text-sm font-semibold">
+            {s.brand ? `${s.brand[0].toUpperCase()}${s.brand.slice(1)}` : "Card"} ····{" "}
+            {s.last4 ?? "····"}
+          </p>
+          <button
+            type="button"
+            disabled={remove.isPending}
+            onClick={() => remove.mutate()}
+            className="inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-destructive disabled:opacity-50"
+          >
+            {remove.isPending ? (
+              <Loader2 className="size-3.5 animate-spin" />
+            ) : (
+              <X className="size-3.5" />
+            )}
+            Remove
+          </button>
+        </div>
+      ) : (
+        <button
+          type="button"
+          disabled={start.isPending}
+          onClick={() => start.mutate()}
+          className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-soft hover:bg-primary/90 disabled:opacity-60"
+        >
+          {start.isPending ? <Loader2 className="size-4 animate-spin" /> : null}
+          Add a card
+        </button>
+      )}
+    </section>
   );
 }
 

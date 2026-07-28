@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       admin_audit_log: {
@@ -107,6 +132,7 @@ export type Database = {
           provider_comment: string | null
           provider_id: string
           provider_rating: number | null
+          reminder_sent_at: string | null
           scheduled_at: string
           senior_id: string
           service_type: string
@@ -125,6 +151,7 @@ export type Database = {
           provider_comment?: string | null
           provider_id: string
           provider_rating?: number | null
+          reminder_sent_at?: string | null
           scheduled_at: string
           senior_id: string
           service_type?: string
@@ -143,6 +170,7 @@ export type Database = {
           provider_comment?: string | null
           provider_id?: string
           provider_rating?: number | null
+          reminder_sent_at?: string | null
           scheduled_at?: string
           senior_id?: string
           service_type?: string
@@ -302,7 +330,7 @@ export type Database = {
         Row: {
           assignee_id: string | null
           created_at: string
-          created_by: string
+          created_by: string | null
           due_at: string | null
           id: string
           notes: string | null
@@ -315,7 +343,7 @@ export type Database = {
         Insert: {
           assignee_id?: string | null
           created_at?: string
-          created_by: string
+          created_by?: string | null
           due_at?: string | null
           id?: string
           notes?: string | null
@@ -328,7 +356,7 @@ export type Database = {
         Update: {
           assignee_id?: string | null
           created_at?: string
-          created_by?: string
+          created_by?: string | null
           due_at?: string | null
           id?: string
           notes?: string | null
@@ -337,33 +365,6 @@ export type Database = {
           target_user_id?: string | null
           title?: string
           updated_at?: string
-        }
-        Relationships: []
-      }
-      family_notification_prefs: {
-        Row: {
-          created_at: string
-          email: boolean
-          push: boolean
-          sms: boolean
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          email?: boolean
-          push?: boolean
-          sms?: boolean
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          email?: boolean
-          push?: boolean
-          sms?: boolean
-          updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }
@@ -462,6 +463,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      family_notification_prefs: {
+        Row: {
+          created_at: string
+          email: boolean
+          push: boolean
+          sms: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email?: boolean
+          push?: boolean
+          sms?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: boolean
+          push?: boolean
+          sms?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       feature_flags: {
         Row: {
@@ -633,6 +661,9 @@ export type Database = {
           provider_id: string
           senior_id: string | null
           status: Database["public"]["Enums"]["ledger_status"]
+          stripe_payment_intent_id: string | null
+          stripe_refund_id: string | null
+          stripe_transfer_id: string | null
           training_referral_id: string | null
           updated_at: string
           visit_id: string | null
@@ -649,6 +680,9 @@ export type Database = {
           provider_id: string
           senior_id?: string | null
           status?: Database["public"]["Enums"]["ledger_status"]
+          stripe_payment_intent_id?: string | null
+          stripe_refund_id?: string | null
+          stripe_transfer_id?: string | null
           training_referral_id?: string | null
           updated_at?: string
           visit_id?: string | null
@@ -665,6 +699,9 @@ export type Database = {
           provider_id?: string
           senior_id?: string | null
           status?: Database["public"]["Enums"]["ledger_status"]
+          stripe_payment_intent_id?: string | null
+          stripe_refund_id?: string | null
+          stripe_transfer_id?: string | null
           training_referral_id?: string | null
           updated_at?: string
           visit_id?: string | null
@@ -709,6 +746,10 @@ export type Database = {
           onboarded_at: string | null
           phone: string | null
           role: Database["public"]["Enums"]["app_role"]
+          stripe_customer_id: string | null
+          stripe_payment_method_id: string | null
+          stripe_pm_brand: string | null
+          stripe_pm_last4: string | null
           suspended_at: string | null
           suspended_reason: string | null
           updated_at: string
@@ -728,6 +769,10 @@ export type Database = {
           onboarded_at?: string | null
           phone?: string | null
           role?: Database["public"]["Enums"]["app_role"]
+          stripe_customer_id?: string | null
+          stripe_payment_method_id?: string | null
+          stripe_pm_brand?: string | null
+          stripe_pm_last4?: string | null
           suspended_at?: string | null
           suspended_reason?: string | null
           updated_at?: string
@@ -747,6 +792,10 @@ export type Database = {
           onboarded_at?: string | null
           phone?: string | null
           role?: Database["public"]["Enums"]["app_role"]
+          stripe_customer_id?: string | null
+          stripe_payment_method_id?: string | null
+          stripe_pm_brand?: string | null
+          stripe_pm_last4?: string | null
           suspended_at?: string | null
           suspended_reason?: string | null
           updated_at?: string
@@ -962,6 +1011,7 @@ export type Database = {
           kind: Database["public"]["Enums"]["credential_kind"]
           notes: string | null
           provider_id: string
+          source_ref: string | null
           status: Database["public"]["Enums"]["verification_status"]
           updated_at: string
           verified_at: string | null
@@ -977,6 +1027,7 @@ export type Database = {
           kind: Database["public"]["Enums"]["credential_kind"]
           notes?: string | null
           provider_id: string
+          source_ref?: string | null
           status?: Database["public"]["Enums"]["verification_status"]
           updated_at?: string
           verified_at?: string | null
@@ -992,6 +1043,7 @@ export type Database = {
           kind?: Database["public"]["Enums"]["credential_kind"]
           notes?: string | null
           provider_id?: string
+          source_ref?: string | null
           status?: Database["public"]["Enums"]["verification_status"]
           updated_at?: string
           verified_at?: string | null
@@ -1371,6 +1423,10 @@ export type Database = {
           service_area: string | null
           service_tier: number
           specialties: string[]
+          stripe_account_id: string | null
+          stripe_charges_enabled: boolean
+          stripe_details_submitted: boolean
+          stripe_payouts_enabled: boolean
           tier: Database["public"]["Enums"]["provider_tier"]
           updated_at: string
           verification_state: Database["public"]["Enums"]["provider_verification_state"]
@@ -1395,6 +1451,10 @@ export type Database = {
           service_area?: string | null
           service_tier?: number
           specialties?: string[]
+          stripe_account_id?: string | null
+          stripe_charges_enabled?: boolean
+          stripe_details_submitted?: boolean
+          stripe_payouts_enabled?: boolean
           tier?: Database["public"]["Enums"]["provider_tier"]
           updated_at?: string
           verification_state?: Database["public"]["Enums"]["provider_verification_state"]
@@ -1419,6 +1479,10 @@ export type Database = {
           service_area?: string | null
           service_tier?: number
           specialties?: string[]
+          stripe_account_id?: string | null
+          stripe_charges_enabled?: boolean
+          stripe_details_submitted?: boolean
+          stripe_payouts_enabled?: boolean
           tier?: Database["public"]["Enums"]["provider_tier"]
           updated_at?: string
           verification_state?: Database["public"]["Enums"]["provider_verification_state"]
@@ -1611,6 +1675,36 @@ export type Database = {
           staff_id?: string
           target_user_id?: string
           token_hash?: string
+        }
+        Relationships: []
+      }
+      stripe_events: {
+        Row: {
+          created_at: string
+          error: string | null
+          event_type: string
+          id: string
+          payload: Json
+          processed_at: string | null
+          stripe_event_id: string
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          event_type: string
+          id?: string
+          payload: Json
+          processed_at?: string | null
+          stripe_event_id: string
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          event_type?: string
+          id?: string
+          payload?: Json
+          processed_at?: string | null
+          stripe_event_id?: string
         }
         Relationships: []
       }
@@ -2362,6 +2456,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       app_role: [

@@ -118,6 +118,7 @@ import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authe
 import { Route as AuthenticatedSeniorVisitsIndexRouteImport } from './routes/_authenticated/senior.visits.index'
 import { Route as AuthenticatedSeniorMessagesIndexRouteImport } from './routes/_authenticated/senior.messages.index'
 import { Route as AuthenticatedOnboardingProviderIndexRouteImport } from './routes/_authenticated/onboarding.provider.index'
+import { Route as ApiPublicHooksStripeRouteImport } from './routes/api/public/hooks/stripe'
 import { Route as ApiPublicHooksProviderReengagementRouteImport } from './routes/api/public/hooks/provider-reengagement'
 import { Route as ApiPublicHooksIdentityVerificationRouteImport } from './routes/api/public/hooks/identity-verification'
 import { Route as ApiPublicHooksBackgroundCheckRouteImport } from './routes/api/public/hooks/background-check'
@@ -735,6 +736,11 @@ const AuthenticatedOnboardingProviderIndexRoute =
     path: '/provider/',
     getParentRoute: () => AuthenticatedOnboardingRoute,
   } as any)
+const ApiPublicHooksStripeRoute = ApiPublicHooksStripeRouteImport.update({
+  id: '/api/public/hooks/stripe',
+  path: '/api/public/hooks/stripe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicHooksProviderReengagementRoute =
   ApiPublicHooksProviderReengagementRouteImport.update({
     id: '/api/public/hooks/provider-reengagement',
@@ -898,6 +904,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/background-check': typeof ApiPublicHooksBackgroundCheckRoute
   '/api/public/hooks/identity-verification': typeof ApiPublicHooksIdentityVerificationRoute
   '/api/public/hooks/provider-reengagement': typeof ApiPublicHooksProviderReengagementRoute
+  '/api/public/hooks/stripe': typeof ApiPublicHooksStripeRoute
   '/onboarding/provider/': typeof AuthenticatedOnboardingProviderIndexRoute
   '/senior/messages/': typeof AuthenticatedSeniorMessagesIndexRoute
   '/senior/visits/': typeof AuthenticatedSeniorVisitsIndexRoute
@@ -1006,6 +1013,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/background-check': typeof ApiPublicHooksBackgroundCheckRoute
   '/api/public/hooks/identity-verification': typeof ApiPublicHooksIdentityVerificationRoute
   '/api/public/hooks/provider-reengagement': typeof ApiPublicHooksProviderReengagementRoute
+  '/api/public/hooks/stripe': typeof ApiPublicHooksStripeRoute
   '/onboarding/provider': typeof AuthenticatedOnboardingProviderIndexRoute
   '/senior/messages': typeof AuthenticatedSeniorMessagesIndexRoute
   '/senior/visits': typeof AuthenticatedSeniorVisitsIndexRoute
@@ -1126,6 +1134,7 @@ export interface FileRoutesById {
   '/api/public/hooks/background-check': typeof ApiPublicHooksBackgroundCheckRoute
   '/api/public/hooks/identity-verification': typeof ApiPublicHooksIdentityVerificationRoute
   '/api/public/hooks/provider-reengagement': typeof ApiPublicHooksProviderReengagementRoute
+  '/api/public/hooks/stripe': typeof ApiPublicHooksStripeRoute
   '/_authenticated/onboarding/provider/': typeof AuthenticatedOnboardingProviderIndexRoute
   '/_authenticated/senior/messages/': typeof AuthenticatedSeniorMessagesIndexRoute
   '/_authenticated/senior/visits/': typeof AuthenticatedSeniorVisitsIndexRoute
@@ -1246,6 +1255,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/background-check'
     | '/api/public/hooks/identity-verification'
     | '/api/public/hooks/provider-reengagement'
+    | '/api/public/hooks/stripe'
     | '/onboarding/provider/'
     | '/senior/messages/'
     | '/senior/visits/'
@@ -1354,6 +1364,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/background-check'
     | '/api/public/hooks/identity-verification'
     | '/api/public/hooks/provider-reengagement'
+    | '/api/public/hooks/stripe'
     | '/onboarding/provider'
     | '/senior/messages'
     | '/senior/visits'
@@ -1473,6 +1484,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/background-check'
     | '/api/public/hooks/identity-verification'
     | '/api/public/hooks/provider-reengagement'
+    | '/api/public/hooks/stripe'
     | '/_authenticated/onboarding/provider/'
     | '/_authenticated/senior/messages/'
     | '/_authenticated/senior/visits/'
@@ -1499,6 +1511,7 @@ export interface RootRouteChildren {
   ApiPublicHooksBackgroundCheckRoute: typeof ApiPublicHooksBackgroundCheckRoute
   ApiPublicHooksIdentityVerificationRoute: typeof ApiPublicHooksIdentityVerificationRoute
   ApiPublicHooksProviderReengagementRoute: typeof ApiPublicHooksProviderReengagementRoute
+  ApiPublicHooksStripeRoute: typeof ApiPublicHooksStripeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -2266,6 +2279,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOnboardingProviderIndexRouteImport
       parentRoute: typeof AuthenticatedOnboardingRoute
     }
+    '/api/public/hooks/stripe': {
+      id: '/api/public/hooks/stripe'
+      path: '/api/public/hooks/stripe'
+      fullPath: '/api/public/hooks/stripe'
+      preLoaderRoute: typeof ApiPublicHooksStripeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/provider-reengagement': {
       id: '/api/public/hooks/provider-reengagement'
       path: '/api/public/hooks/provider-reengagement'
@@ -2675,6 +2695,7 @@ const rootRouteChildren: RootRouteChildren = {
     ApiPublicHooksIdentityVerificationRoute,
   ApiPublicHooksProviderReengagementRoute:
     ApiPublicHooksProviderReengagementRoute,
+  ApiPublicHooksStripeRoute: ApiPublicHooksStripeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

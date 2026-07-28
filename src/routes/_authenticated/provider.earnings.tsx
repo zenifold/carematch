@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Loader2, TrendingUp, Wallet } from "lucide-react";
+import { CheckCircle2, Loader2, ShieldCheck, TrendingUp, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import { getProviderEarnings } from "@/lib/provider.functions";
 import { createSupportTicket } from "@/lib/support.functions";
+import { getMyConnectStatus, startConnectOnboarding } from "@/lib/provider-payments.functions";
 import { PageSkeleton, EmptyState, ErrorState, RouteErrorBoundary } from "@/components/carematch";
 
 export const Route = createFileRoute("/_authenticated/provider/earnings")({
@@ -31,6 +32,21 @@ function EarningsPage() {
       }),
     onSuccess: () => toast.success("Sent — Ops will follow up by email"),
     onError: (err) => toast.error(err instanceof Error ? err.message : "Couldn't send request"),
+  });
+
+  const connectFn = useServerFn(getMyConnectStatus);
+  const connectQ = useQuery({ queryKey: ["provider", "connect-status"], queryFn: () => connectFn() });
+  const startOnboardingFn = useServerFn(startConnectOnboarding);
+  const startOnboarding = useMutation({
+    mutationFn: () =>
+      startOnboardingFn({
+        data: { returnUrl: `${window.location.origin}/provider/earnings` },
+      }),
+    onSuccess: (res) => {
+      window.location.href = res.url;
+    },
+    onError: (err) =>
+      toast.error(err instanceof Error ? err.message : "Couldn't start payout setup"),
   });
 
   if (q.isPending) return <PageSkeleton title="earnings" cards={4} />;
@@ -181,18 +197,65 @@ function EarningsPage() {
       <section className="grid gap-3 sm:grid-cols-2">
         <div className="rounded-2xl border border-border bg-card p-5">
           <h3 className="font-serif text-lg">Direct deposit</h3>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Payouts run every Monday to the bank account you have on file.
-          </p>
-          <button
-            type="button"
-            disabled={requestOpsAction.isPending}
-            onClick={() => requestOpsAction.mutate("Update bank / payout details")}
-            className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-input bg-background px-3 py-1.5 text-xs font-semibold hover:bg-secondary disabled:opacity-50"
-          >
-            {requestOpsAction.isPending ? <Loader2 className="size-3.5 animate-spin" /> : null}
-            Update bank
-          </button>
+          {connectQ.isPending ? (
+            <p className="mt-1 text-sm text-muted-foreground">Checking payout setup…</p>
+          ) : connectQ.data?.payouts_enabled ? (
+            <>
+              <p className="mt-1 flex items-center gap-1.5 text-sm text-success">
+                <CheckCircle2 className="size-4" /> Payouts are set up — paid automatically after
+                each visit.
+              </p>
+              <button
+                type="button"
+                disabled={startOnboarding.isPending}
+                onClick={() => startOnboarding.mutate()}
+                className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-input bg-background px-3 py-1.5 text-xs font-semibold hover:bg-secondary disabled:opacity-50"
+              >
+                {startOnboarding.isPending ? <Loader2 className="size-3.5 animate-spin" /> : null}
+                Update bank details
+              </button>
+            </>
+          ) : connectQ.data?.has_account ? (
+            <>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Almost there — finish verifying your details with Stripe to start getting paid
+                automatically.
+              </p>
+              <button
+                type="button"
+                disabled={startOnboarding.isPending}
+                onClick={() => startOnboarding.mutate()}
+                className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+              >
+                {startOnboarding.isPending ? (
+                  <Loader2 className="size-3.5 animate-spin" />
+                ) : (
+                  <ShieldCheck className="size-3.5" />
+                )}
+                Finish setup
+              </button>
+            </>
+          ) : (
+            <>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Set up direct deposit to get paid automatically the moment a visit is checked out
+                — no waiting on manual payroll.
+              </p>
+              <button
+                type="button"
+                disabled={startOnboarding.isPending || !connectQ.data?.configured}
+                onClick={() => startOnboarding.mutate()}
+                className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+              >
+                {startOnboarding.isPending ? (
+                  <Loader2 className="size-3.5 animate-spin" />
+                ) : (
+                  <ShieldCheck className="size-3.5" />
+                )}
+                Set up direct deposit
+              </button>
+            </>
+          )}
         </div>
         <div className="rounded-2xl border border-border bg-card p-5">
           <h3 className="font-serif text-lg">Tax documents</h3>

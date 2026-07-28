@@ -463,6 +463,15 @@ export const checkOutVisit = createServerFn({ method: "POST" })
 
     // Award consistency bonus for repeat visits with same senior.
     await awardConsistencyBonusIfDue(data.id, context.userId);
+
+    // Charge for the visit now that it's actually complete — never before.
+    // Never throws: a payment failure must not block check-out, since the
+    // visit already happened regardless of how billing resolves.
+    const { chargeCompletedVisit } = await import("@/lib/stripe/charge-visit.server");
+    await chargeCompletedVisit(data.id).catch(() => {
+      /* swallowed intentionally — see chargeCompletedVisit's own doc comment */
+    });
+
     return { ok: true };
   });
 
