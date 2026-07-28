@@ -2,17 +2,30 @@ import { X } from "lucide-react";
 import { useEffect } from "react";
 import { VerificationBadge, VERIFICATION_STAGES } from "./VerificationBadge";
 
+type VerificationState = "pending" | "provisional" | "verified" | "suspended";
+
 type Props = {
   open: boolean;
   onClose: () => void;
   providerName?: string;
+  /** Defaults to describing the process only (no per-provider completion claim) when omitted. */
+  verificationState?: VerificationState;
+};
+
+const STATE_COPY: Record<VerificationState, string> = {
+  verified: "Five checks. Every one refreshed on schedule.",
+  provisional: "Identity confirmed. The remaining checks are still in progress.",
+  pending: "Just joined — here's exactly what we check before their first visit.",
+  suspended: "Verification is in progress — here's what we check.",
 };
 
 /**
  * VerificationModal — full-screen sheet explaining all 5 verification stages.
- * Triggered from a MatchCard's verification badge.
+ * Triggered from a MatchCard's verification badge. The subhead reflects this
+ * specific provider's real verification_state — it never claims a check is
+ * done unless it actually is.
  */
-export function VerificationModal({ open, onClose, providerName }: Props) {
+export function VerificationModal({ open, onClose, providerName, verificationState }: Props) {
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -38,7 +51,9 @@ export function VerificationModal({ open, onClose, providerName }: Props) {
           <div>
             <h2 className="font-serif text-2xl">How we verify {providerName ?? "every caregiver"}</h2>
             <p className="mt-1 text-base text-muted-foreground">
-              Five checks. Every one refreshed on schedule.
+              {verificationState
+                ? STATE_COPY[verificationState]
+                : "Here's exactly what we check, and how often."}
             </p>
           </div>
           <button

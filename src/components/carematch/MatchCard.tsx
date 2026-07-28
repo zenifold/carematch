@@ -9,10 +9,21 @@ export type MatchCardData = {
   initials: string;
   monthlyPlan: number;
   hourlyRate: number;
-  rating: number;
-  distanceMiles: number;
+  /** null when the provider has no ratings yet — shown as "New to CareMatch", never a fabricated number. */
+  rating: number | null;
+  ratingCount: number;
+  serviceArea: string | null;
   whyMatch: string[];
   tier?: "Gold" | "Silver" | "Bronze";
+  /** Real providers.verification_state — the trigger copy must never claim more than this. */
+  verificationState: "pending" | "provisional" | "verified" | "suspended";
+};
+
+const VERIFICATION_LABEL: Record<MatchCardData["verificationState"], string> = {
+  verified: "Verified · tap for details",
+  provisional: "Verification in progress · tap for details",
+  pending: "New application · tap to see our process",
+  suspended: "Verification in progress · tap for details",
 };
 
 type Props = {
@@ -51,7 +62,9 @@ export function MatchCard({ provider, onChoose, onSkip, className = "" }: Props)
           </div>
           <div className="flex items-center gap-1 rounded-full bg-secondary px-3 py-1 text-sm font-semibold">
             <Star className="size-4 fill-accent text-accent" />
-            {provider.rating.toFixed(1)}
+            {provider.rating !== null
+              ? `${provider.rating.toFixed(1)} (${provider.ratingCount})`
+              : "New to CareMatch"}
           </div>
         </div>
 
@@ -60,12 +73,13 @@ export function MatchCard({ provider, onChoose, onSkip, className = "" }: Props)
           onClick={() => setVerifyOpen(true)}
           className="mt-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/15"
         >
-          <ShieldCheck className="size-4" /> Fully verified · tap for details
+          <ShieldCheck className="size-4" /> {VERIFICATION_LABEL[provider.verificationState]}
         </button>
         <VerificationModal
           open={verifyOpen}
           onClose={() => setVerifyOpen(false)}
           providerName={provider.name}
+          verificationState={provider.verificationState}
         />
 
         <p className="mt-5 text-sm font-semibold uppercase tracking-wider text-primary">
@@ -86,7 +100,7 @@ export function MatchCard({ provider, onChoose, onSkip, className = "" }: Props)
             <p className="font-serif text-3xl text-primary">{fmt(provider.monthlyPlan)}<span className="text-base text-muted-foreground"> /mo</span></p>
           </div>
           <p className="text-sm text-muted-foreground">
-            {provider.distanceMiles.toFixed(1)} mi away
+            {provider.serviceArea ? `Serves ${provider.serviceArea}` : "Service area on file"}
           </p>
         </div>
 

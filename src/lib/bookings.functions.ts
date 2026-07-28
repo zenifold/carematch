@@ -151,6 +151,9 @@ export type MatchedProvider = {
   languages: string[];
   service_area: string | null;
   tier: string;
+  rating_avg: number | null;
+  rating_count: number;
+  verification_state: string;
 };
 
 /**
@@ -196,10 +199,18 @@ export const matchProviders = createServerFn({ method: "GET" })
     let q = context.supabase
       .from("providers")
       .select(
-        "id, headline, bio, hourly_rate_cents, years_experience, specialties, languages, service_area, tier, service_tier, is_active, profile:profiles!inner(full_name, avatar_url)",
+        "id, headline, bio, hourly_rate_cents, years_experience, specialties, languages, service_area, tier, service_tier, is_active, rating_avg, rating_count, verification_state, profile:profiles!inner(full_name, avatar_url)",
       )
       .eq("is_active", true)
       .gte("service_tier", requiredTier)
+      // "Best match" means proven quality first, not just cheapest: higher
+      // tier (a real proxy for verification depth), then higher rating for
+      // providers who have one — nullsFirst:false keeps unrated providers
+      // from being buried behind a single lucky 5-star, but doesn't let them
+      // outrank someone with a real track record either — price only breaks
+      // ties among otherwise-similar options.
+      .order("tier", { ascending: false })
+      .order("rating_avg", { ascending: false, nullsFirst: false })
       .order("hourly_rate_cents", { ascending: true })
       .limit(50);
     if (capOptIn) q = q.in("id", Array.from(capOptIn));
@@ -223,6 +234,9 @@ export const matchProviders = createServerFn({ method: "GET" })
         languages: row.languages ?? [],
         service_area: row.service_area,
         tier: row.tier,
+        rating_avg: row.rating_avg,
+        rating_count: row.rating_count ?? 0,
+        verification_state: row.verification_state,
       };
     });
   });

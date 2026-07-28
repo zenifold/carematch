@@ -64,8 +64,10 @@ function toMatchCard(p: MatchedProvider): MatchCardData {
     initials: initialsOf(p.name),
     monthlyPlan: hourly * 20, // ~5h/wk estimate; provider sets their own rate
     hourlyRate: hourly,
-    rating: 4.9,
-    distanceMiles: 0,
+    rating: p.rating_avg,
+    ratingCount: p.rating_count,
+    serviceArea: p.service_area,
+    verificationState: p.verification_state as MatchCardData["verificationState"],
     whyMatch: [
       ...(p.specialties.length > 0 ? [p.specialties.slice(0, 3).join(" · ")] : []),
       ...(p.languages.length > 0 ? [`Speaks ${p.languages.join(", ")}`] : []),
@@ -583,7 +585,7 @@ function BookFlow() {
           ) : (
             <>
               <p className="mt-2 text-lg text-muted-foreground">
-                {matchIndex + 1} of {matches.length} · every one is verified.
+                {matchIndex + 1} of {matches.length} · ranked by rating and fit for your needs.
               </p>
               {(() => {
                 const current = matches[matchIndex];
