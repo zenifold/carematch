@@ -12,4 +12,16 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  // `experimental`/`scheduledTasks` aren't in LovableViteTanstackOptions'
+  // narrow nitro type (it only declares preset/output/cloudflare), but the
+  // wrapper forwards this object to nitro/vite's real NitroConfig as-is —
+  // see tasks/send-visit-reminders.ts. `as any` only widens past that type
+  // check, it doesn't change what's actually passed through.
+  nitro: {
+    experimental: { tasks: true },
+    // cloudflare_module has native Cron Trigger support — Nitro writes the
+    // matching trigger into .output/server/wrangler.json at build time, no
+    // manual wrangler cron config needed.
+    scheduledTasks: { "0 * * * *": "send-visit-reminders" },
+  } as any,
 });

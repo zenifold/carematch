@@ -20,7 +20,13 @@ async function isStaff(context: { supabase: any; userId: string }) {
 
 async function writeAudit(
   context: { supabase: any; userId: string },
-  entry: { action: string; target_user_id?: string | null; entity?: string; entity_id?: string; payload?: any },
+  entry: {
+    action: string;
+    target_user_id?: string | null;
+    entity?: string;
+    entity_id?: string;
+    payload?: any;
+  },
 ) {
   await context.supabase.from("admin_audit_log").insert({
     actor_id: context.userId,
@@ -84,6 +90,31 @@ export const createSupportTicket = createServerFn({ method: "POST" })
       body: data.body,
       internal: false,
     });
+
+    // Best-effort confirmation email — never let a delivery failure fail
+    // the ticket itself; sendTemplateEmail already no-ops quietly if no
+    // provider is configured.
+    try {
+      const email = context.claims.email as string | undefined;
+      if (email) {
+        const { data: profile } = await context.supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", context.userId)
+          .maybeSingle();
+        const { sendTemplateEmail } = await import("./email-templates/send-email");
+        await sendTemplateEmail("support-ticket-confirmation", email, {
+          templateData: {
+            first_name: profile?.full_name?.split(" ")[0] ?? "there",
+            ticket_subject: data.subject,
+          },
+          idempotencyKey: `support-ticket-confirm-${row.id}`,
+        });
+      }
+    } catch {
+      // swallow — confirmation email is best-effort
+    }
+
     return { ok: true, id: row.id as string };
   });
 
@@ -138,23 +169,28 @@ export const listSupportInbox = createServerFn({ method: "GET" })
       if (r.requester_id) ids.add(r.requester_id);
       if (r.assignee_id) ids.add(r.assignee_id);
     }
-    let nameMap = new Map<string, { name: string | null; email: string | null }>();
+    const nameMap = new Map<string, { name: string | null; email: string | null }>();
     if (ids.size) {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const [profR, usersR] = await Promise.all([
         supabaseAdmin.from("profiles").select("id, full_name").in("id", Array.from(ids)),
         supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 }),
       ]);
-      const emailMap = new Map((usersR.data?.users ?? []).map((u: any) => [u.id, u.email as string | null]));
+      const emailMap = new Map(
+        (usersR.data?.users ?? []).map((u: any) => [u.id, u.email as string | null]),
+      );
       for (const p of profR.data ?? []) {
-        nameMap.set(p.id, { name: (p as any).full_name ?? null, email: emailMap.get(p.id) ?? null });
+        nameMap.set(p.id, {
+          name: (p as any).full_name ?? null,
+          email: emailMap.get(p.id) ?? null,
+        });
       }
     }
     return (rows ?? []).map((r: any) => ({
       ...r,
       requester_name: nameMap.get(r.requester_id)?.name ?? null,
       requester_email: nameMap.get(r.requester_id)?.email ?? null,
-      assignee_name: r.assignee_id ? nameMap.get(r.assignee_id)?.name ?? null : null,
+      assignee_name: r.assignee_id ? (nameMap.get(r.assignee_id)?.name ?? null) : null,
     }));
   });
 
@@ -173,47 +209,52 @@ const TicketIdInput = z.object({ ticket_id: z.string().uuid() });
 export const getTicket = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => TicketIdInput.parse(input))
-  .handler(async ({ data, context }): Promise<{ ticket: SupportTicketRow; messages: SupportMessageRow[] }> => {
-    const { data: t, error } = await context.supabase
-      .from("support_tickets")
-      .select(
-        "id, requester_id, assignee_id, subject, body, status, priority, category, portal, last_activity_at, resolved_at, created_at, updated_at",
-      )
-      .eq("id", data.ticket_id)
-      .single();
-    if (error) throw error;
+  .handler(
+    async ({
+      data,
+      context,
+    }): Promise<{ ticket: SupportTicketRow; messages: SupportMessageRow[] }> => {
+      const { data: t, error } = await context.supabase
+        .from("support_tickets")
+        .select(
+          "id, requester_id, assignee_id, subject, body, status, priority, category, portal, last_activity_at, resolved_at, created_at, updated_at",
+        )
+        .eq("id", data.ticket_id)
+        .single();
+      if (error) throw error;
 
-    const { data: msgs, error: mErr } = await context.supabase
-      .from("support_messages")
-      .select("id, ticket_id, author_id, body, internal, created_at")
-      .eq("ticket_id", data.ticket_id)
-      .order("created_at", { ascending: true });
-    if (mErr) throw mErr;
+      const { data: msgs, error: mErr } = await context.supabase
+        .from("support_messages")
+        .select("id, ticket_id, author_id, body, internal, created_at")
+        .eq("ticket_id", data.ticket_id)
+        .order("created_at", { ascending: true });
+      if (mErr) throw mErr;
 
-    const ids = new Set<string>();
-    if (t.requester_id) ids.add(t.requester_id);
-    if (t.assignee_id) ids.add(t.assignee_id);
-    for (const m of msgs ?? []) ids.add(m.author_id);
+      const ids = new Set<string>();
+      if (t.requester_id) ids.add(t.requester_id);
+      if (t.assignee_id) ids.add(t.assignee_id);
+      for (const m of msgs ?? []) ids.add(m.author_id);
 
-    const { data: profs } = await context.supabase
-      .from("profiles")
-      .select("id, full_name")
-      .in("id", Array.from(ids));
-    const nameMap = new Map((profs ?? []).map((p: any) => [p.id, p.full_name as string | null]));
+      const { data: profs } = await context.supabase
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", Array.from(ids));
+      const nameMap = new Map((profs ?? []).map((p: any) => [p.id, p.full_name as string | null]));
 
-    return {
-      ticket: {
-        ...(t as any),
-        requester_name: nameMap.get(t.requester_id) ?? null,
-        requester_email: null,
-        assignee_name: t.assignee_id ? nameMap.get(t.assignee_id) ?? null : null,
-      },
-      messages: (msgs ?? []).map((m: any) => ({
-        ...m,
-        author_name: nameMap.get(m.author_id) ?? null,
-      })),
-    };
-  });
+      return {
+        ticket: {
+          ...(t as any),
+          requester_name: nameMap.get(t.requester_id) ?? null,
+          requester_email: null,
+          assignee_name: t.assignee_id ? (nameMap.get(t.assignee_id) ?? null) : null,
+        },
+        messages: (msgs ?? []).map((m: any) => ({
+          ...m,
+          author_name: nameMap.get(m.author_id) ?? null,
+        })),
+      };
+    },
+  );
 
 const PostMessageInput = z.object({
   ticket_id: z.string().uuid(),
@@ -225,7 +266,8 @@ export const postTicketMessage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => PostMessageInput.parse(input))
   .handler(async ({ data, context }) => {
-    if (data.internal && !(await isStaff(context))) throw new Error("Only staff can post internal notes");
+    if (data.internal && !(await isStaff(context)))
+      throw new Error("Only staff can post internal notes");
     const { error } = await context.supabase.from("support_messages").insert({
       ticket_id: data.ticket_id,
       author_id: context.userId,
@@ -271,7 +313,10 @@ export const updateTicket = createServerFn({ method: "POST" })
     if (data.priority !== undefined) patch.priority = data.priority;
     if (data.assignee_id !== undefined) patch.assignee_id = data.assignee_id;
 
-    const { error } = await context.supabase.from("support_tickets").update(patch).eq("id", data.ticket_id);
+    const { error } = await context.supabase
+      .from("support_tickets")
+      .update(patch)
+      .eq("id", data.ticket_id);
 
     if (error) throw error;
     await writeAudit(context, {
