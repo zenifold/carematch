@@ -493,8 +493,12 @@ function AuthPage() {
               fetchPriority="high"
               className="h-64 w-full object-cover object-top transition-opacity duration-500 sm:h-96 lg:h-full"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-foreground/20 to-transparent" />
-            <div className="absolute inset-x-0 bottom-0 space-y-4 p-6 text-primary-foreground sm:p-8">
+            {/* The quote/benefits overlay needs real height to not just
+                swallow the whole photo behind a wall of text — the mobile
+                image (h-64/h-96) isn't tall enough for that, so the overlay
+                is desktop-only; mobile shows the plain photo. */}
+            <div className="absolute inset-0 hidden bg-gradient-to-t from-foreground/70 via-foreground/20 to-transparent lg:block" />
+            <div className="absolute inset-x-0 bottom-0 hidden space-y-4 p-6 text-primary-foreground sm:p-8 lg:block">
               <blockquote className="font-serif text-2xl leading-snug text-primary-foreground sm:text-3xl">
                 &ldquo;{activeRole.quote}&rdquo;
               </blockquote>
