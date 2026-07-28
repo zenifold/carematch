@@ -74,13 +74,24 @@ export const listAdminUsers = createServerFn({ method: "GET" })
     await assertAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const { data: usersPage, error: usersErr } = await supabaseAdmin.auth.admin.listUsers({
-      page: 1,
-      perPage: data.limit,
-    });
-    if (usersErr) throw usersErr;
+    // Status/role/search filtering below happens in-memory over the full
+    // user set, so a single page-1 fetch silently hid every account past
+    // the first `data.limit` (e.g. searching by name found nothing for
+    // anyone registered after account #200). Page through all of them —
+    // this is an admin tool, not a hot path, so the extra round trips are fine.
+    const allUsers: any[] = [];
+    const PAGE_SIZE = 200;
+    for (let page = 1; ; page++) {
+      const { data: usersPage, error: usersErr } = await supabaseAdmin.auth.admin.listUsers({
+        page,
+        perPage: PAGE_SIZE,
+      });
+      if (usersErr) throw usersErr;
+      allUsers.push(...usersPage.users);
+      if (usersPage.users.length < PAGE_SIZE) break;
+    }
 
-    const ids = usersPage.users.map((u) => u.id);
+    const ids = allUsers.map((u) => u.id);
     if (ids.length === 0) return [];
 
     const [profilesR, rolesR] = await Promise.all([
@@ -101,7 +112,7 @@ export const listAdminUsers = createServerFn({ method: "GET" })
       rMap.set(r.user_id, list);
     }
 
-    const rows: AdminUserRow[] = usersPage.users.map((u: any) => {
+    const rows: AdminUserRow[] = allUsers.map((u: any) => {
       const p = pMap.get(u.id) ?? {};
       return {
         id: u.id,
@@ -139,7 +150,7 @@ export const listAdminUsers = createServerFn({ method: "GET" })
           (r.city ?? "").toLowerCase().includes(needle),
       );
     }
-    return filtered;
+    return filtered.slice(0, data.limit);
   });
 
 const AddRoleInput = z.object({

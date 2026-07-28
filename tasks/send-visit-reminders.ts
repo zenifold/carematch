@@ -32,21 +32,25 @@ export default defineTask({
 
     const seniorIds = Array.from(new Set(bookings.map((b: any) => b.senior_id)));
 
-    const [{ data: prefs }, { data: profiles }, { data: usersPage }] = await Promise.all([
+    const [{ data: prefs }, { data: profiles }, users] = await Promise.all([
       supabaseAdmin
         .from("senior_preferences")
         .select("user_id, notify_before_visit")
         .in("user_id", seniorIds),
       supabaseAdmin.from("profiles").select("id, full_name").in("id", seniorIds),
-      supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 }),
+      // Fetching one page of listUsers and filtering client-side silently
+      // dropped anyone outside the first 200 accounts as the user base grew.
+      // seniorIds is bounded to "seniors with a visit in the next 2 hours",
+      // so looking each one up directly scales regardless of total users.
+      Promise.all(seniorIds.map((id) => supabaseAdmin.auth.admin.getUserById(id))),
     ]);
 
     const prefMap = new Map((prefs ?? []).map((p: any) => [p.user_id, !!p.notify_before_visit]));
     const nameMap = new Map((profiles ?? []).map((p: any) => [p.id, p.full_name as string | null]));
     const emailMap = new Map(
-      (usersPage?.users ?? [])
-        .filter((u: any) => seniorIds.includes(u.id))
-        .map((u: any) => [u.id, u.email as string | null]),
+      users
+        .filter((u) => u.data?.user)
+        .map((u) => [u.data.user!.id, u.data.user!.email as string | null]),
     );
 
     let sent = 0;

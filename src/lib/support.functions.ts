@@ -172,12 +172,17 @@ export const listSupportInbox = createServerFn({ method: "GET" })
     const nameMap = new Map<string, { name: string | null; email: string | null }>();
     if (ids.size) {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const [profR, usersR] = await Promise.all([
+      // Looking up each id directly (rather than one listUsers page filtered
+      // client-side) means requesters/assignees outside the first 200
+      // registered accounts still resolve correctly as the user base grows.
+      const [profR, users] = await Promise.all([
         supabaseAdmin.from("profiles").select("id, full_name").in("id", Array.from(ids)),
-        supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 }),
+        Promise.all(Array.from(ids).map((id) => supabaseAdmin.auth.admin.getUserById(id))),
       ]);
       const emailMap = new Map(
-        (usersR.data?.users ?? []).map((u: any) => [u.id, u.email as string | null]),
+        users
+          .filter((u) => u.data?.user)
+          .map((u) => [u.data.user!.id, u.data.user!.email as string | null]),
       );
       for (const p of profR.data ?? []) {
         nameMap.set(p.id, {
