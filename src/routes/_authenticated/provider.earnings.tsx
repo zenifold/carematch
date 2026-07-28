@@ -114,7 +114,10 @@ function EarningsPage() {
         </p>
         {latest ? (
           <div className="mt-4 grid gap-2 text-sm sm:grid-cols-3">
-            <FeeRow label="Gross (last week)" value={fmtMoney(latest.gross_cents)} />
+            <FeeRow
+              label={`Gross (week of ${new Date(latest.week_start).toLocaleDateString(undefined, { month: "short", day: "numeric" })})`}
+              value={fmtMoney(latest.gross_cents)}
+            />
             <FeeRow label={`Platform fee (${feePct}%)`} value={`-${fmtMoney(latest.fee_cents)}`} />
             <FeeRow label="Net payout" value={fmtMoney(latest.net_cents)} bold />
           </div>
