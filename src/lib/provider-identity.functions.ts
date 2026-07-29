@@ -293,12 +293,9 @@ export const recordConsent = createServerFn({ method: "POST" })
     if (!doc) throw new Error("Unknown or outdated disclosure version.");
     const hash = await hashConsentText(doc.text);
 
-    // NOTE: IP/UA capture is intentionally omitted in Phase 1 — helper API
-    // varies across TanStack Start versions. Consent record still has
-    // signed_at, signed_full_name, kind, version, and text hash, which is
-    // sufficient for the audit trail.
-    const ip: string | null = null;
-    const ua: string | null = null;
+    const { getRequestHeader, getRequestIP } = await import("@tanstack/start-server-core");
+    const ip = getRequestIP() ?? null;
+    const ua = getRequestHeader("user-agent") ?? null;
 
     const { error } = await context.supabase.from("provider_consents").insert({
       provider_id: context.userId,
