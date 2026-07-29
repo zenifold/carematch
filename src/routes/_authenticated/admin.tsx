@@ -26,12 +26,21 @@ import {
   DollarSign,
   Settings,
   BadgeCheck,
+  MoreHorizontal,
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { getMyStaffRoles } from "@/lib/admin.functions";
 import { RouteErrorBoundary } from "@/components/carematch";
+import {
+  Drawer,
+  DrawerTrigger,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerClose,
+} from "@/components/ui/drawer";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminLayout,
@@ -130,6 +139,13 @@ function AdminLayout() {
     const allowed = NAV_ROLES[n.to] ?? [];
     return allowed.some((r) => heldRoles.has(r));
   });
+  // Which items appear varies by staff role (as few as 1, as many as all 13
+  // for a full admin) — pin the first 4 of whatever's actually visible to the
+  // bottom bar and tuck any overflow behind "More" rather than hardcoding
+  // paths that might not exist for a given role.
+  const primaryNav = visibleNav.slice(0, 4);
+  const moreNav = visibleNav.slice(4);
+  const moreActive = moreNav.some((n) => isActive(n.to, n.exact));
   const primaryRoleLabel =
     ROLE_LABELS[
       ["admin", "staff", "support", "success", "finance", "trust_safety"].find((r) =>
@@ -239,8 +255,8 @@ function AdminLayout() {
           aria-label="Admin console"
           className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden"
         >
-          <ul className="flex items-stretch justify-around overflow-x-auto">
-            {visibleNav.map((n) => {
+          <ul className="flex items-stretch justify-around">
+            {primaryNav.map((n) => {
               const active = isActive(n.to, n.exact);
               return (
                 <li key={n.to} className="flex-1 min-w-0">
@@ -256,6 +272,48 @@ function AdminLayout() {
                 </li>
               );
             })}
+            {moreNav.length > 0 && (
+              <li className="flex-1 min-w-0">
+                <Drawer>
+                  <DrawerTrigger asChild>
+                    <button
+                      type="button"
+                      className={`flex min-h-14 w-full flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-semibold ${
+                        moreActive ? "text-primary" : "text-muted-foreground"
+                      }`}
+                    >
+                      <MoreHorizontal className="size-4" />
+                      <span className="truncate">More</span>
+                    </button>
+                  </DrawerTrigger>
+                  <DrawerContent>
+                    <DrawerHeader>
+                      <DrawerTitle>More</DrawerTitle>
+                    </DrawerHeader>
+                    <div className="grid gap-1 px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
+                      {moreNav.map((n) => {
+                        const active = isActive(n.to, n.exact);
+                        return (
+                          <DrawerClose key={n.to} asChild>
+                            <Link
+                              to={n.to}
+                              className={`flex items-center gap-3 rounded-lg px-3 py-3 text-base ${
+                                active
+                                  ? "bg-primary/10 font-semibold text-primary"
+                                  : "text-foreground hover:bg-secondary"
+                              }`}
+                            >
+                              <n.icon className="size-5" />
+                              <span className="flex-1">{n.label}</span>
+                            </Link>
+                          </DrawerClose>
+                        );
+                      })}
+                    </div>
+                  </DrawerContent>
+                </Drawer>
+              </li>
+            )}
           </ul>
         </nav>
 
