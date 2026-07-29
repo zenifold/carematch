@@ -246,12 +246,12 @@ export function SiteFooter() {
   return (
     <footer className="border-t border-border bg-secondary/40">
       <div className="mx-auto max-w-7xl px-5 py-12 lg:px-10">
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
           <div>
             <Link to="/" className="font-serif text-xl font-bold tracking-tight text-foreground">
               CareMatch
             </Link>
-            <p className="mt-3 text-sm text-muted-foreground">
+            <p className="mt-3 max-w-xs text-sm text-muted-foreground">
               Verified in-home helpers for older adults — matched to care needs, personality, and budget.
             </p>
             <a
@@ -261,22 +261,24 @@ export function SiteFooter() {
               <Phone className="size-3.5" /> Call {PHONE}
             </a>
           </div>
-          {cols.map((col) => (
-            <div key={col.title}>
-              <p className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
-                {col.title}
-              </p>
-              <ul className="mt-3 space-y-2 text-sm">
-                {col.links.map((l) => (
-                  <li key={l.to}>
-                    <Link to={l.to} className="hover:text-primary">
-                      {l.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-[repeat(4,minmax(0,1fr))]">
+            {cols.map((col) => (
+              <div key={col.title}>
+                <p className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+                  {col.title}
+                </p>
+                <ul className="mt-3 space-y-2 text-sm">
+                  {col.links.map((l) => (
+                    <li key={l.to}>
+                      <Link to={l.to} className="hover:text-primary">
+                        {l.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="mt-10 flex flex-wrap items-center gap-3 border-t border-border pt-6 text-sm">
