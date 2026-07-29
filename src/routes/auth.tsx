@@ -26,6 +26,7 @@ import authFamily from "@/assets/auth-family.jpg";
 import authProvider from "@/assets/auth-provider.jpg";
 import { requiredDocumentsFor, LEGAL_DOCUMENTS, type LegalDocumentKind } from "@/lib/legal";
 import { acceptLegalDocuments } from "@/lib/legal.functions";
+import { finishOAuthSignup } from "@/lib/oauth-signup.functions";
 
 type Role = "senior" | "family" | "provider";
 
@@ -148,12 +149,25 @@ function AuthPage() {
   const [specialties, setSpecialties] = useState<string[]>([]);
   const [languages, setLanguages] = useState<string[]>(["English"]);
 
-  // Bounce if already signed in.
+  // Bounce if already signed in. A `?role=` in the URL means we just landed
+  // back here from the Google OAuth redirect — that round-trip has no way to
+  // carry the role the user picked on the form, so handle_new_user() always
+  // defaults fresh OAuth accounts to 'senior' and never records the legal
+  // consent the signup form's checkbox implied. Reconcile both before
+  // continuing on (finishOAuthSignup no-ops for anyone already onboarded).
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/dashboard", replace: true });
+    supabase.auth.getSession().then(async ({ data }) => {
+      if (!data.session) return;
+      if (roleParam) {
+        try {
+          await finishOAuthSignup({ data: { role: roleParam } });
+        } catch (err) {
+          console.error("Failed to reconcile OAuth signup", err);
+        }
+      }
+      navigate({ to: "/dashboard", replace: true });
     });
-  }, [navigate]);
+  }, [navigate, roleParam]);
 
   // Required documents differ by role (providers additionally need the
   // Independent Contractor Agreement) — re-require acceptance if role changes.
