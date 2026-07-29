@@ -1962,6 +1962,39 @@ export type Database = {
           },
         ]
       }
+      user_legal_acceptances: {
+        Row: {
+          accepted_at: string
+          document_hash: string
+          document_version: string
+          id: string
+          ip_address: string | null
+          kind: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          accepted_at?: string
+          document_hash: string
+          document_version: string
+          id?: string
+          ip_address?: string | null
+          kind: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          accepted_at?: string
+          document_hash?: string
+          document_version?: string
+          id?: string
+          ip_address?: string | null
+          kind?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string

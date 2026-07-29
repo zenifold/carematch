@@ -232,6 +232,9 @@ export function SiteFooter() {
     {
       title: "Legal",
       links: [
+        { to: "/legal/terms", label: "Terms of Service" },
+        { to: "/legal/privacy", label: "Privacy Policy" },
+        { to: "/legal/caregiver-agreement", label: "Caregiver Agreement" },
         { to: "/legal/independent-contractors", label: "Independent contractors" },
         { to: "/legal/scope-of-practice", label: "Scope of practice" },
         { to: "/legal/state-availability", label: "State availability" },

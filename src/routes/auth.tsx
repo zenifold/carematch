@@ -25,6 +25,8 @@ import { toast } from "sonner";
 import authSenior from "@/assets/auth-senior.jpg";
 import authFamily from "@/assets/auth-family.jpg";
 import authProvider from "@/assets/auth-provider.jpg";
+import { requiredDocumentsFor, LEGAL_DOCUMENTS, type LegalDocumentKind } from "@/lib/legal";
+import { acceptLegalDocuments } from "@/lib/legal.functions";
 
 type Role = "senior" | "family" | "provider";
 
@@ -126,6 +128,7 @@ function AuthPage() {
   const [city, setCity] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [legalAccepted, setLegalAccepted] = useState(false);
 
   // senior + family
   const [monthlyBudget, setMonthlyBudget] = useState<string>("");
@@ -153,6 +156,11 @@ function AuthPage() {
     });
   }, [navigate]);
 
+  // Required documents differ by role (providers additionally need the
+  // Independent Contractor Agreement) — re-require acceptance if role changes.
+  useEffect(() => setLegalAccepted(false), [role]);
+  const requiredDocs = useMemo(() => requiredDocumentsFor(role), [role]);
+
   const activeRole = roleMeta[role];
 
   const totalSteps = 4;
@@ -162,7 +170,7 @@ function AuthPage() {
 
   const validateStep = (s: number): string | null => {
     if (mode !== "signup") return null;
-    if (s === 0) return null; // role selection always valid
+    if (s === 0) return legalAccepted ? null : "Please agree to the required terms to continue";
     if (s === 1) {
       const nameOk = nameSchema.safeParse(fullName);
       if (!nameOk.success) return nameOk.error.issues[0].message;
@@ -289,6 +297,21 @@ function AuthPage() {
         } catch (persistErr) {
           console.error("Failed to persist role data on signup", persistErr);
         }
+        try {
+          await acceptLegalDocuments({
+            data: {
+              acceptances: requiredDocs.map((kind) => ({
+                kind,
+                version: LEGAL_DOCUMENTS[kind].version,
+              })),
+            },
+          });
+        } catch (consentErr) {
+          // Don't block account creation on this — but this is a real gap:
+          // surface it loudly rather than losing it silently, since a
+          // missing acceptance record is a compliance problem, not a UX one.
+          console.error("Failed to record legal document acceptance", consentErr);
+        }
         toast.success("Welcome to CareMatch");
         navigate({ to: "/dashboard", replace: true });
       } else {
@@ -372,7 +395,14 @@ function AuthPage() {
             ) : (
               <form onSubmit={handleSubmit} className="mt-8 grid gap-6">
                 {step === 0 && (
-                  <RoleStep role={role} setRole={setRole} onGoogle={handleGoogle} busy={busy} />
+                  <RoleStep
+                    role={role}
+                    setRole={setRole}
+                    onGoogle={handleGoogle}
+                    busy={busy}
+                    legalAccepted={legalAccepted}
+                    setLegalAccepted={setLegalAccepted}
+                  />
                 )}
                 {step === 1 && (
                   <BasicsStep
@@ -615,16 +645,67 @@ function SigninForm({
   );
 }
 
+const DOC_LINK: Record<LegalDocumentKind, string> = {
+  terms_of_service: "/legal/terms",
+  privacy_policy: "/legal/privacy",
+  independent_contractor_agreement: "/legal/caregiver-agreement",
+};
+
+/** Required-document checkbox gate — shown once, on role selection, since
+ * that's the earliest point both the Google and email/password signup paths
+ * diverge from. Neither path should be reachable without this checked. */
+function LegalConsentCheckboxes({
+  role,
+  accepted,
+  setAccepted,
+}: {
+  role: Role;
+  accepted: boolean;
+  setAccepted: (v: boolean) => void;
+}) {
+  const docs = requiredDocumentsFor(role);
+  return (
+    <label className="flex items-start gap-3 rounded-2xl border border-border bg-card p-4 text-sm">
+      <input
+        type="checkbox"
+        checked={accepted}
+        onChange={(e) => setAccepted(e.target.checked)}
+        className="mt-0.5 size-5 shrink-0 accent-primary"
+      />
+      <span className="text-foreground">
+        I agree to CareMatch's{" "}
+        {docs.map((kind, i) => (
+          <span key={kind}>
+            {i > 0 && (i === docs.length - 1 ? " and " : ", ")}
+            <Link
+              to={DOC_LINK[kind]}
+              target="_blank"
+              className="font-semibold text-primary underline-offset-2 hover:underline"
+            >
+              {LEGAL_DOCUMENTS[kind].title}
+            </Link>
+          </span>
+        ))}
+        .
+      </span>
+    </label>
+  );
+}
+
 function RoleStep({
   role,
   setRole,
   onGoogle,
   busy,
+  legalAccepted,
+  setLegalAccepted,
 }: {
   role: Role;
   setRole: (r: Role) => void;
   onGoogle: () => void;
   busy: boolean;
+  legalAccepted: boolean;
+  setLegalAccepted: (v: boolean) => void;
 }) {
   const roles: Role[] = ["senior", "family", "provider"];
   return (
@@ -692,6 +773,8 @@ function RoleStep({
           </p>
         </div>
       )}
+      <LegalConsentCheckboxes role={role} accepted={legalAccepted} setAccepted={setLegalAccepted} />
+
       <div className="flex items-center gap-3 text-sm text-muted-foreground">
         <span className="h-px flex-1 bg-border" /> or sign up with <span className="h-px flex-1 bg-border" />
       </div>
@@ -702,7 +785,7 @@ function RoleStep({
         size="lg"
         className="h-14 w-full text-base"
         onClick={onGoogle}
-        disabled={busy}
+        disabled={busy || !legalAccepted}
       >
         <GoogleIcon /> Continue with Google
       </Button>

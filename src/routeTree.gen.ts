@@ -59,9 +59,12 @@ import { Route as ResourcesCompanionVsPersonalCareRouteImport } from './routes/r
 import { Route as ResourcesCaregiverBurnoutRouteImport } from './routes/resources.caregiver-burnout'
 import { Route as ResourcesBathingHelpSeniorsRouteImport } from './routes/resources.bathing-help-seniors'
 import { Route as ResourcesAgingInPlaceChecklistRouteImport } from './routes/resources.aging-in-place-checklist'
+import { Route as LegalTermsRouteImport } from './routes/legal.terms'
 import { Route as LegalStateAvailabilityRouteImport } from './routes/legal.state-availability'
 import { Route as LegalScopeOfPracticeRouteImport } from './routes/legal.scope-of-practice'
+import { Route as LegalPrivacyRouteImport } from './routes/legal.privacy'
 import { Route as LegalIndependentContractorsRouteImport } from './routes/legal.independent-contractors'
+import { Route as LegalCaregiverAgreementRouteImport } from './routes/legal.caregiver-agreement'
 import { Route as ApiSitemapDotxmlRouteImport } from './routes/api/sitemap[.]xml'
 import { Route as AuthenticatedSeniorRouteImport } from './routes/_authenticated/senior'
 import { Route as AuthenticatedProviderRouteImport } from './routes/_authenticated/provider'
@@ -399,6 +402,11 @@ const ResourcesAgingInPlaceChecklistRoute =
     path: '/aging-in-place-checklist',
     getParentRoute: () => ResourcesRoute,
   } as any)
+const LegalTermsRoute = LegalTermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => LegalRoute,
+} as any)
 const LegalStateAvailabilityRoute = LegalStateAvailabilityRouteImport.update({
   id: '/state-availability',
   path: '/state-availability',
@@ -409,12 +417,22 @@ const LegalScopeOfPracticeRoute = LegalScopeOfPracticeRouteImport.update({
   path: '/scope-of-practice',
   getParentRoute: () => LegalRoute,
 } as any)
+const LegalPrivacyRoute = LegalPrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => LegalRoute,
+} as any)
 const LegalIndependentContractorsRoute =
   LegalIndependentContractorsRouteImport.update({
     id: '/independent-contractors',
     path: '/independent-contractors',
     getParentRoute: () => LegalRoute,
   } as any)
+const LegalCaregiverAgreementRoute = LegalCaregiverAgreementRouteImport.update({
+  id: '/caregiver-agreement',
+  path: '/caregiver-agreement',
+  getParentRoute: () => LegalRoute,
+} as any)
 const ApiSitemapDotxmlRoute = ApiSitemapDotxmlRouteImport.update({
   id: '/api/sitemap.xml',
   path: '/api/sitemap.xml',
@@ -812,9 +830,12 @@ export interface FileRoutesByFullPath {
   '/provider': typeof AuthenticatedProviderRouteWithChildren
   '/senior': typeof AuthenticatedSeniorRouteWithChildren
   '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
+  '/legal/caregiver-agreement': typeof LegalCaregiverAgreementRoute
   '/legal/independent-contractors': typeof LegalIndependentContractorsRoute
+  '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/scope-of-practice': typeof LegalScopeOfPracticeRoute
   '/legal/state-availability': typeof LegalStateAvailabilityRoute
+  '/legal/terms': typeof LegalTermsRoute
   '/resources/aging-in-place-checklist': typeof ResourcesAgingInPlaceChecklistRoute
   '/resources/bathing-help-seniors': typeof ResourcesBathingHelpSeniorsRoute
   '/resources/caregiver-burnout': typeof ResourcesCaregiverBurnoutRoute
@@ -923,9 +944,12 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRouteWithChildren
   '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
+  '/legal/caregiver-agreement': typeof LegalCaregiverAgreementRoute
   '/legal/independent-contractors': typeof LegalIndependentContractorsRoute
+  '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/scope-of-practice': typeof LegalScopeOfPracticeRoute
   '/legal/state-availability': typeof LegalStateAvailabilityRoute
+  '/legal/terms': typeof LegalTermsRoute
   '/resources/aging-in-place-checklist': typeof ResourcesAgingInPlaceChecklistRoute
   '/resources/bathing-help-seniors': typeof ResourcesBathingHelpSeniorsRoute
   '/resources/caregiver-burnout': typeof ResourcesCaregiverBurnoutRoute
@@ -1042,9 +1066,12 @@ export interface FileRoutesById {
   '/_authenticated/provider': typeof AuthenticatedProviderRouteWithChildren
   '/_authenticated/senior': typeof AuthenticatedSeniorRouteWithChildren
   '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
+  '/legal/caregiver-agreement': typeof LegalCaregiverAgreementRoute
   '/legal/independent-contractors': typeof LegalIndependentContractorsRoute
+  '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/scope-of-practice': typeof LegalScopeOfPracticeRoute
   '/legal/state-availability': typeof LegalStateAvailabilityRoute
+  '/legal/terms': typeof LegalTermsRoute
   '/resources/aging-in-place-checklist': typeof ResourcesAgingInPlaceChecklistRoute
   '/resources/bathing-help-seniors': typeof ResourcesBathingHelpSeniorsRoute
   '/resources/caregiver-burnout': typeof ResourcesCaregiverBurnoutRoute
@@ -1163,9 +1190,12 @@ export interface FileRouteTypes {
     | '/provider'
     | '/senior'
     | '/api/sitemap.xml'
+    | '/legal/caregiver-agreement'
     | '/legal/independent-contractors'
+    | '/legal/privacy'
     | '/legal/scope-of-practice'
     | '/legal/state-availability'
+    | '/legal/terms'
     | '/resources/aging-in-place-checklist'
     | '/resources/bathing-help-seniors'
     | '/resources/caregiver-burnout'
@@ -1274,9 +1304,12 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/onboarding'
     | '/api/sitemap.xml'
+    | '/legal/caregiver-agreement'
     | '/legal/independent-contractors'
+    | '/legal/privacy'
     | '/legal/scope-of-practice'
     | '/legal/state-availability'
+    | '/legal/terms'
     | '/resources/aging-in-place-checklist'
     | '/resources/bathing-help-seniors'
     | '/resources/caregiver-burnout'
@@ -1392,9 +1425,12 @@ export interface FileRouteTypes {
     | '/_authenticated/provider'
     | '/_authenticated/senior'
     | '/api/sitemap.xml'
+    | '/legal/caregiver-agreement'
     | '/legal/independent-contractors'
+    | '/legal/privacy'
     | '/legal/scope-of-practice'
     | '/legal/state-availability'
+    | '/legal/terms'
     | '/resources/aging-in-place-checklist'
     | '/resources/bathing-help-seniors'
     | '/resources/caregiver-burnout'
@@ -1866,6 +1902,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResourcesAgingInPlaceChecklistRouteImport
       parentRoute: typeof ResourcesRoute
     }
+    '/legal/terms': {
+      id: '/legal/terms'
+      path: '/terms'
+      fullPath: '/legal/terms'
+      preLoaderRoute: typeof LegalTermsRouteImport
+      parentRoute: typeof LegalRoute
+    }
     '/legal/state-availability': {
       id: '/legal/state-availability'
       path: '/state-availability'
@@ -1880,11 +1923,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LegalScopeOfPracticeRouteImport
       parentRoute: typeof LegalRoute
     }
+    '/legal/privacy': {
+      id: '/legal/privacy'
+      path: '/privacy'
+      fullPath: '/legal/privacy'
+      preLoaderRoute: typeof LegalPrivacyRouteImport
+      parentRoute: typeof LegalRoute
+    }
     '/legal/independent-contractors': {
       id: '/legal/independent-contractors'
       path: '/independent-contractors'
       fullPath: '/legal/independent-contractors'
       preLoaderRoute: typeof LegalIndependentContractorsRouteImport
+      parentRoute: typeof LegalRoute
+    }
+    '/legal/caregiver-agreement': {
+      id: '/legal/caregiver-agreement'
+      path: '/caregiver-agreement'
+      fullPath: '/legal/caregiver-agreement'
+      preLoaderRoute: typeof LegalCaregiverAgreementRouteImport
       parentRoute: typeof LegalRoute
     }
     '/api/sitemap.xml': {
@@ -2554,16 +2611,22 @@ const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface LegalRouteChildren {
+  LegalCaregiverAgreementRoute: typeof LegalCaregiverAgreementRoute
   LegalIndependentContractorsRoute: typeof LegalIndependentContractorsRoute
+  LegalPrivacyRoute: typeof LegalPrivacyRoute
   LegalScopeOfPracticeRoute: typeof LegalScopeOfPracticeRoute
   LegalStateAvailabilityRoute: typeof LegalStateAvailabilityRoute
+  LegalTermsRoute: typeof LegalTermsRoute
   LegalIndexRoute: typeof LegalIndexRoute
 }
 
 const LegalRouteChildren: LegalRouteChildren = {
+  LegalCaregiverAgreementRoute: LegalCaregiverAgreementRoute,
   LegalIndependentContractorsRoute: LegalIndependentContractorsRoute,
+  LegalPrivacyRoute: LegalPrivacyRoute,
   LegalScopeOfPracticeRoute: LegalScopeOfPracticeRoute,
   LegalStateAvailabilityRoute: LegalStateAvailabilityRoute,
+  LegalTermsRoute: LegalTermsRoute,
   LegalIndexRoute: LegalIndexRoute,
 }
 
