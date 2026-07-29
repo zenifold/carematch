@@ -7,16 +7,6 @@ Living list of product/engineering backlog items. New entries get appended under
 
 ## New items
 
-### Off-platform migration detection in messaging
-- **Source:** Care Companion team meeting, 2026-07-28
-- **Why:** Marketplace retention risk — a family and caregiver can exchange contact
-  info in-app and move scheduling/payment off-platform entirely, same failure mode
-  Rover/care.com deal with.
-- **What:** Scan `messages.body` on insert for phone numbers, email addresses, and
-  phrases indicating an off-platform handoff ("venmo", "cash", "text me at",
-  "call me directly"). Flag matches to a staff review queue (same pattern as the
-  existing `cs_tasks` coaching-task flow).
-
 ### Caregiver continuity for recurring bookings
 - **Source:** Care Companion team meeting, 2026-07-28
 - **Why:** Real complaint from a family member's own experience with a competitor —
@@ -27,16 +17,6 @@ Living list of product/engineering backlog items. New entries get appended under
   "regular caregiver" concept tied to a recurring schedule; matching should try
   the previous provider first before falling back to "anyone available."
 
-### Legally-required scope-of-care training content
-- **Source:** Care Companion team meeting, 2026-07-28 (VA companion-care legal research)
-- **Why:** Virginia law restricts uncredentialed companion caregivers to hands-off
-  support only — no transfers, bathing, toileting, or medication dispensing. The
-  tier-gating already enforces this correctly (Personal care requires a PCA/HHA
-  credential at tier 1; Medications requires LPN/RN/etc. at tier 3), but the
-  training content itself doesn't teach caregivers where that legal line is.
-- **What:** Add a scope-of-practice lesson + scenario question to the existing
-  `companion_basics_v1` training module, matching its existing lesson format.
-
 ### Provider offboarding reason capture
 - **Source:** Care Companion team meeting, 2026-07-28
 - **Why:** "We should know the reason why they left" — no reason is captured today
@@ -46,15 +26,6 @@ Living list of product/engineering backlog items. New entries get appended under
 - **What:** Required reason code on provider deactivation (found other work /
   hired full-time by family off-platform / avoiding fees or taxes / other),
   feeding retention analytics.
-
-### Liability insurance nudge for providers
-- **Source:** Care Companion team meeting, 2026-07-28 (legal research)
-- **Why:** Providers are independent contractors and personally liable for
-  accidental harm/property damage in a client's home — not covered by workers'
-  comp unless the family carries a domestic employment rider. Low-cost private
-  caregiver general liability insurance (~$15–30/mo) is the recommended mitigation.
-- **What:** Surface a recommendation + link (partner or generic resource) to this
-  insurance during provider onboarding. Can only recommend, not require.
 
 ### Cancellation policy — not yet defined
 - **Source:** Care Companion team meeting, 2026-07-28
@@ -110,4 +81,23 @@ as something to build, and each already exists:
 
 ## Done
 
-*(nothing moved here yet)*
+### Off-platform migration detection in messaging — shipped 2026-07-29
+A trigger on `messages` insert regex-scans for phone numbers, email addresses,
+and off-platform phrases; matches flag into a new `message_flags` table with a
+staff review section on the admin Trust & Safety page (dismiss as false
+positive, or mark handled). Doesn't block the message itself. Verified live:
+phone-number and off-platform-phrase test messages correctly flagged, a clean
+message correctly didn't. Commit `7144bfc`.
+
+### Legally-required scope-of-care training content — shipped 2026-07-29
+Turned out to be more built than the meeting realized — the scope-of-practice
+lesson and a scenario question already existed. The actual gap was narrower:
+"transferring in or out of bed or chairs" wasn't covered, and the
+fall-prevention lesson read ambiguously rather than clearly hands-off. Added
+that explicitly to both lessons plus a 7th scenario question; pass_threshold
+bumped from 5/6 to 6/7. Commit `d68ea67`.
+
+### Liability insurance nudge for providers — shipped 2026-07-29
+A card on the provider Earnings page recommending general liability insurance,
+routed to the existing support-ticket flow rather than an external link since
+no partner is chosen yet. Commit `e845fc5`.
