@@ -1,14 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import {
-  Phone,
-  Menu,
-  X,
-  ChevronDown,
-  ShieldCheck,
-  BadgeCheck,
-  Sparkles,
-} from "lucide-react";
+import { Phone, Menu, X, ChevronDown } from "lucide-react";
 
 export const PHONE = "1-800-CAREMATCH";
 export const PHONE_HREF = `tel:${PHONE.replace(/[^0-9]/g, "")}`;
@@ -281,19 +273,8 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-10 flex flex-wrap items-center gap-3 border-t border-border pt-6 text-sm">
-          <span className="inline-flex items-center gap-2 rounded-full bg-card px-3 py-1.5 font-medium">
-            <ShieldCheck className="size-4 text-primary" /> ID + background verified caregivers
-          </span>
-          <span className="inline-flex items-center gap-2 rounded-full bg-card px-3 py-1.5 font-medium">
-            <BadgeCheck className="size-4 text-primary" /> Encrypted data in transit &amp; at rest
-          </span>
-          <span className="inline-flex items-center gap-2 rounded-full bg-card px-3 py-1.5 font-medium">
-            <Sparkles className="size-4 text-primary" /> Consumer service — not a medical provider
-          </span>
-          <span className="ml-auto text-muted-foreground">
-            © {new Date().getFullYear()} CareMatch. Serving families nationwide.
-          </span>
+        <div className="mt-10 border-t border-border pt-6 text-sm text-muted-foreground">
+          © {new Date().getFullYear()} CareMatch. Serving families nationwide.
         </div>
       </div>
     </footer>

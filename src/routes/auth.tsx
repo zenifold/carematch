@@ -7,7 +7,6 @@ import {
   ArrowRight,
   Check,
   Phone,
-  ShieldCheck,
   Sparkles,
   Users,
   HandHeart,
@@ -501,10 +500,6 @@ function AuthPage() {
               </button>
             </p>
 
-            <p className="mt-6 flex items-center justify-center gap-2 text-xs text-muted-foreground">
-              <ShieldCheck className="size-4 text-primary" />
-              Encrypted data · Verified caregivers · Consumer service (not a medical provider)
-            </p>
           </div>
         </section>
 

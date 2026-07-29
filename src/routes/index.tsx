@@ -303,21 +303,6 @@ function Hero() {
                 <Phone className="size-4" /> <span className="truncate">Call {PHONE}</span>
               </a>
             </div>
-
-            <div className="mt-8 -mx-1 flex gap-2 overflow-x-auto px-1 pb-1 sm:flex-wrap sm:overflow-visible">
-              {[
-                { icon: ShieldCheck, label: "5-Stage Verification" },
-                { icon: Wallet, label: "Budget-Friendly Plans" },
-                { icon: Phone, label: "24/7 Phone Support" },
-              ].map(({ icon: Icon, label }) => (
-                <span
-                  key={label}
-                  className="inline-flex shrink-0 items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-sm font-medium sm:px-4 sm:py-2 sm:text-base"
-                >
-                  <Icon className="size-4 text-primary sm:size-5" /> {label}
-                </span>
-              ))}
-            </div>
           </div>
 
           <div className="min-w-0 lg:col-span-6">

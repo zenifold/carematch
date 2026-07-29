@@ -99,13 +99,6 @@ function Hero() {
               <Phone className="size-4" /> Call {PHONE}
             </a>
           </div>
-          <ul className="mt-8 flex flex-wrap gap-2">
-            {["ID + selfie verified", "Background checked monthly", "Cancel free 4 hrs ahead", "No monthly minimum"].map((f) => (
-              <li key={f} className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-sm font-medium">
-                <Check className="size-4 text-primary" /> {f}
-              </li>
-            ))}
-          </ul>
         </div>
         <div className="lg:col-span-5">
           <img
