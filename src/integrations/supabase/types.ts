@@ -577,6 +577,60 @@ export type Database = {
           },
         ]
       }
+      message_flags: {
+        Row: {
+          conversation_id: string
+          created_at: string
+          dismissed: boolean
+          id: string
+          matched_text: string | null
+          message_id: string
+          reason: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          sender_id: string
+        }
+        Insert: {
+          conversation_id: string
+          created_at?: string
+          dismissed?: boolean
+          id?: string
+          matched_text?: string | null
+          message_id: string
+          reason: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sender_id: string
+        }
+        Update: {
+          conversation_id?: string
+          created_at?: string
+          dismissed?: boolean
+          id?: string
+          matched_text?: string | null
+          message_id?: string
+          reason?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_flags_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "message_flags_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           body: string

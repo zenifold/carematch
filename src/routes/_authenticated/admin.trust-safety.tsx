@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { ShieldAlert, ShieldCheck, Filter } from "lucide-react";
+import { ShieldAlert, ShieldCheck, Filter, MessageSquareWarning, Check, X } from "lucide-react";
 import {
   PageSkeleton,
   EmptyState,
@@ -16,6 +16,11 @@ import {
   type IncidentRow,
   type IncidentStatus,
 } from "@/lib/incidents.functions";
+import {
+  listMessageFlags,
+  resolveMessageFlag,
+  type MessageFlagRow,
+} from "@/lib/message-flags.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/trust-safety")({
   component: TrustSafetyPage,
@@ -239,7 +244,117 @@ function TrustSafetyPage() {
           ))}
         </ul>
       )}
+
+      <MessageFlagsSection />
     </div>
+  );
+}
+
+const REASON_LABELS: Record<MessageFlagRow["reason"], string> = {
+  phone_number: "Phone number",
+  email_address: "Email address",
+  offplatform_phrase: "Off-platform phrase",
+};
+
+function MessageFlagsSection() {
+  const fetchFlags = useServerFn(listMessageFlags);
+  const resolve = useServerFn(resolveMessageFlag);
+  const qc = useQueryClient();
+
+  const q = useQuery({
+    queryKey: ["admin", "message-flags"],
+    queryFn: () => fetchFlags({ data: { status: "unreviewed" } }),
+  });
+
+  const mut = useMutation({
+    mutationFn: resolve,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin", "message-flags"] });
+      toast.success("Flag reviewed");
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Update failed"),
+  });
+
+  const rows = q.data ?? [];
+
+  return (
+    <section className="space-y-3 border-t border-border pt-6">
+      <header>
+        <p className="text-xs uppercase tracking-widest text-muted-foreground">
+          Automated · marketplace retention
+        </p>
+        <h2 className="font-serif text-xl">Off-platform message flags</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Messages auto-flagged for a phone number, email address, or phrase
+          suggesting a move off the platform (e.g. "venmo me," "text me
+          directly"). Not blocked — just surfaced for review.
+        </p>
+      </header>
+
+      {q.isPending ? (
+        <p className="text-sm text-muted-foreground">Loading…</p>
+      ) : q.isError ? (
+        <ErrorState error={q.error} onRetry={() => q.refetch()} />
+      ) : rows.length === 0 ? (
+        <EmptyState
+          icon={<ShieldCheck className="size-6" />}
+          title="Nothing to review"
+          description="No unreviewed off-platform flags right now."
+        />
+      ) : (
+        <ul className="space-y-2">
+          {rows.map((r) => (
+            <li
+              key={r.id}
+              className="flex items-start gap-3 rounded-2xl border border-border bg-card p-4"
+            >
+              <span className="mt-1 grid size-9 shrink-0 place-items-center rounded-full bg-amber-500/15 text-amber-700">
+                <MessageSquareWarning className="size-4" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="font-semibold">{r.sender_name ?? "Unknown sender"}</p>
+                  <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-bold uppercase">
+                    {REASON_LABELS[r.reason]}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {new Date(r.created_at).toLocaleString(undefined, {
+                      month: "short",
+                      day: "numeric",
+                      hour: "numeric",
+                      minute: "2-digit",
+                    })}
+                  </span>
+                </div>
+                <p className="mt-1 whitespace-pre-wrap rounded-lg bg-secondary/40 p-2 text-sm">
+                  {r.matched_text}
+                </p>
+              </div>
+              <div className="flex shrink-0 gap-1.5">
+                <button
+                  type="button"
+                  disabled={mut.isPending}
+                  onClick={() => mut.mutate({ data: { id: r.id, dismissed: true } })}
+                  className="inline-flex items-center gap-1 rounded-lg border border-input bg-background px-2.5 py-1.5 text-xs font-semibold hover:bg-secondary disabled:opacity-50"
+                  title="Dismiss — false positive"
+                >
+                  <X className="size-3.5" /> Dismiss
+                </button>
+                <button
+                  type="button"
+                  disabled={mut.isPending}
+                  onClick={() => mut.mutate({ data: { id: r.id, dismissed: false } })}
+                  className="inline-flex items-center gap-1 rounded-lg bg-primary px-2.5 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+                  title="Mark handled"
+                >
+                  <Check className="size-3.5" /> Handled
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }
 
