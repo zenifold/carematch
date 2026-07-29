@@ -28,8 +28,8 @@ export const COMPANION_BASICS_V1: Module = {
   code: "companion_basics_v1",
   title: "Companion Basics",
   intro:
-    "Five short lessons on what companion-tier caregivers do — and just as importantly, what they don't. Then a 6-question check. You need 5 right to unlock jobs.",
-  pass_threshold: 5,
+    "Five short lessons on what companion-tier caregivers do — and just as importantly, what they don't. Then a 7-question check. You need 6 right to unlock jobs.",
+  pass_threshold: 6,
   lessons: [
     {
       title: "1. Dementia 101 — meet them where they are",
@@ -44,10 +44,10 @@ export const COMPANION_BASICS_V1: Module = {
     {
       title: "2. Fall prevention — the #1 way you save a life",
       body:
-        "Falls are the leading cause of injury death in older adults. Most falls happen from a seated or standing transfer — getting out of a chair, off the toilet, into bed. Slow everything down, clear the path, and be within arm's reach.",
+        "Falls are the leading cause of injury death in older adults. Most falls happen from a seated or standing transfer — getting out of a chair, off the toilet, into bed. As a companion, you don't physically assist these transfers at all — that's hands-on care outside your scope (see Lesson 5). What you CAN do: clear the path, remove hazards, and stay nearby so you can call for help fast if something goes wrong.",
       key_points: [
         "Rugs, cords, wet floors — flag them before someone trips.",
-        "Never rush a transfer. Let them lead.",
+        "Don't physically help someone stand, sit, or transfer — that's hands-on care, not companion scope.",
         "If they fall, don't lift alone. Call for help; call us.",
       ],
     },
@@ -74,10 +74,10 @@ export const COMPANION_BASICS_V1: Module = {
     {
       title: "5. Scope of practice — what companion tier can (and can't) do",
       body:
-        "As a Tier 0 companion, you can help with meals, light housekeeping, transportation, and companionship. You CANNOT give medications, do wound care, assist with bathing or toileting hands-on, or perform any medical task. Those need PCA/HHA/CNA/clinical training. If you're asked to do something outside your scope, decline politely and flag it in the app.",
+        "As a Tier 0 companion, you can help with meals, light housekeeping, transportation, and companionship. You CANNOT give medications, do wound care, assist with bathing or toileting hands-on, or physically help someone transfer — in or out of a bed, chair, or toilet. Those all need PCA/HHA/CNA/clinical training. This isn't just a guideline — it's Virginia law: companion care is hands-off support only. If you're asked to do something outside your scope, decline politely and flag it in the app. You're not the one who looks bad for saying no — you're protecting yourself and them.",
       key_points: [
         "OK: cook, clean, drive, converse, remind them to take a pill.",
-        "NOT OK: hand them the pill, help them shower, change a bandage.",
+        "NOT OK: hand them the pill, help them shower, change a bandage, or physically help them up from a chair/bed/toilet.",
         "When in doubt, decline and tell us. You won't be punished for saying no.",
       ],
     },
@@ -166,6 +166,20 @@ export const COMPANION_BASICS_V1: Module = {
       correct_index: 1,
       explanation:
         "Personal contact info stays personal. All communication goes through the app — it protects the senior, the family, and you.",
+    },
+    {
+      id: "q7",
+      scenario:
+        "Mrs. Ferris is having trouble getting up from her armchair and asks you to pull her up by the arm.",
+      choices: [
+        "Help pull her up — she's struggling and you want to be helpful.",
+        "Decline, let her take her own time, and note the difficulty in your check-out summary.",
+        "Help this one time since no one's watching.",
+        "Push the chair to make it easier for her to stand on her own.",
+      ],
+      correct_index: 1,
+      explanation:
+        "Physically assisting a transfer — chair, bed, or toilet — is hands-on care outside companion scope, and if she's injured during an assisted transfer, you're the one personally liable, not CareMatch. Note it so the family can arrange the right level of help.",
     },
   ],
 };
