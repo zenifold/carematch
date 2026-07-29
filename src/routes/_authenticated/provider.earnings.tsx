@@ -194,7 +194,7 @@ function EarningsPage() {
         )}
       </section>
 
-      <section className="grid gap-3 sm:grid-cols-2">
+      <section className="grid gap-3 sm:grid-cols-3">
         <div className="rounded-2xl border border-border bg-card p-5">
           <h3 className="font-serif text-lg">Direct deposit</h3>
           {connectQ.isPending ? (
@@ -274,6 +274,27 @@ function EarningsPage() {
               <TrendingUp className="size-3.5" />
             )}
             View W-9 / 1099
+          </button>
+        </div>
+        <div className="rounded-2xl border border-border bg-card p-5">
+          <h3 className="font-serif text-lg">Protect yourself</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
+            As an independent caregiver, you're not covered by workers' comp in a
+            client's home. Low-cost general liability insurance (often $15–30/mo)
+            covers accidental harm or property damage claims.
+          </p>
+          <button
+            type="button"
+            disabled={requestOpsAction.isPending}
+            onClick={() => requestOpsAction.mutate("Recommend a liability insurance option")}
+            className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-input bg-background px-3 py-1.5 text-xs font-semibold hover:bg-secondary disabled:opacity-50"
+          >
+            {requestOpsAction.isPending ? (
+              <Loader2 className="size-3.5 animate-spin" />
+            ) : (
+              <ShieldCheck className="size-3.5" />
+            )}
+            Ask for a recommendation
           </button>
         </div>
       </section>
