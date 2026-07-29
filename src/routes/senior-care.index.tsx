@@ -22,7 +22,7 @@ import {
   PHONE_HREF,
   marketingHead,
 } from "@/components/marketing/PageShell";
-import heroImage from "@/assets/hero.jpg";
+import heroImage from "@/assets/caregiver-plants.jpg";
 
 const CARE_TYPES = [
   { to: "/services/companionship" as const, icon: Users, title: "Companionship", blurb: "Visits, walks, hobbies, meals, appointments.", rate: "$20–$35/hr", who: "Someone who wants a friendly presence a few times a week." },
@@ -103,7 +103,7 @@ function Hero() {
         <div className="lg:col-span-5">
           <img
             src={heroImage}
-            alt="A caregiver and older woman sharing tea in a sunlit room"
+            alt="A caregiver helping an older woman tend a potted plant by a sunlit window"
             className="aspect-[4/5] w-full rounded-3xl object-cover shadow-lifted"
             width={1024}
             height={1280}
