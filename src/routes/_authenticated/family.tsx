@@ -11,10 +11,19 @@ import {
   User,
   Users,
   LifeBuoy,
+  MoreHorizontal,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { UnreadMessagesBadge, UpcomingVisitsBadge, SupportWidget } from "@/components/carematch";
+import {
+  Drawer,
+  DrawerTrigger,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerClose,
+} from "@/components/ui/drawer";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/family")({
@@ -32,6 +41,11 @@ const nav: { to: string; label: string; icon: typeof LayoutDashboard; exact?: bo
   { to: "/family/settings", label: "Settings", icon: SettingsIcon },
 ];
 
+// The bottom tab bar only has room for a handful of destinations before it
+// needs a scrollbar users won't notice. Pin the 4 most time-sensitive,
+// day-to-day actions there; everything else lives behind "More".
+const MOBILE_PRIMARY_PATHS = ["/family", "/family/visits", "/family/care-plan", "/family/messages"];
+
 function FamilyLayout() {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -44,6 +58,10 @@ function FamilyLayout() {
 
   const isActive = (to: string, exact?: boolean) =>
     exact ? pathname === to : pathname.startsWith(to);
+
+  const mobilePrimaryNav = MOBILE_PRIMARY_PATHS.map((p) => nav.find((n) => n.to === p)!);
+  const mobileMoreNav = nav.filter((n) => !MOBILE_PRIMARY_PATHS.includes(n.to));
+  const moreActive = mobileMoreNav.some((n) => isActive(n.to, n.exact));
 
   return (
     <div className="min-h-dvh bg-background lg:grid lg:grid-cols-[240px_1fr]">
@@ -130,8 +148,8 @@ function FamilyLayout() {
           aria-label="Family portal sections"
           className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden"
         >
-          <ul className="flex items-stretch justify-around overflow-x-auto">
-            {nav.map((n) => {
+          <ul className="flex items-stretch justify-around">
+            {mobilePrimaryNav.map((n) => {
               const active = isActive(n.to, n.exact);
               return (
                 <li key={n.to} className="flex-1 min-w-0">
@@ -155,6 +173,46 @@ function FamilyLayout() {
                 </li>
               );
             })}
+            <li className="flex-1 min-w-0">
+              <Drawer>
+                <DrawerTrigger asChild>
+                  <button
+                    type="button"
+                    className={`flex min-h-16 w-full flex-col items-center justify-center gap-1 py-2 text-[11px] font-semibold ${
+                      moreActive ? "text-primary" : "text-muted-foreground"
+                    }`}
+                  >
+                    <MoreHorizontal className="size-5" />
+                    <span className="truncate">More</span>
+                  </button>
+                </DrawerTrigger>
+                <DrawerContent>
+                  <DrawerHeader>
+                    <DrawerTitle>More</DrawerTitle>
+                  </DrawerHeader>
+                  <div className="grid gap-1 px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
+                    {mobileMoreNav.map((n) => {
+                      const active = isActive(n.to, n.exact);
+                      return (
+                        <DrawerClose key={n.to} asChild>
+                          <Link
+                            to={n.to}
+                            className={`flex items-center gap-3 rounded-lg px-3 py-3 text-base ${
+                              active
+                                ? "bg-primary/10 font-semibold text-primary"
+                                : "text-foreground hover:bg-secondary"
+                            }`}
+                          >
+                            <n.icon className="size-5" />
+                            <span className="flex-1">{n.label}</span>
+                          </Link>
+                        </DrawerClose>
+                      );
+                    })}
+                  </div>
+                </DrawerContent>
+              </Drawer>
+            </li>
           </ul>
         </nav>
       </div>
