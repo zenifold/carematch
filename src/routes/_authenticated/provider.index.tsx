@@ -212,7 +212,7 @@ function TodayPage() {
             <div className="flex-1 text-sm">
               <p className="font-semibold">Finish Companion Basics to accept your first job</p>
               <p className="mt-0.5 text-muted-foreground">
-                Five short lessons + a 6-question check. Takes about 15 minutes. You'll be blocked from accepting requests until you pass.
+                Five short lessons + a 7-question check. Takes about 15 minutes. You'll be blocked from accepting requests until you pass.
               </p>
               <Link
                 to="/onboarding/provider/basics-course"
