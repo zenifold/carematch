@@ -69,7 +69,6 @@ function Landing() {
     <div className="min-h-dvh bg-background text-foreground">
       <SiteHeader />
       <Hero />
-      <StatsStrip />
       <CareTypeTiles />
       <HowItWorks />
       <MeetNeighbors />
@@ -178,31 +177,15 @@ function CareTypeTiles() {
 
 /* ---------- Local Directory (state SEO strip) ---------- */
 
-const DIRECTORY_STATES: { name: string; slug: string }[] = [
-  { name: "California", slug: "california" },
-  { name: "Texas", slug: "texas" },
-  { name: "Florida", slug: "florida" },
-  { name: "New York", slug: "new-york" },
-  { name: "Pennsylvania", slug: "pennsylvania" },
-  { name: "Illinois", slug: "illinois" },
-  { name: "Ohio", slug: "ohio" },
-  { name: "Georgia", slug: "georgia" },
-  { name: "North Carolina", slug: "north-carolina" },
-  { name: "Michigan", slug: "michigan" },
-  { name: "New Jersey", slug: "new-jersey" },
-  { name: "Virginia", slug: "virginia" },
-  { name: "Washington", slug: "washington" },
-  { name: "Arizona", slug: "arizona" },
-  { name: "Massachusetts", slug: "massachusetts" },
-  { name: "Tennessee", slug: "tennessee" },
-  { name: "Indiana", slug: "indiana" },
-  { name: "Missouri", slug: "missouri" },
-  { name: "Maryland", slug: "maryland" },
-  { name: "Wisconsin", slug: "wisconsin" },
-  { name: "Colorado", slug: "colorado" },
-  { name: "Minnesota", slug: "minnesota" },
-  { name: "South Carolina", slug: "south-carolina" },
-  { name: "Oregon", slug: "oregon" },
+const DIRECTORY_STATES: { name: string; slug: string; cities: string[] }[] = [
+  { name: "California", slug: "california", cities: ["Los Angeles", "San Diego", "San Francisco"] },
+  { name: "Texas", slug: "texas", cities: ["Houston", "Dallas", "Austin"] },
+  { name: "Florida", slug: "florida", cities: ["Miami", "Tampa", "Orlando"] },
+  { name: "New York", slug: "new-york", cities: ["New York City", "Buffalo", "Rochester"] },
+  { name: "Pennsylvania", slug: "pennsylvania", cities: ["Philadelphia", "Pittsburgh", "Allentown"] },
+  { name: "Illinois", slug: "illinois", cities: ["Chicago", "Aurora", "Naperville"] },
+  { name: "Ohio", slug: "ohio", cities: ["Columbus", "Cleveland", "Cincinnati"] },
+  { name: "Georgia", slug: "georgia", cities: ["Atlanta", "Augusta", "Savannah"] },
 ];
 
 function LocalDirectory() {
@@ -218,7 +201,7 @@ function LocalDirectory() {
               Senior care, where you live.
             </h2>
             <p className="mt-3 text-lg text-muted-foreground">
-              Local rates, licensing rules, and what to expect in your state.
+              Local rates, licensing rules, and what to expect — starting with our eight largest states.
             </p>
           </div>
           <Link
@@ -229,16 +212,22 @@ function LocalDirectory() {
           </Link>
         </div>
 
-        <ul className="mt-8 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+        <ul className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {DIRECTORY_STATES.map((s) => (
             <li key={s.slug}>
               <Link
                 to="/senior-care/$state"
                 params={{ state: s.slug }}
-                className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2.5 text-sm font-medium hover:border-primary hover:bg-secondary"
+                className="group flex h-full flex-col rounded-2xl border border-border bg-card p-5 transition-all duration-200 hover:-translate-y-1 hover:border-primary hover:shadow-lifted"
               >
-                <MapPin className="size-4 shrink-0 text-primary" />
-                <span className="truncate">Senior care in {s.name}</span>
+                <span className="inline-flex items-center gap-2 text-lg font-semibold">
+                  <MapPin className="size-4 shrink-0 text-primary" /> {s.name}
+                </span>
+                <p className="mt-2 text-sm text-muted-foreground">{s.cities.join(" · ")}</p>
+                <p className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-primary opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                  See local rates &amp; rules
+                  <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+                </p>
               </Link>
             </li>
           ))}
@@ -351,51 +340,32 @@ function Hero() {
   );
 }
 
-/* ---------- Stats Strip ---------- */
-
-function StatsStrip() {
-  const items = [
-    { value: "You choose", label: "the helper, the visit, the pace" },
-    { value: "5 checks", label: "on every helper, refreshed monthly" },
-    { value: "By the hour", label: "no contracts, no monthly minimums" },
-    { value: "Phone-first", label: "do everything by phone if you prefer" },
-  ];
-  return (
-    <section aria-label="How CareMatch works" className="border-y border-border bg-card">
-      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-4 px-5 py-8 md:grid-cols-4 lg:px-10">
-        {items.map((s) => (
-          <div key={s.label} className="text-center md:text-left">
-            <p className="font-serif text-3xl text-primary sm:text-4xl">{s.value}</p>
-            <p className="mt-1 text-sm font-medium uppercase tracking-wider text-muted-foreground">
-              {s.label}
-            </p>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
 /* ---------- How It Works ---------- */
 
 function HowItWorks() {
+  const [active, setActive] = useState(0);
   const steps = [
     {
       icon: HandHeart,
       title: "Tell us what you need",
-      body: "One question at a time. Voice input on every field, or call and we'll do it with you.",
+      teaser: "One question at a time",
+      body: "Answer one question at a time — by voice, by text, or over the phone with a real person doing it with you.",
     },
     {
       icon: UserCheck,
       title: "See your verified matches",
-      body: "Up to five nearby helpers, each with a full verification report you can open.",
+      teaser: "Up to five nearby helpers",
+      body: "Up to five nearby helpers, each with a full verification report you can open and read before you decide.",
     },
     {
       icon: Check,
       title: "Book with confidence",
-      body: "Every visit begins with a live check-in and ends with a simple 'how did it go?'",
+      teaser: "Live check-in, every visit",
+      body: "Every visit begins with a live check-in and ends with a simple “how did it go?” — so you always know what happened.",
     },
   ];
+  const current = steps[active];
+
   return (
     <section id="how" className="border-b border-border bg-secondary/40">
       <div className="mx-auto max-w-7xl px-5 py-20 lg:px-10">
@@ -411,28 +381,94 @@ function HowItWorks() {
           </p>
         </div>
 
-        <ol className="relative mt-12 grid gap-6 md:grid-cols-3">
-          {/* connecting line */}
+        <div className="mt-12 grid gap-6 lg:grid-cols-12 lg:gap-8">
           <div
-            aria-hidden
-            className="absolute left-0 right-0 top-16 hidden h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent md:block"
-          />
-          {steps.map((s, i) => (
-            <li
-              key={s.title}
-              className="surface-card relative p-7 transition-transform hover:-translate-y-1"
-            >
-              <div className="flex items-center gap-3">
-                <span className="relative grid size-12 place-items-center rounded-full bg-primary text-primary-foreground font-serif text-xl shadow-soft">
-                  {i + 1}
-                </span>
-                <s.icon className="size-7 text-primary" aria-hidden />
-              </div>
-              <h3 className="mt-5 text-2xl font-semibold">{s.title}</h3>
-              <p className="mt-2 text-lg text-muted-foreground">{s.body}</p>
-            </li>
-          ))}
-        </ol>
+            role="tablist"
+            aria-label="How CareMatch works, steps"
+            className="flex gap-2 overflow-x-auto pb-2 lg:col-span-4 lg:flex-col lg:overflow-visible lg:pb-0"
+          >
+            {steps.map((s, i) => {
+              const isActive = i === active;
+              return (
+                <button
+                  key={s.title}
+                  type="button"
+                  role="tab"
+                  id={`how-tab-${i}`}
+                  aria-selected={isActive}
+                  aria-controls={`how-panel-${i}`}
+                  onClick={() => setActive(i)}
+                  className={`flex w-full shrink-0 items-center gap-4 rounded-2xl border p-4 text-left transition-all duration-300 sm:shrink ${
+                    isActive
+                      ? "border-primary bg-card shadow-lifted"
+                      : "border-transparent hover:bg-card/60"
+                  }`}
+                >
+                  <span
+                    className={`grid size-10 shrink-0 place-items-center rounded-full font-serif text-lg transition-colors ${
+                      isActive ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground"
+                    }`}
+                  >
+                    {i + 1}
+                  </span>
+                  <span className="min-w-0">
+                    <span className={`block truncate font-semibold ${isActive ? "text-foreground" : "text-muted-foreground"}`}>
+                      {s.title}
+                    </span>
+                    <span className="hidden truncate text-sm text-muted-foreground lg:block">
+                      {s.teaser}
+                    </span>
+                  </span>
+                </button>
+              );
+            })}
+
+            <div className="relative mt-1 hidden h-1 overflow-hidden rounded-full bg-border lg:block" aria-hidden>
+              <div
+                className="h-full rounded-full bg-primary transition-all duration-500 ease-out"
+                style={{ width: `${((active + 1) / steps.length) * 100}%` }}
+              />
+            </div>
+          </div>
+
+          <div
+            key={active}
+            role="tabpanel"
+            id={`how-panel-${active}`}
+            aria-labelledby={`how-tab-${active}`}
+            className="surface-card animate-fade-in p-8 lg:col-span-8 lg:p-10"
+          >
+            <div className="flex items-center gap-4">
+              <span className="grid size-14 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
+                <current.icon className="size-7" aria-hidden />
+              </span>
+              <span className="font-serif text-lg text-primary">
+                Step {active + 1} of {steps.length}
+              </span>
+            </div>
+            <h3 className="mt-6 text-3xl font-semibold">{current.title}</h3>
+            <p className="mt-3 text-xl text-muted-foreground">{current.body}</p>
+
+            <div className="mt-8 flex gap-3">
+              <button
+                type="button"
+                onClick={() => setActive((a) => Math.max(0, a - 1))}
+                disabled={active === 0}
+                className="rounded-full border border-border px-4 py-2 text-sm font-semibold hover:bg-card disabled:pointer-events-none disabled:opacity-30"
+              >
+                Back
+              </button>
+              <button
+                type="button"
+                onClick={() => setActive((a) => Math.min(steps.length - 1, a + 1))}
+                disabled={active === steps.length - 1}
+                className="group inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-30"
+              >
+                Next <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
