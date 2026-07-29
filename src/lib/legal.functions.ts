@@ -8,11 +8,7 @@ import {
   type LegalDocumentKind,
 } from "@/lib/legal";
 
-const KIND_SCHEMA = z.enum([
-  "terms_of_service",
-  "privacy_policy",
-  "independent_contractor_agreement",
-]);
+const KIND_SCHEMA = z.enum(["terms_of_service", "privacy_policy", "provider_agreement"]);
 
 export type LegalDocumentSummary = {
   kind: LegalDocumentKind;

@@ -23,7 +23,7 @@ Please read these Terms of Service ("Terms") carefully. They govern your use of 
 
 CareMatch is an online marketplace that connects older adults and their families ("Care Recipients") with independent, self-employed companion caregivers ("Providers") for non-medical companion care services.
 
-**CareMatch is a marketplace, not a care provider, home care agency, or employer.** We do not employ Providers, supervise their work, or provide care ourselves. We facilitate introductions, scheduling, communication, and payment between Care Recipients and Providers. Providers are independent contractors who set their own rates (within the marketplace's tools) and decide which bookings to accept.
+**CareMatch is a marketplace, not a care provider, home care agency, or employer.** We do not employ, engage, or contract with Providers, supervise their work, or provide care ourselves. We facilitate introductions, scheduling, communication, and payment between Care Recipients and Providers. Providers are independent businesses who set their own rates (within the marketplace's tools), decide which bookings to accept, and provide services directly to the Care Recipient who books them — never to CareMatch or on CareMatch's behalf.
 
 ## 2. Eligibility
 
@@ -97,9 +97,9 @@ A Senior may link one or more Family members to their account and assign each a 
 
 THE SERVICE IS PROVIDED "AS IS" WITHOUT WARRANTIES OF ANY KIND. CAREMATCH DOES NOT WARRANT THAT THE SERVICE WILL BE UNINTERRUPTED, ERROR-FREE, OR THAT ANY PROVIDER WILL MEET YOUR EXPECTATIONS OR REQUIREMENTS. CAREMATCH IS NOT A MEDICAL PROVIDER, HOME HEALTH AGENCY, OR HIPAA-COVERED ENTITY, AND NOTHING ON THE SERVICE IS MEDICAL ADVICE.
 
-## 11. Independent Contractor Relationship; Limitation of Liability
+## 11. No Employment or Engagement Relationship; Limitation of Liability
 
-Providers are independent contractors, not employees, partners, or agents of CareMatch. CareMatch does not direct or control the manner in which a Provider performs services.
+Providers are independent businesses, not employees, contractors, partners, or agents of CareMatch. CareMatch does not engage or retain Providers to perform services, and does not direct or control the manner in which a Provider performs services for a Care Recipient.
 
 TO THE MAXIMUM EXTENT PERMITTED BY LAW, CAREMATCH IS NOT LIABLE FOR THE ACTS OR OMISSIONS OF ANY PROVIDER OR CARE RECIPIENT, INCLUDING BUT NOT LIMITED TO PERSONAL INJURY, PROPERTY DAMAGE, OR ANY HARM ARISING FROM A VISIT ARRANGED THROUGH THE SERVICE. CAREMATCH'S TOTAL LIABILITY TO YOU FOR ANY CLAIM ARISING FROM THE SERVICE WILL NOT EXCEED THE PLATFORM FEES YOU PAID CAREMATCH IN THE THREE MONTHS BEFORE THE CLAIM AROSE.
 

@@ -648,7 +648,7 @@ function SigninForm({
 const DOC_LINK: Record<LegalDocumentKind, string> = {
   terms_of_service: "/legal/terms",
   privacy_policy: "/legal/privacy",
-  independent_contractor_agreement: "/legal/caregiver-agreement",
+  provider_agreement: "/legal/provider-agreement",
 };
 
 /** Required-document checkbox gate — shown once, on role selection, since

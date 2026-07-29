@@ -62,9 +62,9 @@ import { Route as ResourcesAgingInPlaceChecklistRouteImport } from './routes/res
 import { Route as LegalTermsRouteImport } from './routes/legal.terms'
 import { Route as LegalStateAvailabilityRouteImport } from './routes/legal.state-availability'
 import { Route as LegalScopeOfPracticeRouteImport } from './routes/legal.scope-of-practice'
+import { Route as LegalProviderAgreementRouteImport } from './routes/legal.provider-agreement'
 import { Route as LegalPrivacyRouteImport } from './routes/legal.privacy'
 import { Route as LegalIndependentContractorsRouteImport } from './routes/legal.independent-contractors'
-import { Route as LegalCaregiverAgreementRouteImport } from './routes/legal.caregiver-agreement'
 import { Route as ApiSitemapDotxmlRouteImport } from './routes/api/sitemap[.]xml'
 import { Route as AuthenticatedSeniorRouteImport } from './routes/_authenticated/senior'
 import { Route as AuthenticatedProviderRouteImport } from './routes/_authenticated/provider'
@@ -417,6 +417,11 @@ const LegalScopeOfPracticeRoute = LegalScopeOfPracticeRouteImport.update({
   path: '/scope-of-practice',
   getParentRoute: () => LegalRoute,
 } as any)
+const LegalProviderAgreementRoute = LegalProviderAgreementRouteImport.update({
+  id: '/provider-agreement',
+  path: '/provider-agreement',
+  getParentRoute: () => LegalRoute,
+} as any)
 const LegalPrivacyRoute = LegalPrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
@@ -428,11 +433,6 @@ const LegalIndependentContractorsRoute =
     path: '/independent-contractors',
     getParentRoute: () => LegalRoute,
   } as any)
-const LegalCaregiverAgreementRoute = LegalCaregiverAgreementRouteImport.update({
-  id: '/caregiver-agreement',
-  path: '/caregiver-agreement',
-  getParentRoute: () => LegalRoute,
-} as any)
 const ApiSitemapDotxmlRoute = ApiSitemapDotxmlRouteImport.update({
   id: '/api/sitemap.xml',
   path: '/api/sitemap.xml',
@@ -830,9 +830,9 @@ export interface FileRoutesByFullPath {
   '/provider': typeof AuthenticatedProviderRouteWithChildren
   '/senior': typeof AuthenticatedSeniorRouteWithChildren
   '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
-  '/legal/caregiver-agreement': typeof LegalCaregiverAgreementRoute
   '/legal/independent-contractors': typeof LegalIndependentContractorsRoute
   '/legal/privacy': typeof LegalPrivacyRoute
+  '/legal/provider-agreement': typeof LegalProviderAgreementRoute
   '/legal/scope-of-practice': typeof LegalScopeOfPracticeRoute
   '/legal/state-availability': typeof LegalStateAvailabilityRoute
   '/legal/terms': typeof LegalTermsRoute
@@ -944,9 +944,9 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRouteWithChildren
   '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
-  '/legal/caregiver-agreement': typeof LegalCaregiverAgreementRoute
   '/legal/independent-contractors': typeof LegalIndependentContractorsRoute
   '/legal/privacy': typeof LegalPrivacyRoute
+  '/legal/provider-agreement': typeof LegalProviderAgreementRoute
   '/legal/scope-of-practice': typeof LegalScopeOfPracticeRoute
   '/legal/state-availability': typeof LegalStateAvailabilityRoute
   '/legal/terms': typeof LegalTermsRoute
@@ -1066,9 +1066,9 @@ export interface FileRoutesById {
   '/_authenticated/provider': typeof AuthenticatedProviderRouteWithChildren
   '/_authenticated/senior': typeof AuthenticatedSeniorRouteWithChildren
   '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
-  '/legal/caregiver-agreement': typeof LegalCaregiverAgreementRoute
   '/legal/independent-contractors': typeof LegalIndependentContractorsRoute
   '/legal/privacy': typeof LegalPrivacyRoute
+  '/legal/provider-agreement': typeof LegalProviderAgreementRoute
   '/legal/scope-of-practice': typeof LegalScopeOfPracticeRoute
   '/legal/state-availability': typeof LegalStateAvailabilityRoute
   '/legal/terms': typeof LegalTermsRoute
@@ -1190,9 +1190,9 @@ export interface FileRouteTypes {
     | '/provider'
     | '/senior'
     | '/api/sitemap.xml'
-    | '/legal/caregiver-agreement'
     | '/legal/independent-contractors'
     | '/legal/privacy'
+    | '/legal/provider-agreement'
     | '/legal/scope-of-practice'
     | '/legal/state-availability'
     | '/legal/terms'
@@ -1304,9 +1304,9 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/onboarding'
     | '/api/sitemap.xml'
-    | '/legal/caregiver-agreement'
     | '/legal/independent-contractors'
     | '/legal/privacy'
+    | '/legal/provider-agreement'
     | '/legal/scope-of-practice'
     | '/legal/state-availability'
     | '/legal/terms'
@@ -1425,9 +1425,9 @@ export interface FileRouteTypes {
     | '/_authenticated/provider'
     | '/_authenticated/senior'
     | '/api/sitemap.xml'
-    | '/legal/caregiver-agreement'
     | '/legal/independent-contractors'
     | '/legal/privacy'
+    | '/legal/provider-agreement'
     | '/legal/scope-of-practice'
     | '/legal/state-availability'
     | '/legal/terms'
@@ -1923,6 +1923,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LegalScopeOfPracticeRouteImport
       parentRoute: typeof LegalRoute
     }
+    '/legal/provider-agreement': {
+      id: '/legal/provider-agreement'
+      path: '/provider-agreement'
+      fullPath: '/legal/provider-agreement'
+      preLoaderRoute: typeof LegalProviderAgreementRouteImport
+      parentRoute: typeof LegalRoute
+    }
     '/legal/privacy': {
       id: '/legal/privacy'
       path: '/privacy'
@@ -1935,13 +1942,6 @@ declare module '@tanstack/react-router' {
       path: '/independent-contractors'
       fullPath: '/legal/independent-contractors'
       preLoaderRoute: typeof LegalIndependentContractorsRouteImport
-      parentRoute: typeof LegalRoute
-    }
-    '/legal/caregiver-agreement': {
-      id: '/legal/caregiver-agreement'
-      path: '/caregiver-agreement'
-      fullPath: '/legal/caregiver-agreement'
-      preLoaderRoute: typeof LegalCaregiverAgreementRouteImport
       parentRoute: typeof LegalRoute
     }
     '/api/sitemap.xml': {
@@ -2611,9 +2611,9 @@ const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface LegalRouteChildren {
-  LegalCaregiverAgreementRoute: typeof LegalCaregiverAgreementRoute
   LegalIndependentContractorsRoute: typeof LegalIndependentContractorsRoute
   LegalPrivacyRoute: typeof LegalPrivacyRoute
+  LegalProviderAgreementRoute: typeof LegalProviderAgreementRoute
   LegalScopeOfPracticeRoute: typeof LegalScopeOfPracticeRoute
   LegalStateAvailabilityRoute: typeof LegalStateAvailabilityRoute
   LegalTermsRoute: typeof LegalTermsRoute
@@ -2621,9 +2621,9 @@ interface LegalRouteChildren {
 }
 
 const LegalRouteChildren: LegalRouteChildren = {
-  LegalCaregiverAgreementRoute: LegalCaregiverAgreementRoute,
   LegalIndependentContractorsRoute: LegalIndependentContractorsRoute,
   LegalPrivacyRoute: LegalPrivacyRoute,
+  LegalProviderAgreementRoute: LegalProviderAgreementRoute,
   LegalScopeOfPracticeRoute: LegalScopeOfPracticeRoute,
   LegalStateAvailabilityRoute: LegalStateAvailabilityRoute,
   LegalTermsRoute: LegalTermsRoute,

@@ -1,13 +1,10 @@
 import { TERMS_OF_SERVICE } from "./terms-of-service";
 import { PRIVACY_POLICY } from "./privacy-policy";
-import { INDEPENDENT_CONTRACTOR_AGREEMENT } from "./independent-contractor-agreement";
+import { PROVIDER_AGREEMENT } from "./provider-agreement";
 
-export { TERMS_OF_SERVICE, PRIVACY_POLICY, INDEPENDENT_CONTRACTOR_AGREEMENT };
+export { TERMS_OF_SERVICE, PRIVACY_POLICY, PROVIDER_AGREEMENT };
 
-export type LegalDocumentKind =
-  | "terms_of_service"
-  | "privacy_policy"
-  | "independent_contractor_agreement";
+export type LegalDocumentKind = "terms_of_service" | "privacy_policy" | "provider_agreement";
 
 export type LegalDocument = {
   version: string;
@@ -19,14 +16,14 @@ export type LegalDocument = {
 export const LEGAL_DOCUMENTS: Record<LegalDocumentKind, LegalDocument> = {
   terms_of_service: TERMS_OF_SERVICE,
   privacy_policy: PRIVACY_POLICY,
-  independent_contractor_agreement: INDEPENDENT_CONTRACTOR_AGREEMENT,
+  provider_agreement: PROVIDER_AGREEMENT,
 };
 
 /** Documents every account type must accept at signup. */
 export const REQUIRED_FOR_ALL: LegalDocumentKind[] = ["terms_of_service", "privacy_policy"];
 
 /** Additional documents required for provider accounts specifically. */
-export const REQUIRED_FOR_PROVIDER: LegalDocumentKind[] = ["independent_contractor_agreement"];
+export const REQUIRED_FOR_PROVIDER: LegalDocumentKind[] = ["provider_agreement"];
 
 export function requiredDocumentsFor(role: string): LegalDocumentKind[] {
   return role === "provider"
