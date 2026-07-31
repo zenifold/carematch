@@ -9,13 +9,13 @@
 // so re-acceptance can be required.
 
 export const TERMS_OF_SERVICE = {
-  version: "1.0.0",
+  version: "1.1.0",
   effective_date: "2026-08-01",
   title: "Terms of Service",
   body: `
 # CareMatch Terms of Service
 
-**Version 1.0.0 — Effective August 1, 2026**
+**Version 1.1.0 — Effective August 1, 2026**
 
 Please read these Terms of Service ("Terms") carefully. They govern your use of the CareMatch website, mobile experience, and related services (collectively, the "Service"), operated by [CareMatch Legal Entity Name TBD] ("CareMatch," "we," "us," or "our"). By creating an account or using the Service, you agree to these Terms.
 
@@ -68,15 +68,15 @@ CareMatch requires Providers to complete identity verification and a background 
 
 ## 6. Fees and Payment
 
-CareMatch does not charge a subscription or membership fee to browse Providers, message a Provider, or request a booking. **You are charged only for visits that actually take place**, after the visit is completed. The amount charged is the Provider's disclosed hourly rate for the actual duration of the visit, plus a platform fee (disclosed at checkout) that CareMatch retains for operating the marketplace, verification, and support.
+CareMatch does not charge a subscription or membership fee to browse Providers, message a Provider, or request a booking. **Your payment method is charged once a Provider accepts your visit request**, for the Provider's disclosed hourly rate times the requested duration, plus a platform fee (disclosed before you book) that CareMatch retains for operating the marketplace, verification, and support. If the actual visit runs a different length than requested, any difference is reconciled after the visit.
 
 Payments are processed by our payment processor, Stripe. CareMatch does not store your full payment card details.
 
-Providers are paid automatically, minus the platform fee, once a visit is marked complete and payment succeeds.
+Providers are paid automatically, minus the platform fee, once a visit is checked out as complete.
 
 ## 7. Cancellations
 
-You may cancel or reschedule a visit at no charge up to 4 hours before it is scheduled to begin. Cancellations made within 4 hours of the scheduled start, or a Provider arriving to find no one available, may incur a charge to compensate the Provider for reserved time. *[This matches CareMatch's existing public FAQ commitment — flagging for the team: as of this draft, this policy is not yet enforced anywhere in the booking/cancellation code, so it's a promise the product doesn't currently keep. Either finalize this number and build it, or update the FAQ to match whatever the team's in-progress cancellation-policy research lands on.]*
+You may cancel or reschedule a visit at no charge up to 24 hours before it is scheduled to begin, and your payment method will be fully refunded. Cancellations made within 24 hours of the scheduled start are charged 50% of the visit cost — split evenly between the Provider (for their reserved time) and CareMatch — with the remaining 50% refunded. Recurring visits can be paused at any time with no penalty.
 
 ## 8. Conduct on the Platform
 

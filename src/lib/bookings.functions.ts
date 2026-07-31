@@ -334,6 +334,15 @@ export const acceptBooking = createServerFn({ method: "POST" })
         .insert({ booking_id: data.id });
       if (visitErr) throw visitErr;
     }
+
+    // Charge now — the caregiver has committed to the visit. Never blocks
+    // acceptance: a missing/declined card just leaves payment_status
+    // 'unpaid' for the existing manual mark-paid fallback to reconcile.
+    const { chargeApprovedBooking } = await import("@/lib/stripe/charge-visit.server");
+    await chargeApprovedBooking(data.id).catch(() => {
+      /* swallowed intentionally — see chargeApprovedBooking's own doc comment */
+    });
+
     return { ok: true };
   });
 
@@ -347,6 +356,14 @@ export const declineBooking = createServerFn({ method: "POST" })
       .eq("id", data.id)
       .eq("provider_id", context.userId);
     if (error) throw error;
+
+    // No-ops safely if this booking was never charged (refundCancelledBooking
+    // checks payment_status itself) — covers the reschedule-then-decline path.
+    const { refundCancelledBooking } = await import("@/lib/stripe/charge-visit.server");
+    await refundCancelledBooking(data.id).catch(() => {
+      /* swallowed intentionally — see refundCancelledBooking's own doc comment */
+    });
+
     return { ok: true };
   });
 
@@ -360,6 +377,14 @@ export const cancelBooking = createServerFn({ method: "POST" })
       .update({ status: "cancelled" })
       .eq("id", data.id);
     if (error) throw error;
+
+    // Applies the /pricing cancellation policy (full refund outside 24h,
+    // 50%-charged split inside it) — no-ops if never charged.
+    const { refundCancelledBooking } = await import("@/lib/stripe/charge-visit.server");
+    await refundCancelledBooking(data.id).catch(() => {
+      /* swallowed intentionally — see refundCancelledBooking's own doc comment */
+    });
+
     return { ok: true };
   });
 
@@ -464,12 +489,13 @@ export const checkOutVisit = createServerFn({ method: "POST" })
     // Award consistency bonus for repeat visits with same senior.
     await awardConsistencyBonusIfDue(data.id, context.userId);
 
-    // Charge for the visit now that it's actually complete — never before.
-    // Never throws: a payment failure must not block check-out, since the
-    // visit already happened regardless of how billing resolves.
-    const { chargeCompletedVisit } = await import("@/lib/stripe/charge-visit.server");
-    await chargeCompletedVisit(data.id).catch(() => {
-      /* swallowed intentionally — see chargeCompletedVisit's own doc comment */
+    // The family was already charged when this booking was approved — pay
+    // the provider their cut now that the visit they were charged for has
+    // actually happened. Never throws: a payout failure must not block
+    // check-out either way.
+    const { payOutCompletedVisit } = await import("@/lib/stripe/charge-visit.server");
+    await payOutCompletedVisit(data.id).catch(() => {
+      /* swallowed intentionally — see payOutCompletedVisit's own doc comment */
     });
 
     return { ok: true };

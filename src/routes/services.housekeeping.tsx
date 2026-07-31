@@ -5,7 +5,7 @@ import { ServiceDetail, serviceJsonLd } from "@/components/marketing/ServiceDeta
 const faqs = [
   { q: "Is CareMatch just a cleaning service?", a: "No. Housekeeping helpers on CareMatch are the same trusted people who can also provide companionship and errand help — so one relationship covers many needs, and you don't have to explain your home to a new person every week." },
   { q: "Do I need to supply cleaning products?", a: "By default helpers use your home's supplies (most seniors prefer familiar products). You can also request eco-friendly or unscented options when booking." },
-  { q: "Can housekeeping be recurring?", a: "Yes. Set weekly, bi-weekly, or monthly recurring visits with the same helper. Cancel or reschedule up to 4 hours ahead with no fee." },
+  { q: "Can housekeeping be recurring?", a: "Yes. Set weekly, bi-weekly, or monthly recurring visits with the same helper. Cancel or reschedule up to 24 hours ahead with no fee." },
 ];
 
 export const Route = createFileRoute("/services/housekeeping")({

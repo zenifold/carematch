@@ -879,7 +879,7 @@ function OldWayVsCareMatch() {
     { label: "Who's coming to the door?", old: "A stranger from a printed roster", cm: "A verified helper with a live selfie match" },
     { label: "Background checks", old: "Once at hire, maybe", cm: "Refreshed every 30 days, automatically" },
     { label: "Pricing", old: "Opaque agency invoices", cm: "Transparent plans that fit your budget" },
-    { label: "Booking changes", old: "Phone tag, business hours only", cm: "Cancel or reschedule up to 4 hrs before, any time" },
+    { label: "Booking changes", old: "Phone tag, business hours only", cm: "Cancel or reschedule up to 24 hrs before, any time" },
     { label: "Family visibility", old: "Whatever mom remembers to tell you", cm: "Real-time updates — if the senior invites you" },
     { label: "If something goes wrong", old: "A voicemail on Monday", cm: "24/7 concierge, response in minutes" },
   ];
@@ -1058,7 +1058,7 @@ function SocialProof() {
     },
     {
       title: "One clear price, before you book.",
-      body: "Helpers set their hourly rate. CareMatch adds a flat service fee, shown as one total up front. Cancel free up to 4 hours before a visit.",
+      body: "Helpers set their hourly rate. CareMatch adds a flat service fee, shown as one total up front. Cancel free up to 24 hours before a visit.",
     },
   ];
   return (
@@ -1183,7 +1183,7 @@ function FAQ() {
     },
     {
       q: "Can I cancel or change a visit?",
-      a: "Yes — cancel or reschedule any visit up to 4 hours before it starts, at no charge. Life happens, and the platform is built around that.",
+      a: "Yes — cancel or reschedule any visit up to 24 hours before it starts, at no charge. Life happens, and the platform is built around that.",
     },
     {
       q: "What if something goes wrong?",

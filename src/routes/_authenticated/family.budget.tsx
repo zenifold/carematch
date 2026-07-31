@@ -428,8 +428,9 @@ function PaymentMethodCard({ seniorId }: { seniorId: string }) {
         <div>
           <h2 className="font-serif text-lg">Payment method</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            No membership, no fee to book — this card is only charged after a visit is checked
-            out, for that visit's cost.
+            No membership, no fee to browse or message — this card is only charged once a
+            caregiver accepts a visit request, for that visit's cost. Cancel more than 24 hours
+            ahead for a full refund.
           </p>
         </div>
         <CreditCard className="size-6 shrink-0 text-muted-foreground" />

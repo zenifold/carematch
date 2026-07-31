@@ -14,7 +14,7 @@ const faqs = [
   },
   {
     q: "Can I cancel or reschedule a visit?",
-    a: "Yes. Cancel or reschedule any visit up to 4 hours before it starts, at no charge. Life happens, and the platform is built around that.",
+    a: "Yes. Cancel or reschedule any visit up to 24 hours before it starts, at no charge. Life happens, and the platform is built around that.",
   },
   {
     q: "What if something goes wrong during a visit?",

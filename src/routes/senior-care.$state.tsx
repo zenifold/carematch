@@ -249,7 +249,7 @@ function StatePage() {
             {[
               { n: 1, t: "Tell us what's needed", b: "One question at a time. Online or by phone with a real person." },
               { n: 2, t: "See verified matches nearby", b: "Local helpers with the exact checks that apply in {s}." },
-              { n: 3, t: "Book with confidence", b: "Live selfie + GPS check-in on every visit. Cancel free up to 4 hrs ahead." },
+              { n: 3, t: "Book with confidence", b: "Live selfie + GPS check-in on every visit. Cancel free up to 24 hrs ahead." },
             ].map((step) => (
               <li key={step.n} className="surface-card p-6">
                 <span className="grid size-12 place-items-center rounded-full bg-primary text-primary-foreground font-serif text-xl">
