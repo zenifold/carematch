@@ -20,4 +20,4 @@ Allow: /
 User-agent: Google-Extended
 Allow: /
 
-Sitemap: https://carematcher.lovable.app/api/sitemap.xml
+Sitemap: https://getcompanioncare.com/api/sitemap.xml

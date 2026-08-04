@@ -55,9 +55,6 @@ const entries: SitemapEntry[] = [
   { path: "/resources/hospice-vs-palliative-care", changefreq: "monthly", priority: "0.75" },
   { path: "/resources/senior-nutrition-guide", changefreq: "monthly", priority: "0.75" },
   { path: "/resources/home-health-vs-home-care", changefreq: "monthly", priority: "0.8" },
-
-
-  { path: "/auth", changefreq: "yearly", priority: "0.3" },
 ];
 
 export const Route = createFileRoute("/api/sitemap.xml")({
