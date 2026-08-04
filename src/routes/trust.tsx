@@ -167,8 +167,8 @@ export const Route = createFileRoute("/trust")({
       description:
         "Every CareMatch caregiver clears 5 verification stages: identity proofing, background check, credential verification, monthly re-checks, and live selfie + GPS check-in at every visit.",
       extraMeta: [
-        { property: "og:image", content: "https://carematcher.lovable.app/og-trust.jpg" },
-        { name: "twitter:image", content: "https://carematcher.lovable.app/og-trust.jpg" },
+        { property: "og:image", content: "https://getcompanioncare.com/og-trust.jpg" },
+        { name: "twitter:image", content: "https://getcompanioncare.com/og-trust.jpg" },
       ],
       jsonLd: [
         {

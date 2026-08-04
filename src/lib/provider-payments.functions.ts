@@ -78,7 +78,7 @@ export const startConnectOnboarding = createServerFn({ method: "POST" })
       if (updErr) throw updErr;
     }
 
-    const returnUrl = data.returnUrl ?? "https://carematcher.lovable.app/provider/payments";
+    const returnUrl = data.returnUrl ?? "https://getcompanioncare.com/provider/payments";
     const accountLink = await stripe.accountLinks.create({
       account: accountId,
       type: "account_onboarding",

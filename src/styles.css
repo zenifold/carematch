@@ -2,16 +2,6 @@
 @source "../src";
 @import "tw-animate-css";
 
-/* Hide Lovable badge */
-#lovable-badge,
-[id^="lovable-badge"],
-a[href*="lovable.dev"][target="_blank"] {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

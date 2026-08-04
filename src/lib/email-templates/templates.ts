@@ -16,10 +16,10 @@ function shell(
     html: `<div style="font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;max-width:480px;margin:0 auto;color:#1a1a1a">
       <p>Hi ${firstName},</p>
       ${bodyHtml}
-      <p style="margin-top:24px"><a href="https://carematcher.lovable.app/onboarding/provider" style="color:#0f766e">Finish setting up your account →</a></p>
+      <p style="margin-top:24px"><a href="https://getcompanioncare.com/onboarding/provider" style="color:#0f766e">Finish setting up your account →</a></p>
       <p style="margin-top:32px;font-size:12px;color:#666">CareMatch · you're receiving this because you started a caregiver application.</p>
     </div>`,
-    text: `Hi ${firstName},\n\n${bodyText}\n\nFinish setting up: https://carematcher.lovable.app/onboarding/provider`,
+    text: `Hi ${firstName},\n\n${bodyText}\n\nFinish setting up: https://getcompanioncare.com/onboarding/provider`,
   };
 }
 

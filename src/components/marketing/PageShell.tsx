@@ -4,7 +4,7 @@ import { Phone, Menu, X, ChevronDown } from "lucide-react";
 
 export const PHONE = "1-800-CAREMATCH";
 export const PHONE_HREF = `tel:${PHONE.replace(/[^0-9]/g, "")}`;
-export const SITE_URL = "https://carematcher.lovable.app";
+export const SITE_URL = "https://getcompanioncare.com";
 
 type NavLink = { to: string; label: string };
 

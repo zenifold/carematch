@@ -15,7 +15,6 @@ import {
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -339,17 +338,20 @@ function AuthPage() {
 
   const handleGoogle = async () => {
     setBusy(true);
-    // Pass role in metadata via URL query so callback can reconcile if needed.
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: `${window.location.origin}/auth?role=${role}`,
+    // Pass role via URL query so the /auth page can reconcile it once the
+    // OAuth redirect lands back here (see finishOAuthSignup).
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth?role=${role}`,
+      },
     });
-    if (result.error) {
-      toast.error(result.error.message ?? "Google sign-in failed");
+    if (error) {
+      toast.error(error.message ?? "Google sign-in failed");
       setBusy(false);
-      return;
     }
-    if (result.redirected) return;
-    navigate({ to: "/dashboard", replace: true });
+    // On success, Supabase redirects the browser to Google itself — nothing
+    // left to do here.
   };
 
   // Reset step when toggling mode

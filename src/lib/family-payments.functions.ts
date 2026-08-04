@@ -93,7 +93,7 @@ export const startAddPaymentMethod = createServerFn({ method: "POST" })
       if (updErr) throw updErr;
     }
 
-    const returnUrl = data.returnUrl ?? "https://carematcher.lovable.app/family/budget";
+    const returnUrl = data.returnUrl ?? "https://getcompanioncare.com/family/budget";
     const session = await stripe.checkout.sessions.create({
       mode: "setup",
       customer: customerId,

@@ -124,7 +124,7 @@ export function serviceJsonLd({
       provider: { "@type": "Organization", name: "CareMatch" },
       areaServed: { "@type": "Country", name: "United States" },
       description,
-      url: `https://carematcher.lovable.app${path}`,
+      url: `https://getcompanioncare.com${path}`,
       offers: { "@type": "Offer", price, priceCurrency: "USD" },
     },
     {

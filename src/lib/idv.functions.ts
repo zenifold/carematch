@@ -91,7 +91,7 @@ export const startIdvSession = createServerFn({ method: "POST" })
     const adapter = getIdvAdapter(vendor);
 
     const returnUrl =
-      data.returnUrl ?? "https://carematcher.lovable.app/provider/identity-verification";
+      data.returnUrl ?? "https://getcompanioncare.com/provider/identity-verification";
     const session = await adapter.createSession({
       providerId: userId,
       email,
