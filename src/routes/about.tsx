@@ -6,21 +6,21 @@ export const Route = createFileRoute("/about")({
   head: () =>
     marketingHead({
       path: "/about",
-      title: "About CareMatch — Trust-first in-home care for older adults",
+      title: "About CompanionCare — Trust-first in-home care for older adults",
       description:
-        "CareMatch is a trust-first marketplace where older adults find verified in-home help — companionship, personal care, housekeeping, errands — with family looped in on their terms.",
+        "CompanionCare is a trust-first marketplace where older adults find verified in-home help — companionship, personal care, housekeeping, errands — with family looped in on their terms.",
       jsonLd: {
         "@context": "https://schema.org",
         "@type": "Organization",
-        name: "CareMatch",
+        name: "CompanionCare",
         url: SITE_URL,
         description:
-          "CareMatch matches older adults and their families with verified in-home helpers for companionship, personal care, housekeeping, and errands.",
+          "CompanionCare matches older adults and their families with verified in-home helpers for companionship, personal care, housekeeping, and errands.",
         areaServed: { "@type": "Country", name: "United States" },
-        telephone: "+1-800-CAREMATCH",
+        telephone: "+1-800-COMPANION",
         contactPoint: {
           "@type": "ContactPoint",
-          telephone: "+1-800-CAREMATCH",
+          telephone: "+1-800-COMPANION",
           contactType: "customer service",
           availableLanguage: ["English", "Spanish"],
         },
@@ -35,7 +35,7 @@ function AboutPage() {
       <PageHero
         eyebrow="About"
         title="Care built on trust, verified visit by visit."
-        lead="CareMatch was founded on a simple idea: families should never have to guess whether the person walking through their parent's door is who they said they'd be."
+        lead="CompanionCare was founded on a simple idea: families should never have to guess whether the person walking through their parent's door is who they said they'd be."
       />
 
       <section className="mx-auto max-w-4xl px-5 py-16 lg:px-10">
@@ -65,7 +65,7 @@ function AboutPage() {
 
           <h2 className="mt-12 font-serif text-3xl tracking-tight">Where we are today</h2>
           <p className="mt-3 text-lg text-muted-foreground">
-            CareMatch is a new marketplace — we're just opening the doors. So instead of
+            CompanionCare is a new marketplace — we're just opening the doors. So instead of
             borrowed statistics, here is what is true today, and what we commit to before
             anyone books a visit.
           </p>

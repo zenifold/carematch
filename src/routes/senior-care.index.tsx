@@ -45,7 +45,7 @@ export const Route = createFileRoute("/senior-care/")({
   head: () =>
     marketingHead({
       path: "/senior-care",
-      title: "Senior Care at Home — Verified Helpers, Fair Rates | CareMatch",
+      title: "Senior Care at Home — Verified Helpers, Fair Rates | CompanionCare",
       description:
         "Find verified senior caregivers for companionship, personal care, housekeeping, dementia support, and respite. Real hourly rates, 5-stage verification, family-optional oversight.",
     }),
@@ -82,7 +82,7 @@ function Hero() {
             Senior care at home — chosen by the person receiving it.
           </h1>
           <p className="mt-6 max-w-2xl text-xl text-muted-foreground">
-            Whether it's a friendly visit, help with bathing, a tidy kitchen, or a nurse after a hospital stay — CareMatch is a marketplace of verified local helpers. Real rates. No pressure. Family can be looped in when the senior chooses.
+            Whether it's a friendly visit, help with bathing, a tidy kitchen, or a nurse after a hospital stay — CompanionCare is a marketplace of verified local helpers. Real rates. No pressure. Family can be looped in when the senior chooses.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
@@ -171,7 +171,7 @@ function Verification() {
               Five checks. No opt-outs. No fine print.
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Big listing sites let helpers skip background checks and hide it behind footnotes. Every CareMatch helper clears all five — before their first visit and every month after.
+              Big listing sites let helpers skip background checks and hide it behind footnotes. Every CompanionCare helper clears all five — before their first visit and every month after.
             </p>
             <Link
               to="/trust"
@@ -264,7 +264,7 @@ function FamilyCollaboration() {
               The senior decides who sees what.
             </h2>
             <p className="mt-4 text-xl text-muted-foreground">
-              Most senior-care platforms are built for the adult child. CareMatch is built for the person receiving care — with an easy way to invite family in when they want it.
+              Most senior-care platforms are built for the adult child. CompanionCare is built for the person receiving care — with an easy way to invite family in when they want it.
             </p>
             <ul className="mt-6 grid gap-3">
               {[
@@ -284,7 +284,7 @@ function FamilyCollaboration() {
             <div className="surface-card p-6 md:p-8">
               <h3 className="text-xl font-semibold">For seniors on their own</h3>
               <p className="mt-2 text-base text-muted-foreground">
-                No family nearby? No adult children involved? CareMatch works perfectly as a solo tool — verified helpers, big-text mode, voice input on every field, and a 24/7 phone line for anything the app doesn't handle.
+                No family nearby? No adult children involved? CompanionCare works perfectly as a solo tool — verified helpers, big-text mode, voice input on every field, and a 24/7 phone line for anything the app doesn't handle.
               </p>
               <div className="mt-6 border-t border-border pt-6">
                 <h3 className="text-xl font-semibold">For families across the country</h3>

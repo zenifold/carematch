@@ -75,10 +75,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { property: "og:site_name", content: "CareMatch" },
+      { property: "og:site_name", content: "CompanionCare" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "author", content: "CareMatch" },
+      { name: "author", content: "CompanionCare" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -97,15 +97,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "Organization",
-          name: "CareMatch",
+          name: "CompanionCare",
           url: "https://getcompanioncare.com",
           description:
             "Verified in-home helpers for older adults — companionship, personal care, housekeeping, errands, and respite care. 5-stage verification, transparent pricing.",
-          telephone: "+1-800-CAREMATCH",
+          telephone: "+1-800-COMPANION",
           areaServed: { "@type": "Country", name: "United States" },
           contactPoint: {
             "@type": "ContactPoint",
-            telephone: "+1-800-CAREMATCH",
+            telephone: "+1-800-COMPANION",
             contactType: "customer service",
             availableLanguage: ["English", "Spanish"],
             hoursAvailable: "Mo-Su 00:00-23:59",

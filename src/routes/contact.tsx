@@ -13,17 +13,17 @@ export const Route = createFileRoute("/contact")({
   head: () =>
     marketingHead({
       path: "/contact",
-      title: "Contact CareMatch — 24/7 phone concierge & support",
+      title: "Contact CompanionCare — 24/7 phone concierge & support",
       description:
-        "Reach CareMatch's concierge 24/7 at 1-800-CAREMATCH. Get personal help matching a caregiver, ask about pricing, or reach our safety team any time — day or night.",
+        "Reach CompanionCare's concierge 24/7 at 1-800-COMPANION. Get personal help matching a caregiver, ask about pricing, or reach our safety team any time — day or night.",
       jsonLd: [
         {
           "@context": "https://schema.org",
           "@type": "LocalBusiness",
-          name: "CareMatch",
+          name: "CompanionCare",
           image: `${SITE_URL}/og-default.jpg`,
           url: `${SITE_URL}/contact`,
-          telephone: "+1-800-CAREMATCH",
+          telephone: "+1-800-COMPANION",
           priceRange: "$$",
           areaServed: { "@type": "Country", name: "United States" },
           address: {
@@ -69,10 +69,10 @@ function ContactPage() {
             <p className="mt-2 text-lg text-primary">{PHONE}</p>
             <p className="mt-1 text-sm text-muted-foreground">Available 24/7 — humans, not bots</p>
           </a>
-          <a href="mailto:hello@carematcher.com" className="surface-card block p-8 hover:bg-secondary/40">
+          <a href="mailto:hello@getcompanioncare.com" className="surface-card block p-8 hover:bg-secondary/40">
             <Mail className="size-8 text-primary" aria-hidden />
             <h2 className="mt-4 text-2xl font-semibold">Email us</h2>
-            <p className="mt-2 text-lg text-primary">hello@carematcher.com</p>
+            <p className="mt-2 text-lg text-primary">hello@getcompanioncare.com</p>
             <p className="mt-1 text-sm text-muted-foreground">We reply within 4 business hours</p>
           </a>
           <div className="surface-card p-8">
@@ -99,9 +99,9 @@ function ContactPage() {
           <div>
             <h3 className="text-xl font-semibold">Media, press & partnerships</h3>
             <p className="mt-2 text-base text-muted-foreground">
-              For press inquiries email <a className="text-primary underline" href="mailto:press@carematcher.com">press@carematcher.com</a>.
+              For press inquiries email <a className="text-primary underline" href="mailto:press@getcompanioncare.com">press@getcompanioncare.com</a>.
               For partnership or referral opportunities email{" "}
-              <a className="text-primary underline" href="mailto:partners@carematcher.com">partners@carematcher.com</a>.
+              <a className="text-primary underline" href="mailto:partners@getcompanioncare.com">partners@getcompanioncare.com</a>.
             </p>
           </div>
         </div>

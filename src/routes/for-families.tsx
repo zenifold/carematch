@@ -8,13 +8,13 @@ export const Route = createFileRoute("/for-families")({
       path: "/for-families",
       title: "For Families — Coordinate verified care for a parent from anywhere",
       description:
-        "CareMatch gives adult children a shared view of a parent's care: verified helpers, live visit check-ins, budget transparency, and messaging routed through the platform — with the senior's consent.",
+        "CompanionCare gives adult children a shared view of a parent's care: verified helpers, live visit check-ins, budget transparency, and messaging routed through the platform — with the senior's consent.",
       jsonLd: {
         "@context": "https://schema.org",
         "@type": "WebPage",
-        name: "CareMatch for families",
+        name: "CompanionCare for families",
         description:
-          "How adult children coordinate verified in-home care for an aging parent using CareMatch.",
+          "How adult children coordinate verified in-home care for an aging parent using CompanionCare.",
       },
     }),
   component: ForFamiliesPage,
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/for-families")({
 const features = [
   { icon: Eye, title: "See the visit, not just the invoice", body: "Live check-ins, visit notes, and (with senior consent) photos — so you don't have to wonder if Tuesday's visit happened." },
   { icon: ShieldCheck, title: "Trust that doesn't decay", body: "Every helper is re-verified every 30 days. New charges or license changes surface within days." },
-  { icon: MessageCircle, title: "On-platform messaging", body: "Coordinate through CareMatch, never through a caregiver's personal phone. The senior stays in control of who sees what." },
+  { icon: MessageCircle, title: "On-platform messaging", body: "Coordinate through CompanionCare, never through a caregiver's personal phone. The senior stays in control of who sees what." },
   { icon: Wallet, title: "Budget transparency", body: "Family and senior see the same numbers. No hidden fees, no surprise bills, no 'call for pricing.'" },
 ];
 
@@ -33,7 +33,7 @@ function ForFamiliesPage() {
       <PageHero
         eyebrow="For families"
         title="Is Mom okay? Answered in 3 seconds."
-        lead="CareMatch gives adult children a shared, reassurance-first view of a parent's care — with the senior always in control of what family can see and do."
+        lead="CompanionCare gives adult children a shared, reassurance-first view of a parent's care — with the senior always in control of what family can see and do."
       >
         <div className="flex flex-wrap gap-3">
           <Link
@@ -68,7 +68,7 @@ function ForFamiliesPage() {
         <div className="mx-auto max-w-4xl px-5 py-16 lg:px-10">
           <h2 className="font-serif text-3xl tracking-tight">The senior always approves.</h2>
           <p className="mt-4 text-lg text-muted-foreground">
-            Family members propose. Seniors decide. CareMatch never lets a family member
+            Family members propose. Seniors decide. CompanionCare never lets a family member
             book a visit, change a caregiver, or view messages without the senior's
             explicit approval — every single time.
           </p>

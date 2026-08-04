@@ -65,7 +65,7 @@ function weekLabel(key: string) {
 function downloadReceipt(v: VisitRow, seniorName: string) {
   const total = (v.hourly_rate_cents * v.duration_minutes) / 60 / 100;
   const lines = [
-    `CareMatch receipt`,
+    `CompanionCare receipt`,
     `Visit ID: ${v.id}`,
     `Senior: ${seniorName}`,
     `Date: ${new Date(v.scheduled_at).toLocaleString()}`,

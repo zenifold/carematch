@@ -85,7 +85,7 @@ function ProviderLayout() {
             <span className="grid size-8 place-items-center rounded-full bg-primary text-primary-foreground">
               <Heart className="size-4" />
             </span>
-            CareMatch
+            CompanionCare
           </Link>
           <p className="mt-3 rounded-lg bg-card px-3 py-2 text-xs">
             <span className="font-semibold uppercase tracking-widest text-muted-foreground">

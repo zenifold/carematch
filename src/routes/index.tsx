@@ -46,13 +46,13 @@ export const Route = createFileRoute("/")({
   head: () =>
     marketingHead({
       path: "/",
-      title: "CareMatch — A marketplace to find in-home help you can trust",
+      title: "CompanionCare — A marketplace to find in-home help you can trust",
       description:
         "A marketplace where older adults find verified in-home help — companionship, personal care, housekeeping, errands. You stay in charge; family can be looped in when you invite them.",
       jsonLd: {
         "@context": "https://schema.org",
         "@type": "WebSite",
-        name: "CareMatch",
+        name: "CompanionCare",
         url: SITE_URL,
         potentialAction: {
           "@type": "SearchAction",
@@ -74,7 +74,7 @@ function Landing() {
       <MeetNeighbors />
       <TrustLayer />
       <RateExplorer />
-      <OldWayVsCareMatch />
+      <OldWayVsCompanionCare />
       <ServiceSpectrum />
       <SocialProof />
       <AccessibilitySupport />
@@ -384,7 +384,7 @@ function HowItWorks() {
         <div className="mt-12 grid gap-6 lg:grid-cols-12 lg:gap-8">
           <div
             role="tablist"
-            aria-label="How CareMatch works, steps"
+            aria-label="How CompanionCare works, steps"
             className="flex gap-2 overflow-x-auto pb-2 lg:col-span-4 lg:flex-col lg:overflow-visible lg:pb-0"
           >
             {steps.map((s, i) => {
@@ -872,9 +872,9 @@ function RateExplorer() {
   );
 }
 
-/* ---------- Old Way vs CareMatch ---------- */
+/* ---------- Old Way vs CompanionCare ---------- */
 
-function OldWayVsCareMatch() {
+function OldWayVsCompanionCare() {
   const rows = [
     { label: "Who's coming to the door?", old: "A stranger from a printed roster", cm: "A verified helper with a live selfie match" },
     { label: "Background checks", old: "Once at hire, maybe", cm: "Refreshed every 30 days, automatically" },
@@ -915,7 +915,7 @@ function OldWayVsCareMatch() {
                 <X className="size-4" /> Old way
               </span>
               <span className="flex items-center gap-2 text-primary">
-                <Check className="size-4" /> CareMatch
+                <Check className="size-4" /> CompanionCare
               </span>
             </div>
             <ul>
@@ -995,7 +995,7 @@ function ServiceSpectrum() {
             the same trusted helpers, the same account.
           </p>
           <p className="mt-3 text-sm text-muted-foreground">
-            Rates set by each provider. CareMatch adds a flat 15–18% service fee — shown as a single total before you book.
+            Rates set by each provider. CompanionCare adds a flat 15–18% service fee — shown as a single total before you book.
           </p>
         </div>
 
@@ -1058,7 +1058,7 @@ function SocialProof() {
     },
     {
       title: "One clear price, before you book.",
-      body: "Helpers set their hourly rate. CareMatch adds a flat service fee, shown as one total up front. Cancel free up to 24 hours before a visit.",
+      body: "Helpers set their hourly rate. CompanionCare adds a flat service fee, shown as one total up front. Cancel free up to 24 hours before a visit.",
     },
   ];
   return (
@@ -1082,7 +1082,7 @@ function SocialProof() {
                 <p className="text-base font-semibold">A new marketplace</p>
               </div>
               <p className="mt-2 text-sm text-muted-foreground">
-                CareMatch is just opening. We'd rather earn your first review than borrow someone else's.
+                CompanionCare is just opening. We'd rather earn your first review than borrow someone else's.
               </p>
             </div>
           </div>
@@ -1096,7 +1096,7 @@ function SocialProof() {
             No stock testimonials. Just what we promise.
           </h2>
           <p className="mt-4 text-xl text-muted-foreground">
-            CareMatch is a new marketplace — so instead of borrowed quotes, here's exactly how we've built it and what you can hold us to.
+            CompanionCare is a new marketplace — so instead of borrowed quotes, here's exactly how we've built it and what you can hold us to.
           </p>
 
           <div className="mt-8 grid gap-4">
@@ -1175,7 +1175,7 @@ function FAQ() {
   const items = [
     {
       q: "How much does this cost?",
-      a: "Providers set their own hourly rates within suggested market bands: cleaning $25–$45/hr, companionship $20–$35/hr, personal care $28–$50/hr, skilled nursing $45–$80/hr. CareMatch adds a flat 15–18% service fee — shown as one total before you book. Full plans typically run $800–$3,500/month depending on hours and tier. Optional CareMatch Plus is $29/month and waives fees on the first $200 of bookings.",
+      a: "Providers set their own hourly rates within suggested market bands: cleaning $25–$45/hr, companionship $20–$35/hr, personal care $28–$50/hr, skilled nursing $45–$80/hr. CompanionCare adds a flat 15–18% service fee — shown as one total before you book. Full plans typically run $800–$3,500/month depending on hours and tier. Optional CompanionCare Plus is $29/month and waives fees on the first $200 of bookings.",
     },
     {
       q: "How do you verify helpers?",
@@ -1187,7 +1187,7 @@ function FAQ() {
     },
     {
       q: "What if something goes wrong?",
-      a: "Call our 24/7 concierge at 1-800-CAREMATCH. Every helper is covered by our insurance, and our team responds to safety concerns within minutes — not business days.",
+      a: "Call our 24/7 concierge at 1-800-COMPANION. Every helper is covered by our insurance, and our team responds to safety concerns within minutes — not business days.",
     },
     {
       q: "Can my family see what's happening?",
@@ -1199,7 +1199,7 @@ function FAQ() {
     },
     {
       q: "What if I don't have a smartphone?",
-      a: "You never need one. Everything CareMatch does digitally can be done by phone with a real person on our concierge team. Same options, same helpers, same care.",
+      a: "You never need one. Everything CompanionCare does digitally can be done by phone with a real person on our concierge team. Same options, same helpers, same care.",
     },
     {
       q: "How do I know the person showing up is the right person?",

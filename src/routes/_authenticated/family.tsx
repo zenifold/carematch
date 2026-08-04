@@ -72,7 +72,7 @@ function FamilyLayout() {
             <span className="grid size-9 place-items-center rounded-full bg-primary text-primary-foreground">
               <Heart className="size-4" />
             </span>
-            CareMatch
+            CompanionCare
           </Link>
           <p className="mt-4 rounded-xl bg-card px-3 py-2 text-xs">
             <span className="font-semibold uppercase tracking-widest text-muted-foreground">
@@ -120,7 +120,7 @@ function FamilyLayout() {
             <span className="grid size-8 place-items-center rounded-full bg-primary text-primary-foreground">
               <Heart className="size-4" />
             </span>
-            CareMatch
+            CompanionCare
           </Link>
           <div className="flex items-center gap-1">
             <Link

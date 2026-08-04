@@ -5,7 +5,7 @@ import { ServiceDetail, serviceJsonLd } from "@/components/marketing/ServiceDeta
 const faqs = [
   { q: "Is companionship care the same as personal care?", a: "No. Companionship focuses on conversation, activities, and outings — not bathing, dressing, or medication management. If you need hands-on personal care, choose our Personal Care service." },
   { q: "How long is a typical companionship visit?", a: "Most families book 2–8 hour visits, 1–5 times per week. There's no minimum — we can start small and grow from there." },
-  { q: "Can the same helper come every week?", a: "Yes. CareMatch prioritizes consistent matches so your loved one sees the same familiar face — trust builds over time." },
+  { q: "Can the same helper come every week?", a: "Yes. CompanionCare prioritizes consistent matches so your loved one sees the same familiar face — trust builds over time." },
 ];
 
 export const Route = createFileRoute("/services/companionship")({
@@ -31,13 +31,13 @@ export const Route = createFileRoute("/services/companionship")({
       intro={
         <>
           <p>
-            Loneliness is a health risk on par with smoking. CareMatch's companionship
+            Loneliness is a health risk on par with smoking. CompanionCare's companionship
             helpers are trained to make regular visits meaningful — playing cards, walking
             the neighborhood, gardening, driving to appointments, or simply sharing a cup
             of coffee.
           </p>
           <p>
-            Every companionship helper on CareMatch has cleared identity proofing,
+            Every companionship helper on CompanionCare has cleared identity proofing,
             a national background check, and reference verification. Continuous monthly
             re-checks keep the profile current, and every visit begins with a live
             selfie + GPS check-in.

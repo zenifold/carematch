@@ -42,9 +42,9 @@ export const Route = createFileRoute("/legal/state-availability")({
   head: () =>
     marketingHead({
       path: "/legal/state-availability",
-      title: "State Availability — Where CareMatch Operates",
+      title: "State Availability — Where CompanionCare Operates",
       description:
-        "State-by-state availability for CareMatch Helpers, Companions, Partners (personal care), and Health (skilled referrals). Coverage varies by state licensing and partner network.",
+        "State-by-state availability for CompanionCare Helpers, Companions, Partners (personal care), and Health (skilled referrals). Coverage varies by state licensing and partner network.",
     }),
   component: StateAvailabilityPage,
 });
@@ -54,7 +54,7 @@ function StateAvailabilityPage() {
     <PageShell>
       <PageHero
         eyebrow="Legal · Availability"
-        title="Where CareMatch operates"
+        title="Where CompanionCare operates"
         lead="Coverage varies by state licensing rules and partner network density. This page reflects our current rollout. If your state isn't live yet, join the waitlist — we'll notify you when it opens."
       />
 
@@ -106,7 +106,7 @@ function StateAvailabilityPage() {
 
         <p className="mt-6 text-sm text-muted-foreground">
           "Via partner" means personal care or skilled services are delivered by a licensed home care or Medicare-certified
-          home health agency in your state, matched through CareMatch. CareMatch is not a home care agency and does not
+          home health agency in your state, matched through CompanionCare. CompanionCare is not a home care agency and does not
           employ personal care aides or clinicians.{" "}
           <Link to="/legal/scope-of-practice" className="font-medium text-primary hover:underline">See scope of practice →</Link>
         </p>

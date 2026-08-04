@@ -1,16 +1,16 @@
 // DRAFT — pending attorney review. Provider-only agreement.
 //
 // Deliberately framed as a pure marketplace-participation agreement, NOT an
-// independent contractor agreement — CareMatch does not engage, hire, or
+// independent contractor agreement — CompanionCare does not engage, hire, or
 // contract with Providers in any capacity. This is a meaningful legal
 // distinction, not just wording: an "independent contractor agreement"
-// implies CareMatch is the one retaining the Provider to perform services
+// implies CompanionCare is the one retaining the Provider to perform services
 // (the exact framing that's exposed platforms like Uber to worker-
-// misclassification claims). Here, CareMatch is structured as a neutral
+// misclassification claims). Here, CompanionCare is structured as a neutral
 // technology platform — closer to how Airbnb or Etsy relate to hosts/sellers
 // — and Providers are independent businesses who use the Service to find
 // their own clients. Services are provided directly to the Care Recipient,
-// never to or on behalf of CareMatch.
+// never to or on behalf of CompanionCare.
 //
 // Mirrors the scope-of-practice language already shipped in
 // provider-training-content.ts (Lesson 5 + the fall-prevention lesson) so the
@@ -22,25 +22,25 @@ export const PROVIDER_AGREEMENT = {
   effective_date: "2026-08-01",
   title: "Provider Agreement",
   body: `
-# CareMatch Provider Agreement
+# CompanionCare Provider Agreement
 
 **Version 1.0.0 — Effective August 1, 2026**
 
-This Provider Agreement ("Agreement") governs your use of the CareMatch marketplace to offer companion care services and connect with Care Recipients, and applies to **Marketplace-tier companion care** specifically. By accepting this Agreement, you agree to the terms below in addition to CareMatch's general Terms of Service.
+This Provider Agreement ("Agreement") governs your use of the CompanionCare marketplace to offer companion care services and connect with Care Recipients, and applies to **Marketplace-tier companion care** specifically. By accepting this Agreement, you agree to the terms below in addition to CompanionCare's general Terms of Service.
 
-*[Scoping note for the team, not the Provider: CareMatch's existing marketing pages (/legal/independent-contractors, /legal/state-availability) describe a three-tier model where higher tiers ("Partners" for personal care, "Healthcare" for skilled/clinical) are delivered by W-2 employees of separate licensed partner agencies — while the product actually built treats every provider identically via Stripe Connect, regardless of credential tier. This Agreement is written for what's actually built today. If/when a real partner-agency referral model is built, those providers would need an entirely different legal relationship (a referral/vendor agreement between CareMatch and the partner agency, not this document) — worth resolving which vision is the near-term real one.]*
+*[Scoping note for the team, not the Provider: CompanionCare's existing marketing pages (/legal/independent-contractors, /legal/state-availability) describe a three-tier model where higher tiers ("Partners" for personal care, "Healthcare" for skilled/clinical) are delivered by W-2 employees of separate licensed partner agencies — while the product actually built treats every provider identically via Stripe Connect, regardless of credential tier. This Agreement is written for what's actually built today. If/when a real partner-agency referral model is built, those providers would need an entirely different legal relationship (a referral/vendor agreement between CompanionCare and the partner agency, not this document) — worth resolving which vision is the near-term real one.]*
 
-## 1. CareMatch Is a Marketplace, Not Your Employer or Client
+## 1. CompanionCare Is a Marketplace, Not Your Employer or Client
 
-CareMatch operates a technology platform that helps you find, schedule, and get paid by Care Recipients. **CareMatch does not engage, hire, retain, or contract with you to perform any services.** You are an independent business. Any care services you provide are provided directly to the Care Recipient who books you — never to CareMatch, and never on CareMatch's behalf.
+CompanionCare operates a technology platform that helps you find, schedule, and get paid by Care Recipients. **CompanionCare does not engage, hire, retain, or contract with you to perform any services.** You are an independent business. Any care services you provide are provided directly to the Care Recipient who books you — never to CompanionCare, and never on CompanionCare's behalf.
 
-CareMatch does not direct or control how you perform care, does not supervise your work, and does not require exclusivity — you're free to offer your services through other platforms or directly to clients you find outside CareMatch. Nothing in this Agreement creates an employment, agency, partnership, contractor, or joint-venture relationship between you and CareMatch.
+CompanionCare does not direct or control how you perform care, does not supervise your work, and does not require exclusivity — you're free to offer your services through other platforms or directly to clients you find outside CompanionCare. Nothing in this Agreement creates an employment, agency, partnership, contractor, or joint-venture relationship between you and CompanionCare.
 
-**If a family you meet through CareMatch later hires you directly, outside the marketplace,** CareMatch's verification, payment handling, and support no longer apply to that relationship — it's between you and that family. Depending on the arrangement, you may become that family's household employee under applicable law; understand the tax and legal implications of that before agreeing to it.
+**If a family you meet through CompanionCare later hires you directly, outside the marketplace,** CompanionCare's verification, payment handling, and support no longer apply to that relationship — it's between you and that family. Depending on the arrangement, you may become that family's household employee under applicable law; understand the tax and legal implications of that before agreeing to it.
 
 ## 2. Scope of Services — Companion Care Only
 
-Unless CareMatch has verified you for a higher credential tier (such as PCA, HHA, CNA, or a clinical license) and you are matched for a booking requiring that credential, you provide **companion-tier care only**. This means:
+Unless CompanionCare has verified you for a higher credential tier (such as PCA, HHA, CNA, or a clinical license) and you are matched for a booking requiring that credential, you provide **companion-tier care only**. This means:
 
 **You may:** provide companionship and conversation, light housekeeping, meal preparation, transportation and errands, and *remind* a Care Recipient to take medication that they administer themselves.
 
@@ -50,32 +50,32 @@ Performing services outside your verified scope is a violation of this Agreement
 
 ## 3. Verification and Training
 
-You must complete CareMatch's identity verification, background check, and required training modules (and keep them current) to remain visible on the marketplace and eligible for bookings. CareMatch may restrict your access to the marketplace if your verification lapses or a background check reveals disqualifying information.
+You must complete CompanionCare's identity verification, background check, and required training modules (and keep them current) to remain visible on the marketplace and eligible for bookings. CompanionCare may restrict your access to the marketplace if your verification lapses or a background check reveals disqualifying information.
 
 ## 4. Payment
 
-You are paid through CareMatch's payment system (Stripe Connect) for completed, verified visits, at your disclosed hourly rate, less CareMatch's platform fee. Payment is issued automatically after a visit is marked complete. CareMatch processes this payment as the platform facilitating your marketplace transaction — not as compensation CareMatch owes you for services rendered to CareMatch.
+You are paid through CompanionCare's payment system (Stripe Connect) for completed, verified visits, at your disclosed hourly rate, less CompanionCare's platform fee. Payment is issued automatically after a visit is marked complete. CompanionCare processes this payment as the platform facilitating your marketplace transaction — not as compensation CompanionCare owes you for services rendered to CompanionCare.
 
 ## 5. Taxes
 
-You are responsible for your own federal, state, and local taxes, including self-employment tax, on income you earn through the marketplace. CareMatch (or its payment processor) will issue you the applicable IRS form (such as a 1099-NEC or 1099-K) for earnings that meet the reporting threshold, as required by law. CareMatch does not withhold taxes from your payments.
+You are responsible for your own federal, state, and local taxes, including self-employment tax, on income you earn through the marketplace. CompanionCare (or its payment processor) will issue you the applicable IRS form (such as a 1099-NEC or 1099-K) for earnings that meet the reporting threshold, as required by law. CompanionCare does not withhold taxes from your payments.
 
 ## 6. Insurance
 
-CareMatch does not provide workers' compensation coverage, because you are not our employee and a Care Recipient's home is not a CareMatch worksite. **We strongly recommend you obtain your own general liability and/or occupational accident insurance** to protect yourself against claims of accidental injury or property damage while providing services. This is a recommendation, not a requirement of this Agreement, but the financial risk of not carrying it is yours alone.
+CompanionCare does not provide workers' compensation coverage, because you are not our employee and a Care Recipient's home is not a CompanionCare worksite. **We strongly recommend you obtain your own general liability and/or occupational accident insurance** to protect yourself against claims of accidental injury or property damage while providing services. This is a recommendation, not a requirement of this Agreement, but the financial risk of not carrying it is yours alone.
 
 ## 7. Code of Conduct
 
 You agree to:
 
-- Communicate with Care Recipients and Family members only through the CareMatch app, not personal contact information
-- Never accept cash, gifts of significant value, or off-platform payment for a booking made through CareMatch
+- Communicate with Care Recipients and Family members only through the CompanionCare app, not personal contact information
+- Never accept cash, gifts of significant value, or off-platform payment for a booking made through CompanionCare
 - Report safety concerns, falls, or requests to perform services outside your scope through the Service promptly
-- Treat every Care Recipient with respect and patience, consistent with CareMatch's caregiver training
+- Treat every Care Recipient with respect and patience, consistent with CompanionCare's caregiver training
 
 ## 8. Liability and Indemnification
 
-You are personally responsible for your own conduct while providing services, including any injury, property damage, or other harm you cause. You agree to indemnify and hold CareMatch harmless from any claim arising from your acts or omissions while providing services, including claims arising from services performed outside the scope described in Section 2.
+You are personally responsible for your own conduct while providing services, including any injury, property damage, or other harm you cause. You agree to indemnify and hold CompanionCare harmless from any claim arising from your acts or omissions while providing services, including claims arising from services performed outside the scope described in Section 2.
 
 ## 9. Confidentiality
 
@@ -83,7 +83,7 @@ Information about a Care Recipient that you learn while providing services — t
 
 ## 10. Suspension and Removal
 
-CareMatch may restrict, suspend, or remove your access to the marketplace at any time for violation of this Agreement, CareMatch's Terms of Service, or the Code of Conduct in Section 7. You may stop using the Service at any time.
+CompanionCare may restrict, suspend, or remove your access to the marketplace at any time for violation of this Agreement, CompanionCare's Terms of Service, or the Code of Conduct in Section 7. You may stop using the Service at any time.
 
 ## 11. Governing Law
 
@@ -91,6 +91,6 @@ This Agreement is governed by the laws of the Commonwealth of Virginia.
 
 ## 12. Acknowledgment
 
-By accepting this Agreement, you confirm that you understand CareMatch is a marketplace platform, that CareMatch does not engage or contract with you to perform services, and that you have read and understood the scope-of-care limitations in Section 2.
+By accepting this Agreement, you confirm that you understand CompanionCare is a marketplace platform, that CompanionCare does not engage or contract with you to perform services, and that you have read and understood the scope-of-care limitations in Section 2.
 `,
 } as const;

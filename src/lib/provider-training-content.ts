@@ -132,7 +132,7 @@ export const COMPANION_BASICS_V1: Module = {
       choices: [
         "Take it — it's his money and his choice.",
         "Politely decline and remind him tips go through the app.",
-        "Accept but hide it from CareMatch.",
+        "Accept but hide it from CompanionCare.",
         "Take it and split it with his family later.",
       ],
       correct_index: 1,
@@ -159,7 +159,7 @@ export const COMPANION_BASICS_V1: Module = {
         "Mr. Brown asks for your personal cell number 'in case he needs to reach you between visits.'",
       choices: [
         "Give it to him — he seems lonely.",
-        "Say no, and tell him he can reach you through the CareMatch app.",
+        "Say no, and tell him he can reach you through the CompanionCare app.",
         "Give him a fake number.",
         "Block his family and give him the number.",
       ],
@@ -179,7 +179,7 @@ export const COMPANION_BASICS_V1: Module = {
       ],
       correct_index: 1,
       explanation:
-        "Physically assisting a transfer — chair, bed, or toilet — is hands-on care outside companion scope, and if she's injured during an assisted transfer, you're the one personally liable, not CareMatch. Note it so the family can arrange the right level of help.",
+        "Physically assisting a transfer — chair, bed, or toilet — is hands-on care outside companion scope, and if she's injured during an assisted transfer, you're the one personally liable, not CompanionCare. Note it so the family can arrange the right level of help.",
     },
   ],
 };

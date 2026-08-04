@@ -126,7 +126,7 @@ function ProviderMessages() {
         <p className="text-xs uppercase tracking-widest text-muted-foreground">Inbox</p>
         <h1 className="font-serif text-2xl lg:text-3xl">Messages</h1>
         <p className="text-xs text-muted-foreground">
-          All messages route through CareMatch for safety and record-keeping.
+          All messages route through CompanionCare for safety and record-keeping.
         </p>
       </header>
 

@@ -6,9 +6,9 @@ export const Route = createFileRoute("/legal/independent-contractors")({
   head: () =>
     marketingHead({
       path: "/legal/independent-contractors",
-      title: "Independent Contractor Policy — CareMatch",
+      title: "Independent Contractor Policy — CompanionCare",
       description:
-        "How CareMatch works with independent Helpers and Companions. Platform role, provider classification, insurance, and what CareMatch does and does not do as a technology marketplace.",
+        "How CompanionCare works with independent Helpers and Companions. Platform role, provider classification, insurance, and what CompanionCare does and does not do as a technology marketplace.",
     }),
   component: ICPage,
 });
@@ -19,18 +19,18 @@ function ICPage() {
       <PageHero
         eyebrow="Legal · Platform policy"
         title="Independent contractor policy"
-        lead="CareMatch is a technology platform. Marketplace helpers are independent contractors, not CareMatch employees. Personal care aides and clinicians are employed by our licensed partner agencies."
+        lead="CompanionCare is a technology platform. Marketplace helpers are independent contractors, not CompanionCare employees. Personal care aides and clinicians are employed by our licensed partner agencies."
       />
 
       <section className="mx-auto max-w-3xl px-5 py-16 lg:px-10 space-y-10 text-lg leading-relaxed">
         <div>
           <div className="flex items-center gap-3">
             <span className="grid size-10 place-items-center rounded-xl bg-primary/10 text-primary"><ShieldCheck className="size-5" /></span>
-            <h2 className="font-serif text-2xl">What CareMatch is</h2>
+            <h2 className="font-serif text-2xl">What CompanionCare is</h2>
           </div>
           <p className="mt-3 text-muted-foreground">
-            CareMatch operates a technology marketplace that helps older adults and their families find, book, and pay
-            independent local Helpers and Companions. CareMatch is not a home care agency, employment agency, or
+            CompanionCare operates a technology marketplace that helps older adults and their families find, book, and pay
+            independent local Helpers and Companions. CompanionCare is not a home care agency, employment agency, or
             health care provider for Tiers 1 and 2.
           </p>
         </div>
@@ -41,7 +41,7 @@ function ICPage() {
             <h2 className="font-serif text-2xl">How providers are classified</h2>
           </div>
           <p className="mt-3 text-muted-foreground">
-            Helpers and Companions are independent contractors who use CareMatch to reach members. They:
+            Helpers and Companions are independent contractors who use CompanionCare to reach members. They:
           </p>
           <ul className="mt-3 space-y-2 text-muted-foreground list-disc pl-6">
             <li>Set their own hourly rate within a suggested market range</li>
@@ -51,7 +51,7 @@ function ICPage() {
             <li>Are responsible for their own taxes and, where applicable, their own insurance</li>
           </ul>
           <p className="mt-3 text-muted-foreground">
-            CareMatch does not train providers on how to perform care, prescribe methods of work, require uniforms, or
+            CompanionCare does not train providers on how to perform care, prescribe methods of work, require uniforms, or
             supervise the manner in which services are delivered. Platform requirements are limited to identity
             verification, background screening, punctuality, professional conduct, and adherence to the platform's{" "}
             <Link to="/legal/scope-of-practice" className="font-medium text-primary hover:underline">scope-of-practice policy</Link>.
@@ -64,7 +64,7 @@ function ICPage() {
             <h2 className="font-serif text-2xl">Insurance & liability</h2>
           </div>
           <p className="mt-3 text-muted-foreground">
-            CareMatch carries platform-level general and professional liability coverage. Marketplace helpers are
+            CompanionCare carries platform-level general and professional liability coverage. Marketplace helpers are
             required to maintain their own general liability coverage and, if driving members, valid auto insurance.
             Personal care and healthcare services are delivered by licensed partner agencies that carry professional
             malpractice and workers' compensation insurance for their own employees.
@@ -94,8 +94,8 @@ function ICPage() {
 
 
         <p className="text-sm text-muted-foreground">
-          This page describes CareMatch's operating model in plain language. It is not legal advice and does not
-          replace the platform Terms of Service, which govern your use of CareMatch.
+          This page describes CompanionCare's operating model in plain language. It is not legal advice and does not
+          replace the platform Terms of Service, which govern your use of CompanionCare.
         </p>
       </section>
     </PageShell>

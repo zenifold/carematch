@@ -3,7 +3,7 @@ import { marketingHead } from "@/components/marketing/PageShell";
 import { ServiceDetail, serviceJsonLd } from "@/components/marketing/ServiceDetail";
 
 const faqs = [
-  { q: "Do CareMatch helpers drive their own car?", a: "Most errand and transport helpers drive their own insured vehicle. If your parent prefers to ride in their own car, we can match with a helper who drives your vehicle instead." },
+  { q: "Do CompanionCare helpers drive their own car?", a: "Most errand and transport helpers drive their own insured vehicle. If your parent prefers to ride in their own car, we can match with a helper who drives your vehicle instead." },
   { q: "Is transport safe for seniors with mobility needs?", a: "Yes. Helpers matched for transport are trained on safe transfers and steady curbside pickups. For wheelchair-accessible transport, mention that during intake so we match appropriately." },
   { q: "Can errands include prescription pickups?", a: "Yes, with your written authorization on file. Helpers can also handle grocery runs, dry cleaning, post office, banking (deposits only), and library returns." },
 ];
@@ -32,7 +32,7 @@ export const Route = createFileRoute("/services/errands")({
         <>
           <p>
             One of the hardest parts of aging is losing the freedom to run a quick errand.
-            CareMatch pairs you with a verified helper who can drive to the pharmacy,
+            CompanionCare pairs you with a verified helper who can drive to the pharmacy,
             wait through a doctor's visit, or handle a grocery list — and stays consistent
             so it feels like family, not a rotating cast of drivers.
           </p>

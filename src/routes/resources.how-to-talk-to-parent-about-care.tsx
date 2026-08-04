@@ -163,7 +163,7 @@ function ArticlePage() {
           straightforward: our{" "}
           <Link to="/resources/how-to-choose-a-caregiver">guide to choosing a caregiver</Link> covers
           the seven questions to ask, and{" "}
-          <Link to="/how-it-works">how CareMatch works</Link> walks through matching in
+          <Link to="/how-it-works">how CompanionCare works</Link> walks through matching in
           your area.
         </p>
 

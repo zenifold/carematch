@@ -150,7 +150,7 @@ function FamilyMessages() {
 
       <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
         <ShieldAlert className="mr-2 inline size-4" />
-        Please keep caregiver conversations inside CareMatch — the senior has to consent
+        Please keep caregiver conversations inside CompanionCare — the senior has to consent
         to any off-platform contact.
       </div>
 

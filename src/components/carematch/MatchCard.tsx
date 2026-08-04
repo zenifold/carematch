@@ -9,7 +9,7 @@ export type MatchCardData = {
   initials: string;
   monthlyPlan: number;
   hourlyRate: number;
-  /** null when the provider has no ratings yet — shown as "New to CareMatch", never a fabricated number. */
+  /** null when the provider has no ratings yet — shown as "New to CompanionCare", never a fabricated number. */
   rating: number | null;
   ratingCount: number;
   serviceArea: string | null;
@@ -64,7 +64,7 @@ export function MatchCard({ provider, onChoose, onSkip, className = "" }: Props)
             <Star className="size-4 fill-accent text-accent" />
             {provider.rating !== null
               ? `${provider.rating.toFixed(1)} (${provider.ratingCount})`
-              : "New to CareMatch"}
+              : "New to CompanionCare"}
           </div>
         </div>
 

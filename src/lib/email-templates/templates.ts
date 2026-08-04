@@ -17,7 +17,7 @@ function shell(
       <p>Hi ${firstName},</p>
       ${bodyHtml}
       <p style="margin-top:24px"><a href="https://getcompanioncare.com/onboarding/provider" style="color:#0f766e">Finish setting up your account →</a></p>
-      <p style="margin-top:32px;font-size:12px;color:#666">CareMatch · you're receiving this because you started a caregiver application.</p>
+      <p style="margin-top:32px;font-size:12px;color:#666">CompanionCare · you're receiving this because you started a caregiver application.</p>
     </div>`,
     text: `Hi ${firstName},\n\n${bodyText}\n\nFinish setting up: https://getcompanioncare.com/onboarding/provider`,
   };
@@ -34,7 +34,7 @@ function plainShell(
     html: `<div style="font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;max-width:480px;margin:0 auto;color:#1a1a1a">
       <p>Hi ${firstName},</p>
       ${bodyHtml}
-      <p style="margin-top:32px;font-size:12px;color:#666">CareMatch</p>
+      <p style="margin-top:32px;font-size:12px;color:#666">CompanionCare</p>
     </div>`,
     text: `Hi ${firstName},\n\n${bodyText}`,
   };
@@ -58,8 +58,8 @@ const RENDERERS: Record<string, (data: TemplateData) => RenderedEmail> = {
     const firstName = String(data.first_name ?? "there");
     const { html, text } = shell(
       firstName,
-      "<p>Dolores has been a CareMatch caregiver for 8 months and loves the flexible schedule. Caregivers like her are waiting for someone like you to join.</p>",
-      "Dolores has been a CareMatch caregiver for 8 months and loves the flexible schedule. Caregivers like her are waiting for someone like you to join.",
+      "<p>Dolores has been a CompanionCare caregiver for 8 months and loves the flexible schedule. Caregivers like her are waiting for someone like you to join.</p>",
+      "Dolores has been a CompanionCare caregiver for 8 months and loves the flexible schedule. Caregivers like her are waiting for someone like you to join.",
     );
     return { subject: String(data.subject ?? "Meet Dolores."), html, text };
   },
@@ -117,8 +117,8 @@ const RENDERERS: Record<string, (data: TemplateData) => RenderedEmail> = {
     const { html, text } = plainShell(
       firstName,
       `<p>Just a reminder — <strong>${providerName}</strong> is scheduled for a ${serviceType} visit ${when}.</p>
-       <p>Need to change or cancel? Open the visit in your CareMatch app, or call the concierge at 1 (800) 227-3628.</p>`,
-      `Just a reminder — ${providerName} is scheduled for a ${serviceType} visit ${when}.\n\nNeed to change or cancel? Open the visit in your CareMatch app, or call the concierge at 1 (800) 227-3628.`,
+       <p>Need to change or cancel? Open the visit in your CompanionCare app, or call the concierge at 1 (800) 227-3628.</p>`,
+      `Just a reminder — ${providerName} is scheduled for a ${serviceType} visit ${when}.\n\nNeed to change or cancel? Open the visit in your CompanionCare app, or call the concierge at 1 (800) 227-3628.`,
     );
     return { subject: `Reminder: ${providerName} visits ${when}`, html, text };
   },

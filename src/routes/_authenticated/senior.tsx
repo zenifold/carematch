@@ -72,7 +72,7 @@ function SeniorLayout() {
             <span className="grid size-8 place-items-center rounded-full bg-primary text-primary-foreground">
               <Heart className="size-4" />
             </span>
-            CareMatch
+            CompanionCare
           </Link>
           <div className="flex items-center gap-1">
             <Link

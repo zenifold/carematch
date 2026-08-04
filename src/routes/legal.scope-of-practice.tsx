@@ -20,7 +20,7 @@ const scopes = [
     tier: "Healthcare",
     to: "/services/healthcare",
     can: ["Skilled nursing visits (RN/LPN)", "Wound care", "Physical, occupational, speech therapy", "Physician-ordered plan of care"],
-    cant: ["Provided by CareMatch directly — referral only to a Medicare-certified home health agency"],
+    cant: ["Provided by CompanionCare directly — referral only to a Medicare-certified home health agency"],
   },
 ];
 
@@ -28,9 +28,9 @@ export const Route = createFileRoute("/legal/scope-of-practice")({
   head: () =>
     marketingHead({
       path: "/legal/scope-of-practice",
-      title: "Scope of Practice — What each CareMatch service does",
+      title: "Scope of Practice — What each CompanionCare service does",
       description:
-        "Exactly what Marketplace helpers, Partner personal care aides, and Healthcare clinicians can and cannot do on CareMatch. Scope-of-practice policy across our three services.",
+        "Exactly what Marketplace helpers, Partner personal care aides, and Healthcare clinicians can and cannot do on CompanionCare. Scope-of-practice policy across our three services.",
     }),
   component: ScopePage,
 });
@@ -83,9 +83,9 @@ function ScopePage() {
 
         <div className="rounded-2xl border border-border bg-secondary/40 p-6 text-sm text-muted-foreground">
           <p>
-            CareMatch enforces scope of practice by restricting the task menu each helper can accept. Attempts to
+            CompanionCare enforces scope of practice by restricting the task menu each helper can accept. Attempts to
             book out-of-scope tasks are routed to the right service — or, for skilled needs, to a Medicare-certified
-            partner via <Link to="/services/healthcare" className="font-medium text-primary hover:underline">CareMatch Healthcare</Link>.
+            partner via <Link to="/services/healthcare" className="font-medium text-primary hover:underline">CompanionCare Healthcare</Link>.
           </p>
         </div>
 

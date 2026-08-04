@@ -12,7 +12,7 @@ type Props = {
  * Same corner every screen. Thumb-reachable, ≥56px target.
  */
 export function CallButton({
-  phone = "1-800-CAREMATCH",
+  phone = "1-800-COMPANION",
   label = "Call Concierge",
   variant = "floating",
   className = "",

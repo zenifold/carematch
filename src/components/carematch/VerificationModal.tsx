@@ -39,7 +39,7 @@ export function VerificationModal({ open, onClose, providerName, verificationSta
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="How CareMatch verifies caregivers"
+      aria-label="How CompanionCare verifies caregivers"
       className="fixed inset-0 z-50 flex items-end justify-center bg-foreground/40 sm:items-center"
       onClick={onClose}
     >

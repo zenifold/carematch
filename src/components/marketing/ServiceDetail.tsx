@@ -121,7 +121,7 @@ export function serviceJsonLd({
       "@type": "Service",
       name,
       serviceType: name,
-      provider: { "@type": "Organization", name: "CareMatch" },
+      provider: { "@type": "Organization", name: "CompanionCare" },
       areaServed: { "@type": "Country", name: "United States" },
       description,
       url: `https://getcompanioncare.com${path}`,

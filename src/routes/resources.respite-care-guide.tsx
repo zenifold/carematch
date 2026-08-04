@@ -149,7 +149,7 @@ function ArticlePage() {
           <li>If a veteran: call the <strong>VA Caregiver Support Line</strong> (1-855-260-3274).</li>
           <li>If in hospice: ask the <strong>hospice social worker</strong> to schedule the 5-day inpatient respite.</li>
           <li>Look up your state's <strong>Medicaid HCBS waiver</strong> and get on any waitlist even if you don't need it now.</li>
-          <li>For flexible, on-demand hours, book vetted caregivers through a marketplace like <Link to="/services/respite-care">CareMatch respite care</Link>.</li>
+          <li>For flexible, on-demand hours, book vetted caregivers through a marketplace like <Link to="/services/respite-care">CompanionCare respite care</Link>.</li>
         </ol>
 
         <h2>The guilt problem</h2>

@@ -7,8 +7,8 @@ export const Route = createFileRoute("/legal/terms")({
   head: () =>
     marketingHead({
       path: "/legal/terms",
-      title: "Terms of Service | CareMatch",
-      description: "CareMatch's Terms of Service.",
+      title: "Terms of Service | CompanionCare",
+      description: "CompanionCare's Terms of Service.",
     }),
   component: TermsPage,
 });

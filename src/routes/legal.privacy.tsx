@@ -7,8 +7,8 @@ export const Route = createFileRoute("/legal/privacy")({
   head: () =>
     marketingHead({
       path: "/legal/privacy",
-      title: "Privacy Policy | CareMatch",
-      description: "CareMatch's Privacy Policy.",
+      title: "Privacy Policy | CompanionCare",
+      description: "CompanionCare's Privacy Policy.",
     }),
   component: PrivacyPage,
 });

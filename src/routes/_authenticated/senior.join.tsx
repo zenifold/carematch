@@ -68,7 +68,7 @@ function SeniorJoin() {
         </p>
         <h1 className="mt-1 font-serif text-3xl lg:text-4xl">Enter your invite code</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Your family member set up your CareMatch account and sent you a code. Enter it below
+          Your family member set up your CompanionCare account and sent you a code. Enter it below
           to link with them.
         </p>
       </div>
@@ -120,7 +120,7 @@ function SeniorJoin() {
                 Invite from
               </p>
               <p className="font-serif text-xl">
-                {previewQ.data.family_name ?? "A CareMatch family member"}
+                {previewQ.data.family_name ?? "A CompanionCare family member"}
               </p>
               {previewQ.data.relationship && (
                 <p className="text-sm text-muted-foreground">

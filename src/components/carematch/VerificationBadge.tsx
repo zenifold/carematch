@@ -58,7 +58,7 @@ const STAGES: Record<VerificationStage, StageMeta> = {
     icon: MapPin,
     what: "Live selfie matched to the verified ID, plus GPS confirmation at your address.",
     frequency: "At the start of every single visit.",
-    vendor: "CareMatch on-visit verification",
+    vendor: "CompanionCare on-visit verification",
   },
 };
 

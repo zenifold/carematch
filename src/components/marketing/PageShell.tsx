@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Phone, Menu, X, ChevronDown } from "lucide-react";
 
-export const PHONE = "1-800-CAREMATCH";
+export const PHONE = "1-800-COMPANION";
 export const PHONE_HREF = `tel:${PHONE.replace(/[^0-9]/g, "")}`;
 export const SITE_URL = "https://getcompanioncare.com";
 
@@ -47,7 +47,7 @@ export function SiteHeader() {
     { to: "/senior", label: "Senior portal", description: "For older adults" },
     { to: "/family", label: "Family portal", description: "For family coordinators" },
     { to: "/provider", label: "Provider portal", description: "For marketplace providers" },
-    { to: "/dashboard", label: "Staff portal", description: "CareMatch team" },
+    { to: "/dashboard", label: "Staff portal", description: "CompanionCare team" },
   ];
 
   return (
@@ -57,7 +57,7 @@ export function SiteHeader() {
           to="/"
           className="font-serif text-xl font-bold tracking-tight text-foreground"
         >
-          CareMatch
+          CompanionCare
         </Link>
         <nav className="hidden items-center gap-0.5 lg:flex">
           {primaryLinks.map((l) => (
@@ -203,7 +203,7 @@ export function SiteFooter() {
       ],
     },
     {
-      title: "CareMatch",
+      title: "CompanionCare",
       links: [
         { to: "/how-it-works", label: "How it works" },
         { to: "/trust", label: "Trust & verification" },
@@ -241,7 +241,7 @@ export function SiteFooter() {
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
           <div>
             <Link to="/" className="font-serif text-xl font-bold tracking-tight text-foreground">
-              CareMatch
+              CompanionCare
             </Link>
             <p className="mt-3 max-w-xs text-sm text-muted-foreground">
               Verified in-home helpers for older adults — matched to care needs, personality, and budget.
@@ -274,7 +274,7 @@ export function SiteFooter() {
         </div>
 
         <div className="mt-10 border-t border-border pt-6 text-sm text-muted-foreground">
-          © {new Date().getFullYear()} CareMatch. Serving families nationwide.
+          © {new Date().getFullYear()} CompanionCare. Serving families nationwide.
         </div>
       </div>
     </footer>

@@ -24,7 +24,7 @@ const steps = [
   { icon: Phone, title: "Tell us what's needed", body: "Call or fill in a short form. Tell us the clinical need, the ZIP code, and any hospital or physician already involved." },
   { icon: ClipboardList, title: "We prepare the introduction", body: "Our concierge picks the Medicare-certified home health agency in your area with the right specialty and availability." },
   { icon: MessageCircle, title: "The agency takes over clinical care", body: "They coordinate physician orders, staff the clinicians, and handle Medicare, Medicaid, or insurance billing directly." },
-  { icon: Sparkles, title: "We stay involved with everything else", body: "Your CareMatch dashboard still holds marketplace helpers, personal care, family messages, and the phone we always answer." },
+  { icon: Sparkles, title: "We stay involved with everything else", body: "Your CompanionCare dashboard still holds marketplace helpers, personal care, family messages, and the phone we always answer." },
 ];
 
 const scenarios = [
@@ -38,14 +38,14 @@ const scenarios = [
   },
   {
     title: "A stroke recovery at home",
-    body: "Physical, occupational, and speech therapy coordinated by the agency — layered with companionship and personal care from CareMatch.",
+    body: "Physical, occupational, and speech therapy coordinated by the agency — layered with companionship and personal care from CompanionCare.",
   },
 ];
 
 const faqs = [
   {
-    q: "Does CareMatch send the nurse or therapist?",
-    a: "No. Skilled nursing and therapy are provided by a Medicare-certified home health agency in your area. The agency employs the clinicians, holds the licenses, and handles physician orders and billing. CareMatch introduces you, then keeps everything else at home in one place.",
+    q: "Does CompanionCare send the nurse or therapist?",
+    a: "No. Skilled nursing and therapy are provided by a Medicare-certified home health agency in your area. The agency employs the clinicians, holds the licenses, and handles physician orders and billing. CompanionCare introduces you, then keeps everything else at home in one place.",
   },
   {
     q: "Will Medicare or insurance cover it?",
@@ -69,17 +69,17 @@ export const Route = createFileRoute("/services/healthcare")({
   head: () =>
     marketingHead({
       path: "/services/healthcare",
-      title: "CareMatch Healthcare — Skilled nursing and therapy at home",
+      title: "CompanionCare Healthcare — Skilled nursing and therapy at home",
       description:
-        "Skilled nursing, wound care, and physical, occupational, and speech therapy at home — delivered by Medicare-certified home health agencies introduced by CareMatch. One dashboard, one concierge, one phone number.",
+        "Skilled nursing, wound care, and physical, occupational, and speech therapy at home — delivered by Medicare-certified home health agencies introduced by CompanionCare. One dashboard, one concierge, one phone number.",
       jsonLd: [
         {
           "@context": "https://schema.org",
           "@type": "Service",
-          name: "CareMatch Healthcare",
+          name: "CompanionCare Healthcare",
           serviceType: "Home health referral concierge",
           areaServed: { "@type": "Country", name: "United States" },
-          provider: { "@type": "Organization", name: "CareMatch", url: SITE_URL },
+          provider: { "@type": "Organization", name: "CompanionCare", url: SITE_URL },
           url: `${SITE_URL}/services/healthcare`,
           description:
             "Concierge referrals to Medicare-certified home health agencies for skilled nursing, wound care, and physical, occupational, and speech therapy at home.",
@@ -102,9 +102,9 @@ function HealthcarePage() {
   return (
     <PageShell>
       <PageHero
-        eyebrow="CareMatch Healthcare"
+        eyebrow="CompanionCare Healthcare"
         title="Skilled nursing and therapy at home — we make the introduction."
-        lead="When clinical care comes home, the last thing a family needs is a scramble. CareMatch introduces you to a Medicare-certified home health agency in your area — and keeps the rest of home life together in one place."
+        lead="When clinical care comes home, the last thing a family needs is a scramble. CompanionCare introduces you to a Medicare-certified home health agency in your area — and keeps the rest of home life together in one place."
       >
         <div className="flex flex-col gap-3 sm:flex-row">
           <a
@@ -206,7 +206,7 @@ function HealthcarePage() {
                 "Physician-ordered plan of care",
                 "Agency handles Medicare, Medicaid, and insurance billing directly",
                 "HIPAA-compliant clinical records held by the agency",
-                "CareMatch is not the provider of clinical services",
+                "CompanionCare is not the provider of clinical services",
               ].map((point) => (
                 <li key={point} className="flex items-start gap-3 rounded-2xl bg-card p-4 border border-border">
                   <Check className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden />
@@ -235,8 +235,8 @@ function HealthcarePage() {
       <section className="mx-auto max-w-4xl px-5 py-4 lg:px-10">
         <div className="surface-card p-6 text-sm text-muted-foreground">
           <p>
-            <span className="font-semibold text-foreground">CareMatch does not provide clinical services.</span>{" "}
-            Skilled nursing and therapy are provided by Medicare-certified home health agencies. CareMatch is a
+            <span className="font-semibold text-foreground">CompanionCare does not provide clinical services.</span>{" "}
+            Skilled nursing and therapy are provided by Medicare-certified home health agencies. CompanionCare is a
             referral platform and is not a health care provider, insurer, or Medicare-certified entity. In an
             emergency, dial 911.
           </p>

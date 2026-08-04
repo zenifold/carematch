@@ -165,7 +165,7 @@ export function ArticleMeta({
       <span aria-hidden>·</span>
       <span>{readMins} min read</span>
       <span aria-hidden>·</span>
-      <span>Reviewed by the CareMatch care team</span>
+      <span>Reviewed by the CompanionCare care team</span>
     </p>
   );
 }
@@ -188,10 +188,10 @@ export function articleHead(opts: {
       description: opts.description,
       datePublished: opts.datePublished,
       dateModified: opts.dateModified ?? opts.datePublished,
-      author: { "@type": "Organization", name: "CareMatch" },
+      author: { "@type": "Organization", name: "CompanionCare" },
       publisher: {
         "@type": "Organization",
-        name: "CareMatch",
+        name: "CompanionCare",
         logo: { "@type": "ImageObject", url: `${SITE_URL}/favicon.ico` },
       },
       mainEntityOfPage: `${SITE_URL}${opts.path}`,
@@ -211,7 +211,7 @@ export function articleHead(opts: {
   }
   return marketingHead({
     path: opts.path,
-    title: `${opts.title} — CareMatch`,
+    title: `${opts.title} — CompanionCare`,
     description: opts.description,
     ogType: "article",
     extraMeta: [

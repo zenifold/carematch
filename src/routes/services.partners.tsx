@@ -45,8 +45,8 @@ const scenarios = [
 
 const faqs = [
   {
-    q: "Who employs the caregiver — CareMatch or the agency?",
-    a: "The caregiver is an employee of the licensed home care agency, not CareMatch. That agency holds the state license, carries the insurance, and provides clinical supervision. CareMatch is the technology and concierge layer that makes the whole experience feel like one.",
+    q: "Who employs the caregiver — CompanionCare or the agency?",
+    a: "The caregiver is an employee of the licensed home care agency, not CompanionCare. That agency holds the state license, carries the insurance, and provides clinical supervision. CompanionCare is the technology and concierge layer that makes the whole experience feel like one.",
   },
   {
     q: "Can I keep the same aide over time?",
@@ -54,7 +54,7 @@ const faqs = [
   },
   {
     q: "How is this different from calling an agency directly?",
-    a: "You get one dashboard for all care in your home, transparent pricing before you commit, and a concierge who compares partner agencies for you. You also keep the same CareMatch phone number and family app whether it's a Tuesday cleaning or a Sunday overnight.",
+    a: "You get one dashboard for all care in your home, transparent pricing before you commit, and a concierge who compares partner agencies for you. You also keep the same CompanionCare phone number and family app whether it's a Tuesday cleaning or a Sunday overnight.",
   },
   {
     q: "Does insurance cover any of this?",
@@ -70,20 +70,20 @@ export const Route = createFileRoute("/services/partners")({
   head: () =>
     marketingHead({
       path: "/services/partners",
-      title: "CareMatch Partners — Personal care from licensed home care agencies",
+      title: "CompanionCare Partners — Personal care from licensed home care agencies",
       description:
-        "Personal care — bathing, dressing, transfers, dementia-informed care, and overnights — delivered by licensed home care agencies partnered with CareMatch. One dashboard, one phone number, real oversight.",
+        "Personal care — bathing, dressing, transfers, dementia-informed care, and overnights — delivered by licensed home care agencies partnered with CompanionCare. One dashboard, one phone number, real oversight.",
       jsonLd: [
         {
           "@context": "https://schema.org",
           "@type": "Service",
-          name: "CareMatch Partners",
+          name: "CompanionCare Partners",
           serviceType: "Non-medical personal care coordination",
           areaServed: { "@type": "Country", name: "United States" },
-          provider: { "@type": "Organization", name: "CareMatch", url: SITE_URL },
+          provider: { "@type": "Organization", name: "CompanionCare", url: SITE_URL },
           url: `${SITE_URL}/services/partners`,
           description:
-            "Personal care — bathing, dressing, transfers, feeding, dementia-informed and overnight care — delivered by state-licensed home care agencies partnered with CareMatch.",
+            "Personal care — bathing, dressing, transfers, feeding, dementia-informed and overnight care — delivered by state-licensed home care agencies partnered with CompanionCare.",
         },
         {
           "@context": "https://schema.org",
@@ -103,7 +103,7 @@ function PartnersPage() {
   return (
     <PageShell>
       <PageHero
-        eyebrow="CareMatch Partners"
+        eyebrow="CompanionCare Partners"
         title="Hands-on personal care, delivered by licensed local agencies."
         lead="When care means bathing, dressing, transfers, or overnight help, we match you with a licensed home care agency in your state — and stay on the line to make sure it feels right."
       >

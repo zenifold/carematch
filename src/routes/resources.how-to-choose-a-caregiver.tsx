@@ -11,7 +11,7 @@ export const Route = createFileRoute("/resources/how-to-choose-a-caregiver")({
   head: () =>
     marketingHead({
       path,
-      title: `${title} — CareMatch`,
+      title: `${title} — CompanionCare`,
       description,
       ogType: "article",
       extraMeta: [
@@ -24,10 +24,10 @@ export const Route = createFileRoute("/resources/how-to-choose-a-caregiver")({
         headline: title,
         description,
         datePublished,
-        author: { "@type": "Organization", name: "CareMatch" },
+        author: { "@type": "Organization", name: "CompanionCare" },
         publisher: {
           "@type": "Organization",
-          name: "CareMatch",
+          name: "CompanionCare",
           logo: { "@type": "ImageObject", url: `${SITE_URL}/favicon.ico` },
         },
         mainEntityOfPage: `${SITE_URL}${path}`,
@@ -76,7 +76,7 @@ function ArticlePage() {
           </p>
           <p>
             <Link to="/trust" className="text-primary font-semibold">
-              See CareMatch's 5-stage verification →
+              See CompanionCare's 5-stage verification →
             </Link>
           </p>
         </div>

@@ -20,7 +20,7 @@ const category = "Costs";
 const faq = [
   {
     q: "What is the average hourly cost of in-home care in 2026?",
-    a: "Nationally, non-medical in-home care runs about $28–$35 an hour through a traditional agency, $20–$28 an hour through a caregiver marketplace like CareMatch, and $18–$24 an hour when hiring privately (before payroll taxes and insurance). Skilled nursing at home is $45–$80 an hour. Rates vary by state — coastal metros run 25–40% higher than the national average.",
+    a: "Nationally, non-medical in-home care runs about $28–$35 an hour through a traditional agency, $20–$28 an hour through a caregiver marketplace like CompanionCare, and $18–$24 an hour when hiring privately (before payroll taxes and insurance). Skilled nursing at home is $45–$80 an hour. Rates vary by state — coastal metros run 25–40% higher than the national average.",
   },
   {
     q: "Is in-home care cheaper than assisted living?",
@@ -32,7 +32,7 @@ const faq = [
   },
   {
     q: "What's the difference between agency, marketplace, and private hire?",
-    a: "An agency employs the caregiver and charges a full hourly rate that covers wages, insurance, and overhead. A marketplace like CareMatch connects you directly with verified independent providers who set their own rates; you pay the provider plus a 15–18% platform fee. Private hire (Craigslist, word of mouth) is cheapest hourly but you are the employer — responsible for payroll taxes, insurance, and liability.",
+    a: "An agency employs the caregiver and charges a full hourly rate that covers wages, insurance, and overhead. A marketplace like CompanionCare connects you directly with verified independent providers who set their own rates; you pay the provider plus a 15–18% platform fee. Private hire (Craigslist, word of mouth) is cheapest hourly but you are the employer — responsible for payroll taxes, insurance, and liability.",
   },
   {
     q: "How can families reduce the cost of home care?",
@@ -56,7 +56,7 @@ function ArticlePage() {
         <ArticleTLDR
           points={[
             "In-home care in 2026 runs about $20–$35 an hour depending on how you hire.",
-            "Marketplaces like CareMatch save families 20–35% vs traditional agencies.",
+            "Marketplaces like CompanionCare save families 20–35% vs traditional agencies.",
             "Medicare rarely pays for ongoing non-medical care; Medicaid and VA benefits may.",
             "Below ~40 hours a week, home care is cheaper than assisted living.",
           ]}
@@ -92,7 +92,7 @@ function ArticlePage() {
           what you pay — the rest is overhead.
         </p>
 
-        <h3>2. Caregiver marketplace (e.g. CareMatch)</h3>
+        <h3>2. Caregiver marketplace (e.g. CompanionCare)</h3>
         <p>
           Independent, verified providers set their own hourly rate; the platform
           handles vetting, insurance, and payment. Rates typically run{" "}
@@ -213,7 +213,7 @@ function ArticlePage() {
         />
 
         <p>
-          <Link to="/pricing">See CareMatch's live pricing estimator →</Link>
+          <Link to="/pricing">See CompanionCare's live pricing estimator →</Link>
         </p>
       </ArticleBody>
       <CTASection />

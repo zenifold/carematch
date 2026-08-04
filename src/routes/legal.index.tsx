@@ -3,9 +3,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 export const Route = createFileRoute("/legal/")({
   head: () => ({
     meta: [
-      { title: "Legal & Policies — CareMatch" },
-      { name: "description", content: "CareMatch legal policies: contractor status, scope of practice, and state availability." },
-      { property: "og:title", content: "Legal & Policies — CareMatch" },
+      { title: "Legal & Policies — CompanionCare" },
+      { name: "description", content: "CompanionCare legal policies: contractor status, scope of practice, and state availability." },
+      { property: "og:title", content: "Legal & Policies — CompanionCare" },
       { property: "og:description", content: "Contractor status, scope of practice, and state availability." },
     ],
   }),
@@ -13,9 +13,9 @@ export const Route = createFileRoute("/legal/")({
 });
 
 const DOCS = [
-  { to: "/legal/independent-contractors", title: "Independent contractor policy", desc: "How our Marketplace providers work with CareMatch." },
+  { to: "/legal/independent-contractors", title: "Independent contractor policy", desc: "How our Marketplace providers work with CompanionCare." },
   { to: "/legal/scope-of-practice", title: "Scope of practice", desc: "What Marketplace vs licensed partner caregivers can and can't do." },
-  { to: "/legal/state-availability", title: "Where CareMatch operates", desc: "States and regions currently served." },
+  { to: "/legal/state-availability", title: "Where CompanionCare operates", desc: "States and regions currently served." },
 ] as const;
 
 function LegalIndex() {

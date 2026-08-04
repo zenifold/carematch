@@ -59,7 +59,7 @@ const StartSetupInput = z.object({
 /**
  * Creates (or reuses) a Stripe Customer for the senior and returns a Stripe
  * Checkout Session URL in "setup" mode — collects and saves a card without
- * charging anything. The actual card never touches CareMatch's server.
+ * charging anything. The actual card never touches CompanionCare's server.
  */
 export const startAddPaymentMethod = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

@@ -29,7 +29,7 @@ function computeVisitCost(row: VisitRow) {
 function downloadReceipt(r: VisitRow, amount: number) {
   const when = new Date(r.scheduled_at);
   const lines = [
-    "CareMatch — Visit Receipt",
+    "CompanionCare — Visit Receipt",
     "",
     `Visit ID:     ${r.id}`,
     `Date:         ${when.toLocaleString()}`,
@@ -39,7 +39,7 @@ function downloadReceipt(r: VisitRow, amount: number) {
     `Hourly rate:  $${(r.hourly_rate_cents / 100).toFixed(2)}`,
     `Total:        $${amount.toFixed(2)}`,
     "",
-    "Thank you for using CareMatch.",
+    "Thank you for using CompanionCare.",
   ];
   const blob = new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" });
   const url = URL.createObjectURL(blob);

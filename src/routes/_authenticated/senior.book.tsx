@@ -60,7 +60,7 @@ function toMatchCard(p: MatchedProvider): MatchCardData {
   return {
     id: p.id,
     name: p.name,
-    headline: p.headline ?? "CareMatch provider",
+    headline: p.headline ?? "CompanionCare provider",
     initials: initialsOf(p.name),
     monthlyPlan: hourly * 20, // ~5h/wk estimate; provider sets their own rate
     hourlyRate: hourly,

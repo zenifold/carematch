@@ -14,7 +14,7 @@ const rails = [
     name: "Marketplace",
     tagline: "Independent providers. Their services, their rates.",
     blurb:
-      "Verified local providers list themselves on CareMatch and pick the services they offer — errands, rides, cleaning, companionship, meal prep, tech help, and more. Providers set their own hourly rate. You see the person, the tasks, and the total before you book.",
+      "Verified local providers list themselves on CompanionCare and pick the services they offer — errands, rides, cleaning, companionship, meal prep, tech help, and more. Providers set their own hourly rate. You see the person, the tasks, and the total before you book.",
     price: "Providers set their own rate",
     examples: ["Errands & rides", "Cleaning & laundry", "Companionship", "Meal prep", "Reminders", "Tech help"],
   },
@@ -50,7 +50,7 @@ export const Route = createFileRoute("/services/")({
       path: "/services",
       title: "Services — Marketplace, Partners & Skilled Referrals",
       description:
-        "One CareMatch app, three rails: a marketplace of independent helpers, personal care via licensed agency partners, and skilled home health referrals. Start where you need help today.",
+        "One CompanionCare app, three rails: a marketplace of independent helpers, personal care via licensed agency partners, and skilled home health referrals. Start where you need help today.",
       jsonLd: {
         "@context": "https://schema.org",
         "@type": "ItemList",
@@ -80,7 +80,7 @@ function ServicesHub() {
         <div className="surface-card mb-20 flex items-start gap-4 p-6">
           <ShieldCheck className="size-6 shrink-0 text-primary" aria-hidden />
           <p className="text-base text-muted-foreground">
-            <span className="font-semibold text-foreground">CareMatch is a technology platform</span>, not a home
+            <span className="font-semibold text-foreground">CompanionCare is a technology platform</span>, not a home
             care agency. The Marketplace connects you with independent providers who set their own services and
             rates. Partners and Healthcare hand you off to licensed agencies.{" "}
             <Link to="/legal/scope-of-practice" className="font-medium text-primary hover:underline">

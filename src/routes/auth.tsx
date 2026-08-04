@@ -324,7 +324,7 @@ function AuthPage() {
           // missing acceptance record is a compliance problem, not a UX one.
           console.error("Failed to record legal document acceptance", consentErr);
         }
-        toast.success("Welcome to CareMatch");
+        toast.success("Welcome to CompanionCare");
         navigate({ to: "/dashboard", replace: true });
       } else {
         toast.success("Check your email to confirm your account");
@@ -364,14 +364,14 @@ function AuthPage() {
     <div className="min-h-dvh bg-background">
       <header className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 lg:px-10">
         <Link to="/" className="font-serif text-2xl font-bold tracking-tight text-foreground">
-          CareMatch
+          CompanionCare
         </Link>
 
         <a
           href="tel:18002273362"
           className="hidden items-center gap-2 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground sm:inline-flex"
         >
-          <Phone className="size-4" /> 1-800-CAREMATCH
+          <Phone className="size-4" /> 1-800-COMPANION
         </a>
       </header>
 
@@ -506,7 +506,7 @@ function AuthPage() {
             )}
 
             <p className="mt-8 text-center text-base text-muted-foreground">
-              {mode === "signup" ? "Already have an account?" : "New to CareMatch?"}{" "}
+              {mode === "signup" ? "Already have an account?" : "New to CompanionCare?"}{" "}
               <button
                 type="button"
                 className="font-semibold text-primary underline-offset-4 hover:underline"
@@ -684,7 +684,7 @@ function LegalConsentCheckboxes({
         className="mt-0.5 size-5 shrink-0 accent-primary"
       />
       <span className="text-foreground">
-        I agree to CareMatch's{" "}
+        I agree to CompanionCare's{" "}
         {docs.map((kind, i) => (
           <span key={kind}>
             {i > 0 && (i === docs.length - 1 ? " and " : ", ")}

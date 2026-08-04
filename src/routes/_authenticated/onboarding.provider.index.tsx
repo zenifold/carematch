@@ -393,7 +393,7 @@ function ProviderOnboarding() {
             </p>
             <p>
               The people you'll help are someone's <b className="text-foreground">mom, dad, or grandparent</b>.
-              They trust CareMatch to send them someone kind, reliable, and honest — and now they'll trust you.
+              They trust CompanionCare to send them someone kind, reliable, and honest — and now they'll trust you.
             </p>
             <p>
               That means showing up on time. Treating them with patience and respect, even on tough days.
@@ -424,7 +424,7 @@ function ProviderOnboarding() {
       {step === 4 && (
         <StepCard
           title="5. Trust & safety"
-          description="Every caregiver on CareMatch passes an ID check and background check before accepting jobs."
+          description="Every caregiver on CompanionCare passes an ID check and background check before accepting jobs."
         >
           <div className="rounded-xl border border-border bg-secondary/50 p-4 text-sm">
             <div className="flex items-center gap-2 font-semibold">
@@ -452,7 +452,7 @@ function ProviderOnboarding() {
               onChange={(e) => setConsentBg(e.target.checked)}
             />
             <span>
-              I authorize CareMatch and Certn to verify my identity and run a background check for
+              I authorize CompanionCare and Certn to verify my identity and run a background check for
               caregiver placement. I understand a passing result is required to accept bookings.
             </span>
           </label>
@@ -685,11 +685,11 @@ function GrowPrograms({
               </div>
               <div className="mt-3 flex justify-end">
                 <Button size="sm" onClick={() => openReferral(prog.id)}>
-                  Apply through CareMatch
+                  Apply through CompanionCare
                 </Button>
               </div>
               <p className="mt-1 text-[11px] text-muted-foreground">
-                CareMatch may earn a referral fee. This doesn't change what you pay.
+                CompanionCare may earn a referral fee. This doesn't change what you pay.
               </p>
             </li>
           ))}

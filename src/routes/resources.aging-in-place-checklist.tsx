@@ -11,7 +11,7 @@ export const Route = createFileRoute("/resources/aging-in-place-checklist")({
   head: () =>
     marketingHead({
       path,
-      title: `${title} — CareMatch`,
+      title: `${title} — CompanionCare`,
       description,
       ogType: "article",
       extraMeta: [
@@ -24,10 +24,10 @@ export const Route = createFileRoute("/resources/aging-in-place-checklist")({
         headline: title,
         description,
         datePublished,
-        author: { "@type": "Organization", name: "CareMatch" },
+        author: { "@type": "Organization", name: "CompanionCare" },
         publisher: {
           "@type": "Organization",
-          name: "CareMatch",
+          name: "CompanionCare",
           logo: { "@type": "ImageObject", url: `${SITE_URL}/favicon.ico` },
         },
         mainEntityOfPage: `${SITE_URL}${path}`,

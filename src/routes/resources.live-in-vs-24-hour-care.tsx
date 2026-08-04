@@ -121,7 +121,7 @@ function ArticlePage() {
         <p>
           Adjustments: California, NY metro, and Boston add 20–30% to both. Rural markets
           can be 20–25% less. Marketplace models like{" "}
-          <Link to="/pricing">CareMatch</Link> typically fall 15–30% below agency prices
+          <Link to="/pricing">CompanionCare</Link> typically fall 15–30% below agency prices
           because caregivers get most of the hourly rate directly.
         </p>
 
@@ -153,7 +153,7 @@ function ArticlePage() {
         <p>
           For related pricing detail, see our full{" "}
           <Link to="/resources/cost-of-in-home-care">cost of in-home care guide</Link>, or
-          jump to <Link to="/pricing">CareMatch pricing</Link> for marketplace rates in
+          jump to <Link to="/pricing">CompanionCare pricing</Link> for marketplace rates in
           your area.
         </p>
 

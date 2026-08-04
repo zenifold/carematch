@@ -165,7 +165,7 @@ export const mockConversations: MockConversation[] = [
   },
   {
     id: "concierge",
-    name: "CareMatch Concierge",
+    name: "CompanionCare Concierge",
     initials: "CM",
     lastMessage: "Your Saturday visit is confirmed with Priya.",
     lastTime: "Mon",

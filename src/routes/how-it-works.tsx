@@ -71,13 +71,13 @@ export const Route = createFileRoute("/how-it-works")({
   head: () =>
     marketingHead({
       path: "/how-it-works",
-      title: "How CareMatch Works — 3 steps from need to verified visit",
+      title: "How CompanionCare Works — 3 steps from need to verified visit",
       description:
-        "How CareMatch matches you with verified in-home caregivers in 3 steps: tell us what you need, meet verified matches, and book with live check-in on every visit.",
+        "How CompanionCare matches you with verified in-home caregivers in 3 steps: tell us what you need, meet verified matches, and book with live check-in on every visit.",
       jsonLd: {
         "@context": "https://schema.org",
         "@type": "HowTo",
-        name: "How to book verified in-home care with CareMatch",
+        name: "How to book verified in-home care with CompanionCare",
         description:
           "Three steps to book a verified in-home helper for an older adult: intake, matching, and booking with live check-in.",
         totalTime: "PT10M",
@@ -148,7 +148,7 @@ function HowItWorksPage() {
               {
                 icon: Phone,
                 title: "Human concierge, 24/7",
-                text: "Prefer to talk? Every step of CareMatch can be done by phone with the same team you already know.",
+                text: "Prefer to talk? Every step of CompanionCare can be done by phone with the same team you already know.",
               },
             ].map((f) => (
               <li key={f.title} className="surface-card p-6">
@@ -174,7 +174,7 @@ function HowItWorksPage() {
               <div className="relative aspect-square overflow-hidden rounded-xl bg-primary-foreground/10">
                 <img
                   src={conciergeImg}
-                  alt="A CareMatch concierge on the phone in a softly lit home office"
+                  alt="A CompanionCare concierge on the phone in a softly lit home office"
                   loading="lazy"
                   width={1024}
                   height={1024}
@@ -194,7 +194,7 @@ function HowItWorksPage() {
                 A real person is always a call away.
               </h2>
               <p className="mb-8 max-w-xl text-lg leading-relaxed text-primary-foreground/85">
-                Every step of CareMatch can be done by phone with the same friendly team — intake,
+                Every step of CompanionCare can be done by phone with the same friendly team — intake,
                 matching, booking, changes, or just a question. Day or night.
               </p>
               <div className="flex flex-wrap items-center gap-6">
@@ -406,7 +406,7 @@ function ArrivalSimulator() {
               See exactly what happens before the doorbell rings.
             </h2>
             <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
-              Every CareMatch visit starts with a live selfie plus GPS at the arrival address —
+              Every CompanionCare visit starts with a live selfie plus GPS at the arrival address —
               matched against the helper's verified ID before you're notified they're at the door.
               Press play to run the check in real time.
             </p>

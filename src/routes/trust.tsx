@@ -59,7 +59,7 @@ const checks: CheckItem[] = [
     short: "National criminal + sex offender + multi-state records.",
     when: "Before first visit, refreshed yearly",
     detail:
-      "Multi-state and federal criminal records, plus the national sex offender registry. Anything disqualifying removes the helper from CareMatch before they ever accept a booking.",
+      "Multi-state and federal criminal records, plus the national sex offender registry. Anything disqualifying removes the helper from CompanionCare before they ever accept a booking.",
     vendor: "Verified by Certn",
     frequency: "Pre-hire + annual refresh",
     disqualifiers: [
@@ -108,7 +108,7 @@ const checks: CheckItem[] = [
     when: "At the start of every single visit",
     detail:
       "The person at your door is the person you booked. We confirm with a live selfie match and a GPS ping at the arrival address — you see 'verified on arrival' before the visit begins.",
-    vendor: "CareMatch on-visit verification",
+    vendor: "CompanionCare on-visit verification",
     frequency: "At the start of every visit",
     disqualifiers: [
       "Selfie mismatch at arrival",
@@ -147,7 +147,7 @@ const faqs = [
   },
   {
     q: "Who sees my verification records?",
-    a: "You do — on your account, any time. CareMatch staff access is limited to concierge and trust-and-safety roles, and every view is logged with a timestamp and reason. We never sell or share verification data.",
+    a: "You do — on your account, any time. CompanionCare staff access is limited to concierge and trust-and-safety roles, and every view is logged with a timestamp and reason. We never sell or share verification data.",
   },
   {
     q: "Can I request a specific verification level for my match?",
@@ -163,9 +163,9 @@ export const Route = createFileRoute("/trust")({
   head: () =>
     marketingHead({
       path: "/trust",
-      title: "Trust & Verification — How CareMatch verifies every caregiver",
+      title: "Trust & Verification — How CompanionCare verifies every caregiver",
       description:
-        "Every CareMatch caregiver clears 5 verification stages: identity proofing, background check, credential verification, monthly re-checks, and live selfie + GPS check-in at every visit.",
+        "Every CompanionCare caregiver clears 5 verification stages: identity proofing, background check, credential verification, monthly re-checks, and live selfie + GPS check-in at every visit.",
       extraMeta: [
         { property: "og:image", content: "https://getcompanioncare.com/og-trust.jpg" },
         { name: "twitter:image", content: "https://getcompanioncare.com/og-trust.jpg" },
@@ -206,9 +206,9 @@ function ScopeDisclosure() {
   return (
     <section className="border-y border-border bg-warm-cream/60 py-14">
       <div className="mx-auto max-w-3xl px-4 text-center">
-        <h2 className="font-display text-3xl font-bold tracking-tight">What CareMatch is — and isn't</h2>
+        <h2 className="font-display text-3xl font-bold tracking-tight">What CompanionCare is — and isn't</h2>
         <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-          CareMatch is a <strong>consumer marketplace</strong> that connects families with independent,
+          CompanionCare is a <strong>consumer marketplace</strong> that connects families with independent,
           verified caregivers for non-medical companion and personal care. We are <strong>not</strong> a
           home health agency, a medical provider, or a HIPAA-covered entity. We don't diagnose,
           prescribe, or provide clinical services.
@@ -688,7 +688,7 @@ function ComparisonTable() {
         <div className="mt-10 overflow-hidden rounded-3xl border border-border bg-card">
           <div className="grid grid-cols-[1.4fr_1fr_1fr] items-center gap-2 border-b border-border bg-secondary/40 px-4 py-3 text-xs font-bold uppercase tracking-widest text-muted-foreground sm:px-6 sm:py-4">
             <span>What you get</span>
-            <span className="text-center text-primary">CareMatch</span>
+            <span className="text-center text-primary">CompanionCare</span>
             <span className="text-center">Typical agency</span>
           </div>
           <ul>
@@ -764,7 +764,7 @@ function PrivacySection() {
     {
       icon: ShieldCheck,
       title: "You control sharing",
-      body: "Records don't leave CareMatch. We never sell verification data or share with advertisers.",
+      body: "Records don't leave CompanionCare. We never sell verification data or share with advertisers.",
     },
   ];
   return (

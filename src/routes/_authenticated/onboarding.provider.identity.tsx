@@ -125,7 +125,7 @@ function IdentityFlow() {
         <div className="space-y-4">
           <h1 className="text-3xl font-bold">Let's verify your identity</h1>
           <p className="text-muted-foreground">
-            To keep seniors safe, every caregiver on CareMatch goes through the same identity and
+            To keep seniors safe, every caregiver on CompanionCare goes through the same identity and
             background check. This takes about 8 minutes.
           </p>
           <ul className="space-y-2 text-sm">
@@ -247,7 +247,7 @@ function IdentityFlow() {
       )}
 
       {step === "driver" && (
-        <StepShell title="Will you drive for CareMatch?" onBack={() => go("addresses")}>
+        <StepShell title="Will you drive for CompanionCare?" onBack={() => go("addresses")}>
           <p className="text-sm text-muted-foreground">
             If you'll do errand runs or transport, we also need to run a motor vehicle record.
           </p>
@@ -430,7 +430,7 @@ function IdentityFlow() {
         <StepShell title="Social Security number" onBack={() => go("selfie")}>
           <div className="rounded-md border bg-muted/30 p-3 text-sm text-muted-foreground">
             We only keep the last 4 digits on our servers. The full number is sent directly to the
-            background check provider at the time of the check and is never stored on CareMatch.
+            background check provider at the time of the check and is never stored on CompanionCare.
           </div>
           <div>
             <Label>SSN</Label>

@@ -116,7 +116,7 @@ function FamilyJoin() {
                 Invite from
               </p>
               <p className="font-serif text-xl">
-                {previewQ.data.senior_name ?? "A CareMatch member"}
+                {previewQ.data.senior_name ?? "A CompanionCare member"}
               </p>
             </div>
           </div>

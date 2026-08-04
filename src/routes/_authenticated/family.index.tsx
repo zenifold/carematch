@@ -248,7 +248,7 @@ function FamilyOverview() {
                 Verification
               </p>
               <p className="mt-1 font-medium">All active caregivers verified</p>
-              <p className="text-sm text-muted-foreground">CareMatch renews checks automatically</p>
+              <p className="text-sm text-muted-foreground">CompanionCare renews checks automatically</p>
             </div>
           </div>
           <div className="flex items-start gap-3">

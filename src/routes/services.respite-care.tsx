@@ -32,7 +32,7 @@ export const Route = createFileRoute("/services/respite-care")({
         <>
           <p>
             Caregiver burnout is real, and it's the biggest single risk to a loved one
-            aging in place. CareMatch respite care gives you a verified helper you can
+            aging in place. CompanionCare respite care gives you a verified helper you can
             step away from with confidence — for a few hours or a full weekend.
           </p>
         </>

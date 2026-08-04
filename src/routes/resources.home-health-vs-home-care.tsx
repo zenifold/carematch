@@ -11,7 +11,7 @@ export const Route = createFileRoute("/resources/home-health-vs-home-care")({
   head: () =>
     marketingHead({
       path,
-      title: `${title} — CareMatch`,
+      title: `${title} — CompanionCare`,
       description,
       ogType: "article",
       extraMeta: [
@@ -24,10 +24,10 @@ export const Route = createFileRoute("/resources/home-health-vs-home-care")({
         headline: title,
         description,
         datePublished,
-        author: { "@type": "Organization", name: "CareMatch" },
+        author: { "@type": "Organization", name: "CompanionCare" },
         publisher: {
           "@type": "Organization",
-          name: "CareMatch",
+          name: "CompanionCare",
           logo: { "@type": "ImageObject", url: `${SITE_URL}/favicon.ico` },
         },
         mainEntityOfPage: `${SITE_URL}${path}`,
@@ -67,7 +67,7 @@ function ArticlePage() {
             <li><strong>What it does:</strong> wound care, IV therapy, injections, catheter care, disease-specific teaching, rehab after surgery or a hospital stay, medication management assessments.</li>
             <li><strong>How long it lasts:</strong> weeks, not years. Medicare requires the person to be "homebound" and to need skilled care intermittently. Once they've recovered, the benefit ends.</li>
             <li><strong>Who pays:</strong> Medicare Part A/B pays 100% of covered home health when eligibility is met. Medicare Advantage and most private insurance cover it too. Medicaid covers it for lower-income beneficiaries.</li>
-            <li><strong>Who delivers it:</strong> a Medicare-certified home health agency. CareMatch introduces families to one in their state through our{" "}
+            <li><strong>Who delivers it:</strong> a Medicare-certified home health agency. CompanionCare introduces families to one in their state through our{" "}
               <Link to="/services/healthcare" className="text-primary font-semibold">Healthcare rail</Link>.
             </li>
           </ul>
@@ -78,7 +78,7 @@ function ArticlePage() {
             <li><strong>What it does:</strong> companionship, meal prep, light housekeeping, errands, transportation, bathing, dressing, toileting, mobility help, reminders. No clinical tasks.</li>
             <li><strong>How long it lasts:</strong> as long as it's needed — a few hours a week, daily visits, or live-in support that goes on for years.</li>
             <li><strong>Who pays:</strong> mostly private pay. Medicaid covers non-medical home care in every state (rules vary). The VA's Aid & Attendance benefit and long-term care insurance often help. Original Medicare almost never pays for standalone home care.</li>
-            <li><strong>Who delivers it:</strong> either an independent caregiver you hire directly (CareMatch's{" "}
+            <li><strong>Who delivers it:</strong> either an independent caregiver you hire directly (CompanionCare's{" "}
               <Link to="/services/marketplace" className="text-primary font-semibold">Marketplace</Link>) or a licensed home care agency ({" "}
               <Link to="/services/partners" className="text-primary font-semibold">Partners</Link>).
             </li>
@@ -112,9 +112,9 @@ function ArticlePage() {
             </table>
           </div>
 
-          <h2>What CareMatch does</h2>
+          <h2>What CompanionCare does</h2>
           <p>
-            CareMatch is one app for both sides of the line. When you need Home Health,
+            CompanionCare is one app for both sides of the line. When you need Home Health,
             we introduce you to a Medicare-certified agency in your state. When you
             need Home Care, you can hire an independent helper directly through the
             Marketplace, or work with a licensed agency partner for hands-on

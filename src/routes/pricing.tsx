@@ -126,18 +126,18 @@ export const Route = createFileRoute("/pricing")({
         mainEntity: [
           {
             "@type": "Question",
-            name: "How does CareMatch pricing work?",
+            name: "How does CompanionCare pricing work?",
             acceptedAnswer: {
               "@type": "Answer",
-              text: "CareMatch is a marketplace. Each provider sets their own hourly rate within suggested market bands. Before booking, you see the provider's rate, the estimated hours, the CareMatch service fee, and the total you'll pay — all on one line. There are no add-ons, tips, or surprise fees after booking.",
+              text: "CompanionCare is a marketplace. Each provider sets their own hourly rate within suggested market bands. Before booking, you see the provider's rate, the estimated hours, the CompanionCare service fee, and the total you'll pay — all on one line. There are no add-ons, tips, or surprise fees after booking.",
             },
           },
           {
             "@type": "Question",
-            name: "What is the CareMatch service fee?",
+            name: "What is the CompanionCare service fee?",
             acceptedAnswer: {
               "@type": "Answer",
-              text: "CareMatch charges a 15–18% service fee on top of the provider's hourly rate. Skilled tiers (like nursing) are 15%; general care and home services are 18%. The fee funds our 5-stage verification, insurance coverage, in-visit check-in, and dispute protection.",
+              text: "CompanionCare charges a 15–18% service fee on top of the provider's hourly rate. Skilled tiers (like nursing) are 15%; general care and home services are 18%. The fee funds our 5-stage verification, insurance coverage, in-visit check-in, and dispute protection.",
             },
           },
           {
@@ -153,7 +153,7 @@ export const Route = createFileRoute("/pricing")({
             name: "Is there a membership option?",
             acceptedAnswer: {
               "@type": "Answer",
-              text: "Yes. CareMatch Plus is $29/month and waives service fees on the first $200 of bookings each month, plus unlocks priority booking with top-rated providers. Membership is optional — you can book without it.",
+              text: "Yes. CompanionCare Plus is $29/month and waives service fees on the first $200 of bookings each month, plus unlocks priority booking with top-rated providers. Membership is optional — you can book without it.",
             },
           },
           {
@@ -161,7 +161,7 @@ export const Route = createFileRoute("/pricing")({
             name: "What happens if I cancel?",
             acceptedAnswer: {
               "@type": "Answer",
-              text: "Cancel more than 24 hours ahead for a full refund. Cancellations inside 24 hours are charged 50% of the visit — half to the provider (for their reserved time) and half to CareMatch. Recurring visits can be paused anytime with no penalty.",
+              text: "Cancel more than 24 hours ahead for a full refund. Cancellations inside 24 hours are charged 50% of the visit — half to the provider (for their reserved time) and half to CompanionCare. Recurring visits can be paused anytime with no penalty.",
             },
           },
         ],
@@ -191,7 +191,7 @@ function PricingPage() {
       <PageHero
         eyebrow="Marketplace pricing"
         title="Providers set their rate. You see the total. That's it."
-        lead="CareMatch is a marketplace, not a package. Every provider sets their own hourly rate. Before you book, you see the rate, the hours, our service fee, and the total — one screen, no surprises."
+        lead="CompanionCare is a marketplace, not a package. Every provider sets their own hourly rate. Before you book, you see the rate, the hours, our service fee, and the total — one screen, no surprises."
       />
 
       {/* Estimator */}
@@ -306,7 +306,7 @@ function PricingPage() {
                 </div>
                 <div className="flex items-baseline justify-between px-6 py-4">
                   <dt className="text-base text-muted-foreground">
-                    CareMatch service &amp; protection fee ({tier.feePct}%)
+                    CompanionCare service &amp; protection fee ({tier.feePct}%)
                   </dt>
                   <dd className="text-lg">{money(serviceFee)}</dd>
                 </div>
@@ -439,7 +439,7 @@ function PricingPage() {
 
           <div className="mt-8 flex flex-wrap gap-2 rounded-full bg-secondary/60 p-1.5 md:inline-flex">
             {[
-              { key: "carematch", label: "CareMatch", icon: ShieldCheck },
+              { key: "carematch", label: "CompanionCare", icon: ShieldCheck },
               { key: "agency", label: "Traditional agency", icon: Building2 },
               { key: "offplatform", label: "Craigslist / off-platform", icon: UserRound },
             ].map((opt) => {
@@ -595,7 +595,7 @@ function PricingPage() {
             <Link to="/services/healthcare" className="font-medium text-primary hover:underline">
               Healthcare
             </Link>{" "}
-            (skilled nursing referrals), the agency bills you directly. CareMatch is compensated by
+            (skilled nursing referrals), the agency bills you directly. CompanionCare is compensated by
             the agency, not by you.
           </p>
 
@@ -616,7 +616,7 @@ function PricingPage() {
                   <dd className="text-base font-semibold">Agency's published rate</dd>
                 </div>
                 <div className="flex items-baseline justify-between py-3">
-                  <dt className="text-base text-muted-foreground">CareMatch fee model</dt>
+                  <dt className="text-base text-muted-foreground">CompanionCare fee model</dt>
                   <dd className="text-base font-semibold">Finder's fee, paid by agency</dd>
                 </div>
                 <div className="flex items-baseline justify-between py-3">
@@ -646,7 +646,7 @@ function PricingPage() {
                   <dd className="text-base font-semibold">Medicare / insurance / agency</dd>
                 </div>
                 <div className="flex items-baseline justify-between py-3">
-                  <dt className="text-base text-muted-foreground">CareMatch fee model</dt>
+                  <dt className="text-base text-muted-foreground">CompanionCare fee model</dt>
                   <dd className="text-base font-semibold">Flat referral fee, paid by agency</dd>
                 </div>
                 <div className="flex items-baseline justify-between py-3">
@@ -663,7 +663,7 @@ function PricingPage() {
 
           <p className="mt-6 text-sm text-muted-foreground">
             <span className="font-semibold text-foreground">Why this matters to you:</span> you pay
-            the same hourly rate you'd pay the agency directly. CareMatch never adds a markup — the
+            the same hourly rate you'd pay the agency directly. CompanionCare never adds a markup — the
             agency pays our small referral fee, not you.
           </p>
         </div>
@@ -676,7 +676,7 @@ function PricingPage() {
             <p className="text-sm font-semibold uppercase tracking-wider text-primary">
               Optional membership
             </p>
-            <h2 className="mt-2 font-serif text-3xl tracking-tight">CareMatch Plus — $29/month</h2>
+            <h2 className="mt-2 font-serif text-3xl tracking-tight">CompanionCare Plus — $29/month</h2>
             <p className="mt-4 text-lg text-muted-foreground">
               For families booking regular care. Waives service fees on the first $200 of bookings
               each month and unlocks priority access to top-rated providers.
@@ -760,7 +760,7 @@ function PricingPage() {
                   <p className="font-semibold">Inside 24 hours</p>
                   <p className="text-base text-muted-foreground">
                     50% of the visit is charged — half goes to the provider for their reserved time,
-                    half to CareMatch.
+                    half to CompanionCare.
                   </p>
                 </div>
               </li>
@@ -834,7 +834,7 @@ function PricingPage() {
           <ul className="mt-10 divide-y divide-border border-y border-border">
             {[
               {
-                q: "How does CareMatch pricing work?",
+                q: "How does CompanionCare pricing work?",
                 a: "Each provider sets their own hourly rate within a local market band. Before booking, you see the provider's rate, the estimated hours, the service fee, and the total — all on one line. No add-ons, tips, or surprise fees after booking.",
               },
               {
@@ -846,16 +846,16 @@ function PricingPage() {
                 a: "Providers keep 82–85% of their listed hourly rate. They set their own rates, set their own schedule, and can raise them anytime. Payouts run every Monday by direct deposit.",
               },
               {
-                q: "Do I need CareMatch Plus to book?",
+                q: "Do I need CompanionCare Plus to book?",
                 a: "No. Plus is optional and pays for itself at roughly one recurring visit per month. Most families start without it and add it after their second or third booking.",
               },
               {
                 q: "What if I cancel a visit?",
-                a: "More than 24 hours ahead: full refund, no fee. Inside 24 hours: 50% of the visit is charged — half to the provider for reserved time, half to CareMatch. Recurring visits can be paused anytime, no penalty.",
+                a: "More than 24 hours ahead: full refund, no fee. Inside 24 hours: 50% of the visit is charged — half to the provider for reserved time, half to CompanionCare. Recurring visits can be paused anytime, no penalty.",
               },
               {
                 q: "Are Partners and Healthcare priced the same way?",
-                a: "No — for licensed home care agencies (Partners) and skilled nursing referrals (Healthcare), the agency bills you directly at their published rate. CareMatch is paid a small referral fee by the agency, never marked up to you.",
+                a: "No — for licensed home care agencies (Partners) and skilled nursing referrals (Healthcare), the agency bills you directly at their published rate. CompanionCare is paid a small referral fee by the agency, never marked up to you.",
               },
             ].map((item, i) => {
               const open = openFaq === i;

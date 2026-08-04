@@ -6,16 +6,16 @@ export const Route = createFileRoute("/for-caregivers")({
   head: () =>
     marketingHead({
       path: "/for-caregivers",
-      title: "For Caregivers — Join CareMatch's verified helper network",
+      title: "For Caregivers — Join CompanionCare's verified helper network",
       description:
-        "Join CareMatch as a verified in-home caregiver: fair hourly pay, flexible schedule, consistent clients, and a platform that protects you as much as it protects families.",
+        "Join CompanionCare as a verified in-home caregiver: fair hourly pay, flexible schedule, consistent clients, and a platform that protects you as much as it protects families.",
       jsonLd: {
         "@context": "https://schema.org",
         "@type": "JobPosting",
-        title: "In-home caregiver — CareMatch verified helper network",
+        title: "In-home caregiver — CompanionCare verified helper network",
         description:
           "Companionship, personal care, and household help roles across the U.S. Flexible hours, fair pay, and continuous re-verification that builds trust with families.",
-        hiringOrganization: { "@type": "Organization", name: "CareMatch" },
+        hiringOrganization: { "@type": "Organization", name: "CompanionCare" },
         employmentType: ["PART_TIME", "FULL_TIME", "CONTRACTOR"],
         jobLocation: { "@type": "Place", address: { "@type": "PostalAddress", addressCountry: "US" } },
         baseSalary: {
@@ -32,7 +32,7 @@ const perks = [
   { icon: DollarSign, title: "Transparent pay from $18–$34/hr", body: "You see the full rate before you accept. No surprise cuts. Skilled care roles pay more." },
   { icon: Calendar, title: "You choose the schedule", body: "Set your availability, accept the shifts that fit your life, and keep the clients you love." },
   { icon: ShieldCheck, title: "Verified once, trusted everywhere", body: "Our 5-stage verification protects you too — no one can impersonate you at a client's door." },
-  { icon: HeartHandshake, title: "Consistent clients, not one-offs", body: "CareMatch prioritizes long-term matches — so you build real relationships, not just book shifts." },
+  { icon: HeartHandshake, title: "Consistent clients, not one-offs", body: "CompanionCare prioritizes long-term matches — so you build real relationships, not just book shifts." },
 ];
 
 function ForCaregiversPage() {
@@ -41,7 +41,7 @@ function ForCaregiversPage() {
       <PageHero
         eyebrow="For caregivers"
         title="Do the work you love. Get treated like the professional you are."
-        lead="Join CareMatch's verified helper network. Fair pay, consistent clients, and a platform designed to build trust — not extract fees."
+        lead="Join CompanionCare's verified helper network. Fair pay, consistent clients, and a platform designed to build trust — not extract fees."
       >
         <div className="flex flex-wrap gap-3">
           <Link
@@ -80,7 +80,7 @@ function ForCaregiversPage() {
               "Create your profile and upload your ID (takes 5 minutes).",
               "Complete verification — identity, background, and license check where applicable.",
               "Set your availability, services offered, and preferred hourly rate.",
-              "Start accepting matches — CareMatch introduces you to families who fit your profile.",
+              "Start accepting matches — CompanionCare introduces you to families who fit your profile.",
             ].map((step, i) => (
               <li key={step} className="flex items-start gap-3 text-lg">
                 <span className="grid size-8 shrink-0 place-items-center rounded-full bg-primary font-semibold text-primary-foreground">

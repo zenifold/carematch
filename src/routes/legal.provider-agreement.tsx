@@ -7,8 +7,8 @@ export const Route = createFileRoute("/legal/provider-agreement")({
   head: () =>
     marketingHead({
       path: "/legal/provider-agreement",
-      title: "Provider Agreement | CareMatch",
-      description: "CareMatch's Provider Agreement for marketplace caregivers.",
+      title: "Provider Agreement | CompanionCare",
+      description: "CompanionCare's Provider Agreement for marketplace caregivers.",
     }),
   component: ProviderAgreementPage,
 });

@@ -120,7 +120,7 @@ function SeniorOnboarding() {
       <div>
         <div className="flex items-center gap-2 text-primary">
           <Sparkles className="size-5" />
-          <p className="text-xs font-bold uppercase tracking-widest">Welcome to CareMatch</p>
+          <p className="text-xs font-bold uppercase tracking-widest">Welcome to CompanionCare</p>
         </div>
         <h1 className="mt-2 font-serif text-3xl lg:text-4xl">Let's set up your account</h1>
         <p className="mt-2 text-muted-foreground">
@@ -293,7 +293,7 @@ function SeniorOnboarding() {
                 </button>
                 <a
                   href={`sms:?body=${encodeURIComponent(
-                    `Join me on CareMatch — use code ${inviteCode}`,
+                    `Join me on CompanionCare — use code ${inviteCode}`,
                   )}`}
                   className="inline-flex min-h-11 items-center gap-2 rounded-full border border-input bg-card px-4 text-sm font-semibold"
                 >

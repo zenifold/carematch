@@ -81,7 +81,7 @@ export function FamilySeniorInvites() {
         </div>
         <h2 className="mt-1 font-serif text-2xl">Set up their account</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Share a code with your loved one so they can create their CareMatch account. You'll be
+          Share a code with your loved one so they can create their CompanionCare account. You'll be
           linked automatically the moment they sign up.
         </p>
       </div>

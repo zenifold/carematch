@@ -115,7 +115,7 @@ const steps = [
 
 const faqs = [
   {
-    q: "How is CareMatch different from a big-name care app?",
+    q: "How is CompanionCare different from a big-name care app?",
     a: "You see the exact person before you book — not just a category. Every provider is verified continuously, not just once at sign-up. And a real person answers our phone, day or night.",
   },
   {
@@ -132,7 +132,7 @@ const faqs = [
   },
   {
     q: "How is payment handled?",
-    a: "You pay through CareMatch after each visit — no cash, no checks. Rates are set by each helper and shown up front, so the total you see before booking is the total you pay.",
+    a: "You pay through CompanionCare after each visit — no cash, no checks. Rates are set by each helper and shown up front, so the total you see before booking is the total you pay.",
   },
   {
     q: "What if something goes wrong during a visit?",
@@ -144,17 +144,17 @@ export const Route = createFileRoute("/services/marketplace")({
   head: () =>
     marketingHead({
       path: "/services/marketplace",
-      title: "CareMatch Marketplace — Verified local helpers for older adults",
+      title: "CompanionCare Marketplace — Verified local helpers for older adults",
       description:
         "Meet, choose, and book verified local helpers for errands, rides, cleaning, companionship, meal prep, tech help, and more. Transparent hourly rates, the same helper week after week, and a real person on the phone 24/7.",
       jsonLd: [
         {
           "@context": "https://schema.org",
           "@type": "Service",
-          name: "CareMatch Marketplace",
+          name: "CompanionCare Marketplace",
           serviceType: "In-home non-medical help for older adults",
           areaServed: { "@type": "Country", name: "United States" },
-          provider: { "@type": "Organization", name: "CareMatch", url: SITE_URL },
+          provider: { "@type": "Organization", name: "CompanionCare", url: SITE_URL },
           url: `${SITE_URL}/services/marketplace`,
           description:
             "Verified independent providers offering errands, rides, cleaning, companionship, meal prep, medication reminders, tech help, and pet care to older adults at home.",
@@ -178,7 +178,7 @@ function MarketplacePage() {
   return (
     <PageShell>
       <PageHero
-        eyebrow="CareMatch Marketplace"
+        eyebrow="CompanionCare Marketplace"
         title="A trusted helper for the everyday — matched to your loved one."
         lead="Groceries, rides, tidying, meals, company. Pick a verified local helper by name and face, book by the hour, and keep the same friendly person week after week."
       >
@@ -242,7 +242,7 @@ function MarketplacePage() {
         <div className="mx-auto max-w-6xl px-5 py-16 lg:px-10">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <h2 className="font-serif text-3xl sm:text-4xl">What a CareMatch helper can do</h2>
+              <h2 className="font-serif text-3xl sm:text-4xl">What a CompanionCare helper can do</h2>
               <p className="mt-3 max-w-3xl text-lg text-muted-foreground">
                 Every helper picks the tasks they're best at. Rates are set by the helper and shown before you book — no surprise fees.
               </p>
@@ -372,7 +372,7 @@ function MarketplacePage() {
 
       {/* Compare tiers */}
       <section className="mx-auto max-w-6xl px-5 py-16 lg:px-10">
-        <h2 className="font-serif text-3xl sm:text-4xl">Which CareMatch is right for you?</h2>
+        <h2 className="font-serif text-3xl sm:text-4xl">Which CompanionCare is right for you?</h2>
         <p className="mt-3 max-w-3xl text-lg text-muted-foreground">
           Marketplace helpers cover everyday, non-medical support. For hands-on personal care or skilled clinical care, we have you covered too.
         </p>
@@ -391,7 +391,7 @@ function MarketplacePage() {
                   </span>
                 )}
               </div>
-              <h3 className="mt-2 font-serif text-2xl">CareMatch {c.name}</h3>
+              <h3 className="mt-2 font-serif text-2xl">CompanionCare {c.name}</h3>
               <p className="mt-3 text-base font-semibold">{c.price}</p>
               <p className="mt-2 text-base text-muted-foreground">{c.scope}</p>
               <p className="mt-3 flex items-start gap-2 text-sm text-muted-foreground">
@@ -464,9 +464,9 @@ function MarketplacePage() {
             <span className="font-semibold text-foreground">A note on what marketplace helpers do.</span> Marketplace
             helpers focus on non-medical help — companionship, cleaning, meals, rides, and errands. For hands-on
             personal care like bathing and transfers, see{" "}
-            <Link to="/services/partners" className="font-medium text-primary hover:underline">CareMatch Partners</Link>.
+            <Link to="/services/partners" className="font-medium text-primary hover:underline">CompanionCare Partners</Link>.
             For skilled nursing or therapy, see{" "}
-            <Link to="/services/healthcare" className="font-medium text-primary hover:underline">CareMatch Healthcare</Link>.
+            <Link to="/services/healthcare" className="font-medium text-primary hover:underline">CompanionCare Healthcare</Link>.
           </p>
         </div>
       </section>

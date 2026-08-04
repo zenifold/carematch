@@ -15,7 +15,7 @@ function OnboardingLayout() {
           <span className="grid size-9 place-items-center rounded-full bg-primary text-primary-foreground">
             <Heart className="size-4" />
           </span>
-          CareMatch
+          CompanionCare
         </Link>
         <span className="text-xs uppercase tracking-widest text-muted-foreground">
           Getting set up

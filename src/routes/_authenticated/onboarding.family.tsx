@@ -53,12 +53,12 @@ function FamilyOnboarding() {
       <div>
         <div className="flex items-center gap-2 text-primary">
           <Sparkles className="size-5" />
-          <p className="text-xs font-bold uppercase tracking-widest">Welcome to CareMatch</p>
+          <p className="text-xs font-bold uppercase tracking-widest">Welcome to CompanionCare</p>
         </div>
         <h1 className="mt-2 font-serif text-3xl lg:text-4xl">Join a family circle</h1>
         <p className="mt-2 text-muted-foreground">
           Enter the invite code your loved one shared with you. They generate it from their
-          CareMatch account.
+          CompanionCare account.
         </p>
       </div>
 
@@ -89,7 +89,7 @@ function FamilyOnboarding() {
       <div className="rounded-2xl border border-border bg-secondary/40 p-5">
         <p className="text-sm font-semibold">Don't have a code yet?</p>
         <p className="mt-1 text-sm text-muted-foreground">
-          Ask your loved one to open CareMatch → People and generate a family invite. You can
+          Ask your loved one to open CompanionCare → People and generate a family invite. You can
           also skip for now and add one later from{" "}
           <Link to="/family/join" className="text-primary underline">
             family settings

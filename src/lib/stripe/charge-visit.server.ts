@@ -1,6 +1,6 @@
 // Server-only. Charging now happens on booking APPROVAL (acceptBooking),
 // not at visit completion — a deliberate change from the original
-// "charge on checkout" design, made because CareMatch isn't a bank and
+// "charge on checkout" design, made because CompanionCare isn't a bank and
 // can't hold funds indefinitely without a real reason to; charging once a
 // caregiver has committed to the visit is the more standard marketplace
 // pattern, and it's what the cancellation policy already published on the
@@ -8,13 +8,13 @@
 //
 // This means the charge and the provider's payout are no longer the same
 // Stripe call: chargeApprovedBooking is a plain PaymentIntent (funds land in
-// CareMatch's own Stripe balance, not yet split), payOutCompletedVisit later
+// CompanionCare's own Stripe balance, not yet split), payOutCompletedVisit later
 // transfers the provider's cut via a separate Connect transfer once the
 // visit is actually checked out (never before — a caregiver who never shows
 // up is never paid, even though the family was already charged). If the
 // booking gets cancelled before that happens, refundCancelledBooking applies
 // the same 24-hour policy from /pricing: full refund outside 24 hours,
-// 50%-charged (split evenly between provider and CareMatch) inside it.
+// 50%-charged (split evenly between provider and CompanionCare) inside it.
 //
 // None of these throw — a failed/skipped charge, payout, or refund must
 // never block the booking-status change that triggered it. payment_status
@@ -80,7 +80,7 @@ export async function chargeApprovedBooking(bookingId: string): Promise<ChargeRe
       off_session: true,
       confirm: true,
       // No transfer_data/application_fee_amount here — funds stay in
-      // CareMatch's own balance until the visit is actually checked out.
+      // CompanionCare's own balance until the visit is actually checked out.
       metadata: { booking_id: bookingId },
     });
   } catch (err: any) {
@@ -204,7 +204,7 @@ export async function payOutCompletedVisit(bookingId: string): Promise<PayoutRes
  * Called from cancelBooking/declineBooking when the booking was already
  * charged. Applies the cancellation policy published on /pricing: full
  * refund outside 24 hours of the scheduled start, 50%-charged (split evenly
- * between provider and CareMatch) inside it. Never runs if the provider has
+ * between provider and CompanionCare) inside it. Never runs if the provider has
  * already been paid out (that's a post-completion cancellation, a
  * different, rarer case this doesn't attempt to claw back).
  */
@@ -244,7 +244,7 @@ export async function refundCancelledBooking(bookingId: string): Promise<RefundR
   const isLateCancel = msUntilVisit < LATE_CANCEL_WINDOW_MS;
 
   // Outside 24 hours: full refund. Inside 24 hours: half the visit cost is
-  // charged (kept), split evenly between provider and CareMatch; the other
+  // charged (kept), split evenly between provider and CompanionCare; the other
   // half is refunded to the family.
   const refundCents = isLateCancel ? Math.round(totalCents / 2) : totalCents;
   const keptCents = totalCents - refundCents;
@@ -297,7 +297,7 @@ export async function refundCancelledBooking(bookingId: string): Promise<RefundR
         transferId = transfer.id;
       } catch {
         // Provider not payable right now — the compensation simply stays
-        // unpaid in CareMatch's balance rather than blocking the refund.
+        // unpaid in CompanionCare's balance rather than blocking the refund.
       }
     }
 
@@ -320,7 +320,7 @@ export async function refundCancelledBooking(bookingId: string): Promise<RefundR
       amount_cents: platformCents,
       status: "posted",
       posted_at: now,
-      memo: "Late-cancellation fee retained by CareMatch",
+      memo: "Late-cancellation fee retained by CompanionCare",
     });
   }
 

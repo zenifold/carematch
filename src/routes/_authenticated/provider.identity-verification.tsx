@@ -180,7 +180,7 @@ function IdvPage() {
       <div className="text-xs text-muted-foreground">
         {isManual
           ? "During early access, a member of our team reviews your ID and selfie directly instead of an automated scan."
-          : "Verification is powered by Stripe Identity. Your photos and personal details are handled by Stripe and never stored on CareMatch's servers beyond a pass/fail record."}
+          : "Verification is powered by Stripe Identity. Your photos and personal details are handled by Stripe and never stored on CompanionCare's servers beyond a pass/fail record."}
       </div>
     </div>
   );

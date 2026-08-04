@@ -64,7 +64,7 @@ function GrowPage() {
         <p className="text-xs uppercase tracking-widest text-muted-foreground">Provider portal</p>
         <h1 className="font-serif text-2xl lg:text-3xl">Grow your income</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Certifications unlock higher-paying jobs. Apply through CareMatch and we may help cover
+          Certifications unlock higher-paying jobs. Apply through CompanionCare and we may help cover
           the cost.
         </p>
       </header>
@@ -140,10 +140,10 @@ function GrowPage() {
             </div>
             <div className="mt-3 flex items-center justify-between">
               <p className="text-[11px] text-muted-foreground">
-                CareMatch may earn a referral fee. This doesn't change what you pay.
+                CompanionCare may earn a referral fee. This doesn't change what you pay.
               </p>
               <Button size="sm" onClick={() => openReferral(prog.id)}>
-                Apply through CareMatch
+                Apply through CompanionCare
               </Button>
             </div>
           </li>

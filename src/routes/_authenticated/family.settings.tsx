@@ -132,7 +132,7 @@ function FamilySettings() {
             <EmptyState
               icon={<UserPlus className="size-6" />}
               title="No linked seniors yet"
-              description="Ask your loved one to generate an invite code from their CareMatch account, then redeem it here."
+              description="Ask your loved one to generate an invite code from their CompanionCare account, then redeem it here."
               action={
                 <Link
                   to="/family/join"
@@ -226,7 +226,7 @@ function FamilySettings() {
       {/* Notifications */}
       <section className="surface-card p-5 lg:p-6">
         <h2 className="font-serif text-2xl">Notifications</h2>
-        <p className="text-sm text-muted-foreground">How CareMatch reaches you.</p>
+        <p className="text-sm text-muted-foreground">How CompanionCare reaches you.</p>
         <ul className="mt-4 space-y-2">
           {(
             [

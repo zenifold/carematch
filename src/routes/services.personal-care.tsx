@@ -3,7 +3,7 @@ import { marketingHead } from "@/components/marketing/PageShell";
 import { ServiceDetail, serviceJsonLd } from "@/components/marketing/ServiceDetail";
 
 const faqs = [
-  { q: "Are CareMatch personal care aides licensed?", a: "Yes. Every personal care helper on CareMatch is a CNA (Certified Nursing Assistant) or HHA (Home Health Aide) verified against their state's licensing board — with monthly re-verification." },
+  { q: "Are CompanionCare personal care aides licensed?", a: "Yes. Every personal care helper on CompanionCare is a CNA (Certified Nursing Assistant) or HHA (Home Health Aide) verified against their state's licensing board — with monthly re-verification." },
   { q: "Can personal care be billed to insurance?", a: "Some personal care hours may be covered under long-term care insurance or Medicaid waivers depending on your state. Our concierge can walk you through what's eligible in your area." },
   { q: "What tasks are outside the scope of personal care?", a: "Skilled nursing (IVs, wound care, injections) is provided by our licensed clinical partners under our Skilled Care service — not by CNAs/HHAs. Non-medical companionship or housekeeping is a separate service." },
 ];
@@ -32,7 +32,7 @@ export const Route = createFileRoute("/services/personal-care")({
         <>
           <p>
             Personal care is the hands-on help that keeps older adults safe and comfortable
-            at home. CareMatch personal care aides are Certified Nursing Assistants (CNAs)
+            at home. CompanionCare personal care aides are Certified Nursing Assistants (CNAs)
             or Home Health Aides (HHAs) verified against their state's licensing board
             before their first visit — and re-verified every 30 days.
           </p>

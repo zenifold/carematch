@@ -301,7 +301,7 @@ export const Route = createFileRoute("/resources/")({
       jsonLd: {
         "@context": "https://schema.org",
         "@type": "Blog",
-        name: "CareMatch Resources",
+        name: "CompanionCare Resources",
         url: `${SITE_URL}/resources`,
         blogPost: posts.map((p) => ({
           "@type": "BlogPosting",

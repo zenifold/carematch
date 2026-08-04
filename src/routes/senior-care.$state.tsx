@@ -78,7 +78,7 @@ export const Route = createFileRoute("/senior-care/$state")({
     if (!loaderData) {
       return {
         meta: [
-          { title: "State not found — CareMatch" },
+          { title: "State not found — CompanionCare" },
           { name: "robots", content: "noindex" },
         ],
       };
@@ -86,7 +86,7 @@ export const Route = createFileRoute("/senior-care/$state")({
     const s = loaderData;
     return marketingHead({
       path: `/senior-care/${params.state}`,
-      title: `Senior Care in ${s.name} — Rates, Rules & Verified Helpers | CareMatch`,
+      title: `Senior Care in ${s.name} — Rates, Rules & Verified Helpers | CompanionCare`,
       description: `In-home senior care across ${s.name}. Real local hourly rates for companionship, personal care, and skilled nursing. ${s.license}`,
     });
   },
@@ -211,7 +211,7 @@ function StatePage() {
               <h2 className="font-serif text-2xl tracking-tight sm:text-3xl">Licensing in {s.name}</h2>
               <p className="mt-4 text-base text-muted-foreground">{s.license}</p>
               <p className="mt-3 text-sm text-muted-foreground">
-                CareMatch verifies applicable state credentials for every helper who lists personal care or nursing services in {s.name}.
+                CompanionCare verifies applicable state credentials for every helper who lists personal care or nursing services in {s.name}.
               </p>
             </div>
             <div className="surface-card p-6 md:p-8">
@@ -244,7 +244,7 @@ function StatePage() {
 
       <section className="border-t border-border bg-warm-cream">
         <div className="mx-auto max-w-7xl px-5 py-16 lg:px-10">
-          <h2 className="font-serif text-3xl tracking-tight sm:text-4xl">How CareMatch works in {s.name}</h2>
+          <h2 className="font-serif text-3xl tracking-tight sm:text-4xl">How CompanionCare works in {s.name}</h2>
           <ol className="mt-8 grid gap-4 md:grid-cols-3">
             {[
               { n: 1, t: "Tell us what's needed", b: "One question at a time. Online or by phone with a real person." },

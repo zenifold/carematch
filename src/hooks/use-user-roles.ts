@@ -14,7 +14,7 @@ export const ROLE_LABEL: Record<AppRole, string> = {
   senior: "I need care",
   family: "Family member",
   provider: "Caregiver",
-  admin: "CareMatch staff",
+  admin: "CompanionCare staff",
 };
 
 async function fetchRoles(userId: string | null): Promise<AppRole[]> {
