@@ -308,30 +308,6 @@ function Hero() {
                 width={1024}
                 height={768}
               />
-
-              {/* floating verification card */}
-              <div className="surface-card absolute -bottom-6 left-4 right-4 max-w-sm p-5 animate-fade-in lg:-left-8 lg:right-auto">
-                <div className="flex items-center gap-3">
-                  <span className="grid size-12 place-items-center rounded-full bg-primary/10 text-primary">
-                    <BadgeCheck className="size-6" />
-                  </span>
-                  <div>
-                    <p className="text-base font-semibold">Verified on arrival</p>
-                    <p className="text-sm text-muted-foreground">Selfie match + GPS check-in at every visit</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* floating trust badge */}
-              <div className="surface-card absolute -top-4 right-4 hidden items-center gap-3 p-4 md:flex lg:-right-6">
-                <span className="grid size-10 place-items-center rounded-full bg-accent/15 text-accent">
-                  <ShieldCheck className="size-5" />
-                </span>
-                <div className="text-sm">
-                  <p className="font-semibold">5-stage verification</p>
-                  <p className="text-muted-foreground">Every helper. Refreshed monthly.</p>
-                </div>
-              </div>
             </div>
           </div>
         </div>
