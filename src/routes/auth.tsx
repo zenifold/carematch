@@ -26,12 +26,15 @@ import authProvider from "@/assets/auth-provider.jpg";
 import { requiredDocumentsFor, LEGAL_DOCUMENTS, type LegalDocumentKind } from "@/lib/legal";
 import { acceptLegalDocuments } from "@/lib/legal.functions";
 import { finishOAuthSignup } from "@/lib/oauth-signup.functions";
+import { safeRedirect } from "@/lib/safe-redirect";
 
 type Role = "senior" | "family" | "provider";
 
 const search = z.object({
   mode: z.enum(["signin", "signup"]).optional(),
   role: z.enum(["senior", "family", "provider"]).optional(),
+  // Where the auth guard wanted to send them before it bounced them here.
+  redirect: z.string().optional(),
 });
 
 export const Route = createFileRoute("/auth")({
@@ -114,8 +117,9 @@ const passwordSchema = z.string().min(8, "Use at least 8 characters").max(72);
 const nameSchema = z.string().trim().min(2, "Please tell us your name").max(80);
 
 function AuthPage() {
-  const { mode: modeParam, role: roleParam } = Route.useSearch();
+  const { mode: modeParam, role: roleParam, redirect: redirectParam } = Route.useSearch();
   const navigate = useNavigate();
+  const landing = safeRedirect(redirectParam);
   const [mode, setMode] = useState<"signin" | "signup">(modeParam ?? "signin");
   const [step, setStep] = useState(0); // signup steps: 0 role, 1 basics, 2 role-specific, 3 credentials
   const [busy, setBusy] = useState(false);
@@ -164,9 +168,9 @@ function AuthPage() {
           console.error("Failed to reconcile OAuth signup", err);
         }
       }
-      navigate({ to: "/dashboard", replace: true });
+      navigate({ to: landing, replace: true });
     });
-  }, [navigate, roleParam]);
+  }, [navigate, roleParam, landing]);
 
   // Required documents differ by role (providers additionally need the
   // Independent Contractor Agreement) — re-require acceptance if role changes.
@@ -272,7 +276,7 @@ function AuthPage() {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success("Welcome back");
-        navigate({ to: "/dashboard", replace: true });
+        navigate({ to: landing, replace: true });
       } catch (err) {
         toast.error(err instanceof Error ? err.message : "Something went wrong");
       } finally {
@@ -325,7 +329,7 @@ function AuthPage() {
           console.error("Failed to record legal document acceptance", consentErr);
         }
         toast.success("Welcome to CompanionCare");
-        navigate({ to: "/dashboard", replace: true });
+        navigate({ to: landing, replace: true });
       } else {
         toast.success("Check your email to confirm your account");
       }
