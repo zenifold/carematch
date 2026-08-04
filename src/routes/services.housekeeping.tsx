@@ -14,13 +14,12 @@ export const Route = createFileRoute("/services/housekeeping")({
       path: "/services/housekeeping",
       title: "Housekeeping for Seniors — Trusted, verified home helpers",
       description:
-        "Verified in-home housekeeping for older adults: cleaning, laundry, meal prep. Same helper every week, transparent hourly rates from $25/hr, no long contracts.",
+        "Verified in-home housekeeping for older adults: cleaning, laundry, meal prep. Same helper every week, no long contracts.",
       jsonLd: serviceJsonLd({
         name: "Housekeeping",
         path: "/services/housekeeping",
         description:
           "Trusted in-home housekeeping for older adults: cleaning, laundry, and meal prep, delivered by verified helpers.",
-        price: "18",
         faqs,
       }),
     }),
@@ -52,7 +51,6 @@ export const Route = createFileRoute("/services/housekeeping")({
         "Family caregivers who need one thing off the plate",
         "Anyone who wants a consistent, verified helper",
       ]}
-      priceRange="$25–$45 / hour"
       verificationTier="Identity + background check + monthly re-checks + live check-in"
       faqs={faqs}
     />

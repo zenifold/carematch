@@ -96,42 +96,36 @@ function CareTypeTiles() {
       icon: Users,
       title: "Companionship",
       blurb: "Visits, walks, hobbies, appointment company.",
-      rate: "$20–$35/hr",
     },
     {
       to: "/services/personal-care" as const,
       icon: HandHeart,
       title: "Personal Care",
       blurb: "Bathing, dressing, mobility, meds reminders.",
-      rate: "$28–$50/hr",
     },
     {
       to: "/services/housekeeping" as const,
       icon: Home,
       title: "Household Help",
       blurb: "Cleaning, laundry, meal prep, tidy-ups.",
-      rate: "$25–$45/hr",
     },
     {
       to: "/resources/dementia-care-tips" as const,
       icon: Heart,
       title: "Dementia Care",
       blurb: "Trained helpers for memory-loss support.",
-      rate: "$30–$55/hr",
     },
     {
       to: "/services/respite-care" as const,
       icon: Repeat,
       title: "Respite Care",
       blurb: "Short breaks for family caregivers.",
-      rate: "$25–$45/hr",
     },
     {
       to: "/services/healthcare" as const,
       icon: Stethoscope,
       title: "Skilled Care",
       blurb: "RN / LPN visits through licensed partners.",
-      rate: "$45–$80/hr",
     },
   ];
   return (
@@ -144,7 +138,7 @@ function CareTypeTiles() {
           Start with the care type that fits today.
         </h2>
         <p className="mt-4 text-xl text-muted-foreground">
-          Every tile shows typical hourly rates and links to a plain-language guide — no signup needed to look.
+          Each tile links to a plain-language guide — no signup needed to look.
         </p>
       </div>
 
@@ -159,10 +153,7 @@ function CareTypeTiles() {
               <t.icon className="size-7" />
             </span>
             <div className="min-w-0 flex-1">
-              <div className="flex items-baseline justify-between gap-2">
-                <h3 className="text-xl font-semibold">{t.title}</h3>
-                <span className="shrink-0 text-sm font-semibold text-primary">{t.rate}</span>
-              </div>
+              <h3 className="text-xl font-semibold">{t.title}</h3>
               <p className="mt-1 text-base text-muted-foreground">{t.blurb}</p>
               <p className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-primary">
                 Learn more <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
@@ -928,7 +919,6 @@ function ServiceSpectrum() {
       name: "Household Help",
       examples: "Cleaning, laundry, errands, meal prep",
       hours: "2–6 hrs / visit",
-      price: "$25–$45 / hr",
       verify: "Identity + background",
     },
     {
@@ -936,7 +926,6 @@ function ServiceSpectrum() {
       name: "Companionship",
       examples: "Conversation, activities, walks, appointments",
       hours: "2–8 hrs / visit",
-      price: "$20–$35 / hr",
       verify: "Identity + background + references",
     },
     {
@@ -944,7 +933,6 @@ function ServiceSpectrum() {
       name: "Personal Care",
       examples: "Bathing, dressing, medication reminders, mobility",
       hours: "1–8 hrs / visit",
-      price: "$28–$50 / hr",
       verify: "All above + CNA / HHA license",
     },
     {
@@ -952,7 +940,6 @@ function ServiceSpectrum() {
       name: "Skilled Care",
       examples: "Nursing, therapy, wound care (via licensed partners)",
       hours: "Scheduled visits",
-      price: "$45–$80 / hr · insurance-eligible",
       verify: "All above + clinical credentials + insurance",
     },
   ];
@@ -970,9 +957,6 @@ function ServiceSpectrum() {
             Start with what you need today. Grow into more when the time comes —
             the same trusted helpers, the same account.
           </p>
-          <p className="mt-3 text-sm text-muted-foreground">
-            Rates set by each provider. CompanionCare adds a flat 15–18% service fee — shown as a single total before you book.
-          </p>
         </div>
 
         <div className="mt-10 grid gap-5 md:grid-cols-2">
@@ -988,14 +972,10 @@ function ServiceSpectrum() {
                 <h3 className="text-2xl font-semibold">{t.name}</h3>
               </div>
               <p className="mt-4 text-lg text-muted-foreground">{t.examples}</p>
-              <dl className="mt-5 grid grid-cols-3 gap-3 text-sm">
+              <dl className="mt-5 grid grid-cols-2 gap-3 text-sm">
                 <div>
                   <dt className="text-muted-foreground">Typical hours</dt>
                   <dd className="mt-1 font-semibold">{t.hours}</dd>
-                </div>
-                <div>
-                  <dt className="text-muted-foreground">Price range</dt>
-                  <dd className="mt-1 font-semibold">{t.price}</dd>
                 </div>
                 <div>
                   <dt className="text-muted-foreground">Verification</dt>

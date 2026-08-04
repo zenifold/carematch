@@ -14,13 +14,12 @@ export const Route = createFileRoute("/services/personal-care")({
       path: "/services/personal-care",
       title: "Personal Care — CNA/HHA verified in-home caregivers",
       description:
-        "Personal care aides for bathing, dressing, mobility, and medication reminders. Licensed CNAs and HHAs, verified monthly. Rates from $28/hr, insurance-eligible where covered.",
+        "Personal care aides for bathing, dressing, mobility, and medication reminders. Licensed CNAs and HHAs, verified monthly. Insurance-eligible where covered.",
       jsonLd: serviceJsonLd({
         name: "Personal care",
         path: "/services/personal-care",
         description:
           "Licensed CNA and HHA personal care aides for bathing, dressing, mobility, and medication reminders.",
-        price: "24",
         faqs,
       }),
     }),
@@ -56,7 +55,6 @@ export const Route = createFileRoute("/services/personal-care")({
         "Adults with limited mobility or fall risk",
         "Families needing dementia-aware personal care",
       ]}
-      priceRange="$28–$50 / hour"
       verificationTier="Identity + background check + CNA/HHA license + monthly re-checks + live check-in"
       faqs={faqs}
     />

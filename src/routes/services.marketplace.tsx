@@ -26,15 +26,15 @@ import {
 import { PageShell, PageHero, CTASection, marketingHead, SITE_URL, PHONE, PHONE_HREF } from "@/components/marketing/PageShell";
 
 const examples = [
-  { icon: ShoppingCart, name: "Grocery & errands", rate: "$22–$32/hr", blurb: "Weekly shopping, curbside pickup, groceries unpacked and put away — even the heavy stuff." },
-  { icon: Car, name: "Rides & appointments", rate: "$25–$35/hr", blurb: "A friendly driver to the doctor, pharmacy, salon, or bank — and a waiting hand at the curb." },
-  { icon: Home, name: "House cleaning & laundry", rate: "$28–$40/hr", blurb: "Weekly tidying, seasonal deep cleans, fresh linens, and floors that feel like home again." },
-  { icon: MessageCircle, name: "Friendly visits", rate: "$20–$28/hr", blurb: "Conversation over coffee, a walk around the block, cards on the porch — company that shows up." },
-  { icon: Utensils, name: "Meal prep", rate: "$25–$38/hr", blurb: "Shop the list, cook the favorites, portion for the week, and leave the kitchen better than they found it." },
-  { icon: Pill, name: "Medication reminders", rate: "$22–$30/hr", blurb: "A gentle, non-clinical prompt at the right time — plus a quick text home to say all's well." },
-  { icon: Wrench, name: "Handyman & yard", rate: "$30–$45/hr", blurb: "Lightbulbs, smoke alarms, sticky drawers, and lawn edges — small fixes that keep the home safe." },
-  { icon: Smartphone, name: "Tech help", rate: "$25–$40/hr", blurb: "Setting up FaceTime with the grandkids, Wi-Fi that finally works, and phones that stop misbehaving." },
-  { icon: PawPrint, name: "Pet care", rate: "$20–$30/hr", blurb: "Walks, feedings, vet trips, and grooming — because the dog is family, too." },
+  { icon: ShoppingCart, name: "Grocery & errands", blurb: "Weekly shopping, curbside pickup, groceries unpacked and put away — even the heavy stuff." },
+  { icon: Car, name: "Rides & appointments", blurb: "A friendly driver to the doctor, pharmacy, salon, or bank — and a waiting hand at the curb." },
+  { icon: Home, name: "House cleaning & laundry", blurb: "Weekly tidying, seasonal deep cleans, fresh linens, and floors that feel like home again." },
+  { icon: MessageCircle, name: "Friendly visits", blurb: "Conversation over coffee, a walk around the block, cards on the porch — company that shows up." },
+  { icon: Utensils, name: "Meal prep", blurb: "Shop the list, cook the favorites, portion for the week, and leave the kitchen better than they found it." },
+  { icon: Pill, name: "Medication reminders", blurb: "A gentle, non-clinical prompt at the right time — plus a quick text home to say all's well." },
+  { icon: Wrench, name: "Handyman & yard", blurb: "Lightbulbs, smoke alarms, sticky drawers, and lawn edges — small fixes that keep the home safe." },
+  { icon: Smartphone, name: "Tech help", blurb: "Setting up FaceTime with the grandkids, Wi-Fi that finally works, and phones that stop misbehaving." },
+  { icon: PawPrint, name: "Pet care", blurb: "Walks, feedings, vet trips, and grooming — because the dog is family, too." },
 ];
 
 const benefits = [
@@ -66,7 +66,7 @@ const compare = [
     name: "Marketplace",
     to: "/services/marketplace",
     tag: "Everyday help",
-    price: "$20–$45/hr",
+    price: "Set by each helper",
     scope: "Errands, cleaning, meals, rides, company, tech help",
     verify: "5-stage verification, monthly re-checks",
     current: true,
@@ -244,32 +244,24 @@ function MarketplacePage() {
             <div>
               <h2 className="font-serif text-3xl sm:text-4xl">What a CompanionCare helper can do</h2>
               <p className="mt-3 max-w-3xl text-lg text-muted-foreground">
-                Every helper picks the tasks they're best at. Rates are set by the helper and shown before you book — no surprise fees.
+                Every helper picks the tasks they're best at and sets their own rate, shown before you book — no surprise fees.
               </p>
             </div>
             <Link to="/pricing" className="inline-flex items-center gap-1 text-base font-semibold text-primary hover:underline">
-              See full pricing <ArrowRight className="size-4" />
+              See typical rates <ArrowRight className="size-4" />
             </Link>
           </div>
           <ul className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {examples.map((t) => (
               <li key={t.name} className="surface-card p-6">
-                <div className="flex items-start justify-between gap-3">
-                  <span className="grid size-12 place-items-center rounded-2xl bg-primary/10 text-primary">
-                    <t.icon className="size-6" aria-hidden />
-                  </span>
-                  <span className="rounded-full bg-secondary px-3 py-1 text-sm font-semibold text-foreground">
-                    {t.rate}
-                  </span>
-                </div>
+                <span className="grid size-12 place-items-center rounded-2xl bg-primary/10 text-primary">
+                  <t.icon className="size-6" aria-hidden />
+                </span>
                 <h3 className="mt-4 text-xl font-semibold">{t.name}</h3>
                 <p className="mt-2 text-base text-muted-foreground">{t.blurb}</p>
               </li>
             ))}
           </ul>
-          <p className="mt-6 text-sm text-muted-foreground">
-            Ranges are typical helper-set rates. Your total is always shown before you confirm a booking.
-          </p>
         </div>
       </section>
 
@@ -348,7 +340,11 @@ function MarketplacePage() {
           ))}
         </div>
         <p className="mt-4 text-sm text-muted-foreground">
-          Total: 13 hours/week · Typical range with a marketplace helper: about $290–$520/week depending on tasks and location.
+          Total: 13 hours/week. Cost depends on the helper's rate and your location —{" "}
+          <Link to="/pricing" className="font-semibold text-primary hover:underline">
+            see typical ranges on our pricing page
+          </Link>
+          .
         </p>
       </section>
 

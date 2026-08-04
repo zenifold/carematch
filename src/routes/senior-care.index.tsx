@@ -25,12 +25,12 @@ import {
 import heroImage from "@/assets/caregiver-plants.jpg";
 
 const CARE_TYPES = [
-  { to: "/services/companionship" as const, icon: Users, title: "Companionship", blurb: "Visits, walks, hobbies, meals, appointments.", rate: "$20–$35/hr", who: "Someone who wants a friendly presence a few times a week." },
-  { to: "/services/personal-care" as const, icon: HandHeart, title: "Personal Care", blurb: "Bathing, dressing, mobility, meds reminders.", rate: "$28–$50/hr", who: "Help with daily routines and hands-on care." },
-  { to: "/services/housekeeping" as const, icon: Home, title: "Household Help", blurb: "Cleaning, laundry, meal prep, errands.", rate: "$25–$45/hr", who: "The home stays cared for so the day stays easy." },
-  { to: "/resources/dementia-care-tips" as const, icon: Heart, title: "Dementia Care", blurb: "Trained helpers for memory-loss support.", rate: "$30–$55/hr", who: "Consistency and calm for someone with memory changes." },
-  { to: "/services/respite-care" as const, icon: Repeat, title: "Respite Care", blurb: "Short breaks for the family caregiver.", rate: "$25–$45/hr", who: "So the person doing it all can rest and reset." },
-  { to: "/services/healthcare" as const, icon: Stethoscope, title: "Skilled Nursing", blurb: "RN / LPN visits through licensed partners.", rate: "$45–$80/hr", who: "Clinical care after a hospital stay or for ongoing conditions." },
+  { to: "/services/companionship" as const, icon: Users, title: "Companionship", blurb: "Visits, walks, hobbies, meals, appointments.", who: "Someone who wants a friendly presence a few times a week." },
+  { to: "/services/personal-care" as const, icon: HandHeart, title: "Personal Care", blurb: "Bathing, dressing, mobility, meds reminders.", who: "Help with daily routines and hands-on care." },
+  { to: "/services/housekeeping" as const, icon: Home, title: "Household Help", blurb: "Cleaning, laundry, meal prep, errands.", who: "The home stays cared for so the day stays easy." },
+  { to: "/resources/dementia-care-tips" as const, icon: Heart, title: "Dementia Care", blurb: "Trained helpers for memory-loss support.", who: "Consistency and calm for someone with memory changes." },
+  { to: "/services/respite-care" as const, icon: Repeat, title: "Respite Care", blurb: "Short breaks for the family caregiver.", who: "So the person doing it all can rest and reset." },
+  { to: "/services/healthcare" as const, icon: Stethoscope, title: "Skilled Nursing", blurb: "RN / LPN visits through licensed partners.", who: "Clinical care after a hospital stay or for ongoing conditions." },
 ];
 
 const STATES = [
@@ -138,8 +138,7 @@ function CareTypes() {
             </div>
             <p className="mt-4 text-base text-muted-foreground">{t.blurb}</p>
             <p className="mt-3 text-sm italic text-foreground/80">Best for: {t.who}</p>
-            <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
-              <span className="text-sm font-semibold text-primary">{t.rate}</span>
+            <div className="mt-4 border-t border-border pt-4">
               <span className="inline-flex items-center gap-1 text-sm font-semibold text-primary">
                 Learn more <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
               </span>

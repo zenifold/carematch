@@ -14,13 +14,12 @@ export const Route = createFileRoute("/services/errands")({
       path: "/services/errands",
       title: "Errands & Transport for Seniors — Verified drivers you know",
       description:
-        "Grocery runs, pharmacy pickups, and rides to doctor's appointments with a verified helper who knows your parent. Insured drivers, live check-ins, from $20/hr.",
+        "Grocery runs, pharmacy pickups, and rides to doctor's appointments with a verified helper who knows your parent. Insured drivers, live check-ins, rates set by each caregiver.",
       jsonLd: serviceJsonLd({
         name: "Errands and transport",
         path: "/services/errands",
         description:
           "Errands, grocery runs, pharmacy pickups, and rides to appointments — with a familiar, verified helper.",
-        price: "20",
         faqs,
       }),
     }),
@@ -52,7 +51,6 @@ export const Route = createFileRoute("/services/errands")({
         "Family who live too far to run errands themselves",
         "Anyone tired of asking neighbors for rides",
       ]}
-      priceRange="$20–$35 / hour + mileage where applicable"
       verificationTier="Identity + background check + valid driver's license + insurance + monthly re-checks"
       faqs={faqs}
     />

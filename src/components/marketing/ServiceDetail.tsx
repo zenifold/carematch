@@ -10,7 +10,6 @@ export type ServiceDetailProps = {
   intro: ReactNode;
   includes: string[];
   whoItsFor: string[];
-  priceRange: string;
   verificationTier: string;
   faqs: { q: string; a: string }[];
 };
@@ -65,21 +64,13 @@ export function ServiceDetail(p: ServiceDetailProps) {
             </div>
           </div>
 
-          <div className="mt-8 grid gap-4 md:grid-cols-2">
-            <div className="surface-card p-6">
+          <div className="mt-8 surface-card flex items-start gap-3 p-6">
+            <ShieldCheck className="mt-1 size-6 text-primary" aria-hidden />
+            <div>
               <p className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                Typical rate
+                Verification
               </p>
-              <p className="mt-2 font-serif text-3xl text-primary">{p.priceRange}</p>
-            </div>
-            <div className="surface-card flex items-start gap-3 p-6">
-              <ShieldCheck className="mt-1 size-6 text-primary" aria-hidden />
-              <div>
-                <p className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                  Verification
-                </p>
-                <p className="mt-1 text-base">{p.verificationTier}</p>
-              </div>
+              <p className="mt-1 text-base">{p.verificationTier}</p>
             </div>
           </div>
         </div>
@@ -106,13 +97,11 @@ export function serviceJsonLd({
   name,
   path,
   description,
-  price,
   faqs,
 }: {
   name: string;
   path: string;
   description: string;
-  price: string;
   faqs: { q: string; a: string }[];
 }) {
   return [
@@ -125,7 +114,6 @@ export function serviceJsonLd({
       areaServed: { "@type": "Country", name: "United States" },
       description,
       url: `https://getcompanioncare.com${path}`,
-      offers: { "@type": "Offer", price, priceCurrency: "USD" },
     },
     {
       "@context": "https://schema.org",

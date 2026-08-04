@@ -14,13 +14,12 @@ export const Route = createFileRoute("/services/companionship")({
       path: "/services/companionship",
       title: "Companionship Care — Verified helpers for older adults",
       description:
-        "Verified companionship care for seniors: conversation, activities, walks, and appointment company. Consistent matches, 5-stage verification, transparent pricing from $20/hr.",
+        "Verified companionship care for seniors: conversation, activities, walks, and appointment company. Consistent matches, 5-stage verification, rates set by each caregiver.",
       jsonLd: serviceJsonLd({
         name: "Companionship care",
         path: "/services/companionship",
         description:
           "Verified companionship care for older adults — conversation, activities, walks, and appointment company.",
-        price: "20",
         faqs,
       }),
     }),
@@ -58,7 +57,6 @@ export const Route = createFileRoute("/services/companionship")({
         "Families who live far away",
         "Anyone who wants a familiar face on a regular schedule",
       ]}
-      priceRange="$20–$35 / hour"
       verificationTier="Identity + background check + references + monthly re-checks"
       faqs={faqs}
     />

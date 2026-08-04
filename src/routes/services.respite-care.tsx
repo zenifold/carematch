@@ -14,13 +14,12 @@ export const Route = createFileRoute("/services/respite-care")({
       path: "/services/respite-care",
       title: "Respite Care — Short-term relief for family caregivers",
       description:
-        "Respite care for family caregivers: 4-hour blocks, overnights, or weekend coverage with a verified helper. Trusted, licensed, and insured. From $28/hr.",
+        "Respite care for family caregivers: 4-hour blocks, overnights, or weekend coverage with a verified helper. Trusted, licensed, and insured.",
       jsonLd: serviceJsonLd({
         name: "Respite care",
         path: "/services/respite-care",
         description:
           "Short-term in-home respite care for family caregivers — hourly, overnight, or multi-day coverage by verified helpers.",
-        price: "22",
         faqs,
       }),
     }),
@@ -51,7 +50,6 @@ export const Route = createFileRoute("/services/respite-care")({
         "Adult children juggling work and care",
         "Anyone traveling out of town with a loved one at home",
       ]}
-      priceRange="$28–$50 / hour (higher for skilled overnight)"
       verificationTier="Identity + background + credentials (where applicable) + monthly re-checks"
       faqs={faqs}
     />
