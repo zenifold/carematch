@@ -37,7 +37,7 @@ Living list of product/engineering backlog items. New entries get appended under
 ### Decision needed: who pays for the background check
 - **Source:** Care Companion team meeting, 2026-07-28
 - **Why:** Rover charges the *provider* $49 upfront for their background check
-  (deducted from their account, not billed to the family). CareMatch doesn't
+  (deducted from their account, not billed to the family). CompanionCare doesn't
   currently charge providers anything for verification.
 - **What:** Decide whether to pass the real background-check vendor cost to
   providers (Rover's model) or absorb it, before activating a real vendor
@@ -68,10 +68,6 @@ as something to build, and each already exists:
 
 ## Tracked — pending external decisions, not yet actionable
 
-- **Company name / domain** — leading candidate discussed: "Care Companion"
-  (reversing "Companion Care"). Not final. Will need a rebrand pass through the
-  codebase (branding strings, metadata, `SITE_URL` constant, etc.) once decided —
-  not urgent before then.
 - **Open legal question**: whether recurring/standing weekly scheduling *through
   the marketplace* risks reclassifying the caregiver relationship (1099 vs.
   household employee) under Virginia law. Flagged for an attorney, not something
@@ -101,3 +97,10 @@ bumped from 5/6 to 6/7. Commit `d68ea67`.
 A card on the provider Earnings page recommending general liability insurance,
 routed to the existing support-ticket flow rather than an external link since
 no partner is chosen yet. Commit `e845fc5`.
+
+### Company name / domain — decided and rebranded, 2026-08-05
+Name is "CompanionCare"; domain getcompanioncare.com purchased (DNS/hosting not
+yet configured). Full rebrand pass completed: 375 occurrences across 76 files
+(page copy, nav/footer, meta/JSON-LD, legal documents, email templates, vanity
+phone number), plus the live admin seed account's display name and this
+backlog file itself. Commits `b534868` and follow-up.

@@ -81,7 +81,7 @@ All `.middleware([requireSupabaseAuth])`, admin ones do a role check inside the 
 - Inserts into `background_check_events`, updates `provider_background_checks` via `normalizeEvent`, lets the DB trigger flip `provider_credentials` when appropriate.
 - Returns 200 fast; heavy work stays sync but bounded.
 
-URL to configure in Certn: `https://carematcher.lovable.app/api/public/hooks/background-check` (or dev host).
+URL to configure in Certn: `https://getcompanioncare.com/api/public/hooks/background-check` (or dev host).
 
 ## 6. UI
 
@@ -151,5 +151,5 @@ Approve and I'll request the Certn secrets, then implement.
 
 1. Sign up for Certn (or Yardstik/GoodHire — same adapter shape).
 2. Add `CERTN_API_KEY` and `CERTN_WEBHOOK_SECRET` in Settings → Secrets.
-3. Point the vendor's webhook at `https://carematcher.lovable.app/api/public/hooks/background-check`.
+3. Point the vendor's webhook at `https://getcompanioncare.com/api/public/hooks/background-check`.
 4. `BACKGROUND_CHECK_VENDOR` defaults to `certn`; set it if switching.

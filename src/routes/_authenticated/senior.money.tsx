@@ -45,7 +45,7 @@ function downloadReceipt(r: VisitRow, amount: number) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `carematch-receipt-${r.id.slice(0, 8)}.txt`;
+  a.download = `companioncare-receipt-${r.id.slice(0, 8)}.txt`;
   a.click();
   URL.revokeObjectURL(url);
 }
