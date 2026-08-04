@@ -1627,6 +1627,7 @@ export type Database = {
           notify_before_visit: boolean
           reduce_motion: boolean
           text_size: Database["public"]["Enums"]["text_size"]
+          timezone: string | null
           updated_at: string
           user_id: string
         }
@@ -1641,6 +1642,7 @@ export type Database = {
           notify_before_visit?: boolean
           reduce_motion?: boolean
           text_size?: Database["public"]["Enums"]["text_size"]
+          timezone?: string | null
           updated_at?: string
           user_id: string
         }
@@ -1655,6 +1657,7 @@ export type Database = {
           notify_before_visit?: boolean
           reduce_motion?: boolean
           text_size?: Database["public"]["Enums"]["text_size"]
+          timezone?: string | null
           updated_at?: string
           user_id?: string
         }

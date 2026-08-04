@@ -14,6 +14,7 @@ export default defineTask({
   run: async () => {
     const { supabaseAdmin } = await import("../src/integrations/supabase/client.server");
     const { sendTemplateEmail } = await import("../src/lib/email-templates/send-email");
+    const { formatVisitTime } = await import("../src/lib/format-visit-time");
 
     const now = new Date();
     const windowEnd = new Date(now.getTime() + 2 * 60 * 60 * 1000);
@@ -35,7 +36,7 @@ export default defineTask({
     const [{ data: prefs }, { data: profiles }, users] = await Promise.all([
       supabaseAdmin
         .from("senior_preferences")
-        .select("user_id, notify_before_visit")
+        .select("user_id, notify_before_visit, timezone")
         .in("user_id", seniorIds),
       supabaseAdmin.from("profiles").select("id, full_name").in("id", seniorIds),
       // Fetching one page of listUsers and filtering client-side silently
@@ -46,6 +47,9 @@ export default defineTask({
     ]);
 
     const prefMap = new Map((prefs ?? []).map((p: any) => [p.user_id, !!p.notify_before_visit]));
+    const tzMap = new Map(
+      (prefs ?? []).map((p: any) => [p.user_id, (p.timezone as string | null) ?? null]),
+    );
     const nameMap = new Map((profiles ?? []).map((p: any) => [p.id, p.full_name as string | null]));
     const emailMap = new Map(
       users
@@ -67,11 +71,10 @@ export default defineTask({
       const email = emailMap.get(booking.senior_id);
       if (!email) continue;
 
-      const when = new Date(booking.scheduled_at).toLocaleString(undefined, {
-        weekday: "long",
-        hour: "numeric",
-        minute: "2-digit",
-      });
+      // Format in the senior's own zone. Passing `undefined` here used to mean
+      // "the runtime's zone", which on a Worker is UTC — so everyone was told
+      // the wrong time, and west-coast seniors the wrong day.
+      const when = formatVisitTime(booking.scheduled_at, tzMap.get(booking.senior_id));
 
       const result = await sendTemplateEmail("visit-reminder", email, {
         templateData: {

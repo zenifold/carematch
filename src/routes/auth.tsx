@@ -27,6 +27,7 @@ import { requiredDocumentsFor, LEGAL_DOCUMENTS, type LegalDocumentKind } from "@
 import { acceptLegalDocuments } from "@/lib/legal.functions";
 import { finishOAuthSignup } from "@/lib/oauth-signup.functions";
 import { safeRedirect } from "@/lib/safe-redirect";
+import { browserTimeZone } from "@/lib/format-visit-time";
 
 type Role = "senior" | "family" | "provider";
 
@@ -243,6 +244,10 @@ function AuthPage() {
           notify_before_visit: true,
           call_for_changes: true,
           family_can_see: familyCanSee,
+          // Captured here because the browser is the only place that knows it.
+          // Visit reminders are sent from a Worker, whose ambient zone is UTC —
+          // without this they would state the wrong time.
+          timezone: browserTimeZone(),
         },
         { onConflict: "user_id" },
       );
