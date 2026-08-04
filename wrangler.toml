@@ -2,6 +2,11 @@ name = "carematch"
 compatibility_date = "2026-07-24"
 compatibility_flags = ["nodejs_compat"]
 
+routes = [
+  { pattern = "getcompanioncare.com", custom_domain = true },
+  { pattern = "www.getcompanioncare.com", custom_domain = true },
+]
+
 # `main` and `[assets]` are intentionally omitted — Nitro's cloudflare-module
 # preset always regenerates these with paths correct relative to
 # .output/server at build time (see .output/server/wrangler.json after
