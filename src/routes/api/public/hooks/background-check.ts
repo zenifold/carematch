@@ -8,7 +8,16 @@ export const Route = createFileRoute("/api/public/hooks/background-check")({
         const { getAdapter } = await import("@/lib/background-check/adapters/index.server");
         const { getActiveVendor } = await import("@/lib/background-check/vendor");
         const vendor = getActiveVendor();
-        const adapter = getAdapter(vendor);
+        // "manual" (the default) has no adapter — getAdapter throws for it.
+        // Answer 503 like the other postback endpoints rather than letting the
+        // throw surface as a 500 HTML error page, which a vendor would retry
+        // against forever and which reads as an outage rather than "off".
+        let adapter;
+        try {
+          adapter = getAdapter(vendor);
+        } catch {
+          return new Response("Not configured", { status: 503 });
+        }
 
         const verified = adapter.verifyWebhookSignature(rawBody, request.headers);
         if (!verified) {

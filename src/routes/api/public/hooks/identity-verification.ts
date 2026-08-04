@@ -8,7 +8,16 @@ export const Route = createFileRoute("/api/public/hooks/identity-verification")(
         const { getActiveIdvVendor } = await import("@/lib/idv/vendor");
         const { getIdvAdapter } = await import("@/lib/idv/adapters/index.server");
         const vendor = getActiveIdvVendor();
-        const adapter = getIdvAdapter(vendor);
+        // "manual" (the default) has no adapter — getIdvAdapter throws for it.
+        // Answer 503 like the other postback endpoints rather than letting the
+        // throw surface as a 500 HTML error page, which a vendor would retry
+        // against forever and which reads as an outage rather than "off".
+        let adapter;
+        try {
+          adapter = getIdvAdapter(vendor);
+        } catch {
+          return new Response("Not configured", { status: 503 });
+        }
 
         if (!adapter.verifyWebhookSignature(rawBody, request.headers)) {
           return new Response("Invalid signature", { status: 401 });
