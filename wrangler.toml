@@ -7,6 +7,13 @@ routes = [
   { pattern = "www.getcompanioncare.com", custom_domain = true },
 ]
 
+# The hourly Cron Trigger (see scheduledTasks in vite.config.ts) runs
+# unattended, so without retained logs its only failure signal is a user
+# noticing a missing reminder. `wrangler tail` shows live traffic only, which is
+# no help for something that fires once an hour.
+[observability]
+enabled = true
+
 # `main` and `[assets]` are intentionally omitted — Nitro's cloudflare-module
 # preset always regenerates these with paths correct relative to
 # .output/server at build time (see .output/server/wrangler.json after
