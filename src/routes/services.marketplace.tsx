@@ -24,6 +24,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { PageShell, PageHero, CTASection, marketingHead, SITE_URL, PHONE, PHONE_HREF } from "@/components/marketing/PageShell";
+import { ServiceQuiz } from "@/components/marketing/ServiceQuiz";
 
 const examples = [
   { icon: ShoppingCart, name: "Grocery & errands", blurb: "Weekly shopping, curbside pickup, groceries unpacked and put away — even the heavy stuff." },
@@ -216,6 +217,11 @@ function MarketplacePage() {
             </div>
           ))}
         </div>
+      </section>
+
+      {/* Guided picker — most visitors land here unsure which service they want */}
+      <section className="mx-auto max-w-4xl px-5 pt-16 lg:px-10">
+        <ServiceQuiz />
       </section>
 
       {/* Benefits */}

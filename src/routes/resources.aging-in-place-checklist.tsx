@@ -1,5 +1,65 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageShell, PageHero, CTASection, marketingHead, SITE_URL } from "@/components/marketing/PageShell";
+import {
+  InteractiveChecklist,
+  type ChecklistSection,
+} from "@/components/marketing/InteractiveChecklist";
+
+const STORAGE_KEY = "companioncare:aging-in-place-checklist";
+
+// Section keys are part of the saved progress — renaming one silently drops a
+// family's ticks for that section, so treat them as stable identifiers.
+const CHECKLIST: ChecklistSection[] = [
+  {
+    key: "every-room",
+    title: "1. Every room: falls, lighting, and floor",
+    items: [
+      "Remove throw rugs or secure them with grippers.",
+      "Add night lights on the path from bed to bathroom.",
+      "Check that pathways are clear of cords and clutter.",
+      "Confirm every room has a working smoke and CO alarm.",
+    ],
+  },
+  {
+    key: "bathroom",
+    title: "2. Bathroom: the #1 fall zone",
+    items: [
+      "Install grab bars beside the toilet and inside the shower.",
+      "Add a non-slip bath mat and a shower chair if needed.",
+      "Set the water heater below 120°F to prevent scalding.",
+      "Keep a nightlight on 24/7.",
+    ],
+  },
+  {
+    key: "kitchen",
+    title: "3. Kitchen: safe cooking",
+    items: [
+      "Move everyday items to waist-height shelves.",
+      "Add an automatic stove shutoff if there's any memory concern.",
+      "Keep a fire extinguisher accessible.",
+      "Check that expired food is cleared regularly.",
+    ],
+  },
+  {
+    key: "medications",
+    title: "4. Medications",
+    items: [
+      "Use a weekly pill organizer with alarms or reminders.",
+      "Keep an updated medication list on the fridge.",
+      "Schedule a pharmacist review every 12 months.",
+    ],
+  },
+  {
+    key: "emergency",
+    title: "5. Emergency plan",
+    items: [
+      "Post emergency numbers by every phone.",
+      "Set up a medical alert pendant.",
+      'Add trusted neighbors to a "check-in call" list.',
+      "Document advance directives and where they're kept.",
+    ],
+  },
+];
 
 const title = "The Aging-in-Place Checklist Every Family Should Have";
 const description =
@@ -50,46 +110,9 @@ function ArticlePage() {
             before they become emergencies.
           </p>
 
-          <h2>1. Every room: falls, lighting, and floor</h2>
-          <ul>
-            <li>Remove throw rugs or secure them with grippers.</li>
-            <li>Add night lights on the path from bed to bathroom.</li>
-            <li>Check that pathways are clear of cords and clutter.</li>
-            <li>Confirm every room has a working smoke and CO alarm.</li>
-          </ul>
+          <InteractiveChecklist storageKey={STORAGE_KEY} sections={CHECKLIST} />
 
-          <h2>2. Bathroom: the #1 fall zone</h2>
-          <ul>
-            <li>Install grab bars beside the toilet and inside the shower.</li>
-            <li>Add a non-slip bath mat and a shower chair if needed.</li>
-            <li>Set the water heater below 120°F to prevent scalding.</li>
-            <li>Keep a nightlight on 24/7.</li>
-          </ul>
-
-          <h2>3. Kitchen: safe cooking</h2>
-          <ul>
-            <li>Move everyday items to waist-height shelves.</li>
-            <li>Add an automatic stove shutoff if there's any memory concern.</li>
-            <li>Keep a fire extinguisher accessible.</li>
-            <li>Check that expired food is cleared regularly.</li>
-          </ul>
-
-          <h2>4. Medications</h2>
-          <ul>
-            <li>Use a weekly pill organizer with alarms or reminders.</li>
-            <li>Keep an updated medication list on the fridge.</li>
-            <li>Schedule a pharmacist review every 12 months.</li>
-          </ul>
-
-          <h2>5. Emergency plan</h2>
-          <ul>
-            <li>Post emergency numbers by every phone.</li>
-            <li>Set up a medical alert pendant.</li>
-            <li>Add trusted neighbors to a "check-in call" list.</li>
-            <li>Document advance directives and where they're kept.</li>
-          </ul>
-
-          <h2>6. Regular help before it's urgent</h2>
+          <h2>Regular help before it's urgent</h2>
           <p>
             The single strongest predictor of successful aging in place is a regular,
             verified helper visiting the home. Not because your parent can't do it alone

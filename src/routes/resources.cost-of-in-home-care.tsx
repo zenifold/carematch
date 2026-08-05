@@ -9,6 +9,7 @@ import {
   RelatedPosts,
   articleHead,
 } from "@/components/marketing/ArticleLayout";
+import { CostEstimator } from "@/components/marketing/CostEstimator";
 
 const path = "/resources/cost-of-in-home-care";
 const title = "How Much Does In-Home Care Cost in 2026?";
@@ -111,24 +112,19 @@ function ArticlePage() {
 
         <h2>What does home care actually cost per month?</h2>
         <p>
-          Three real-world examples, using median 2026 marketplace rates and an 18%
-          service fee.
+          Rather than give you three made-up families, work it out for your own
+          situation. Pick the kind of help you need, set the hours, and slide the rate
+          within the band providers actually charge.
         </p>
-        <ul>
-          <li>
-            <strong>Light support (4 hrs/week)</strong>: companionship, errands,
-            check-ins — ~<strong>$472/month</strong>.
-          </li>
-          <li>
-            <strong>Moderate care (20 hrs/week)</strong>: meal prep, personal care,
-            transportation, medication reminders — ~<strong>$2,362/month</strong>.
-          </li>
-          <li>
-            <strong>Heavy care (40 hrs/week)</strong>: daily personal care and
-            supervision — ~<strong>$4,724/month</strong>. At this level, assisted
-            living usually becomes the cheaper option.
-          </li>
-        </ul>
+
+        <CostEstimator />
+
+        <p>
+          The figures come straight from the rate bands on our{" "}
+          <Link to="/pricing">pricing page</Link>, so they move if the market does. The
+          crossover point against assisted living is calculated from whatever rate you
+          set — for most families it lands somewhere around 35–45 hours a week.
+        </p>
 
         <h2>Costs by care type</h2>
         <ul>
