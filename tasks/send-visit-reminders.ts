@@ -29,7 +29,10 @@ export default defineTask({
       .lte("scheduled_at", windowEnd.toISOString())
       .is("reminder_sent_at", null);
     if (error) throw error;
-    if (!bookings || bookings.length === 0) return { result: { sent: 0, checked: 0 } };
+    if (!bookings || bookings.length === 0) {
+      console.log("[send-visit-reminders] checked=0 sent=0 (no visits in window)");
+      return { result: { sent: 0, checked: 0 } };
+    }
 
     const seniorIds = Array.from(new Set(bookings.map((b: any) => b.senior_id)));
 
@@ -106,6 +109,12 @@ export default defineTask({
       }
     }
 
+    // Nitro swallows a task's return value on a cron invocation, so without
+    // this the only trace of an hourly run is the absence of a complaint.
+    // Retained via [observability] in wrangler.toml.
+    console.log(
+      `[send-visit-reminders] checked=${bookings.length} sent=${sent} skipped=${bookings.length - sent}`,
+    );
     return { result: { sent, checked: bookings.length } };
   },
 });
