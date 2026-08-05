@@ -33,7 +33,7 @@ export default defineTask({
 
     const seniorIds = Array.from(new Set(bookings.map((b: any) => b.senior_id)));
 
-    const [{ data: prefs }, { data: profiles }, users] = await Promise.all([
+    const [{ data: prefs, error: prefsErr }, { data: profiles }, users] = await Promise.all([
       supabaseAdmin
         .from("senior_preferences")
         .select("user_id, notify_before_visit, timezone")
@@ -45,6 +45,14 @@ export default defineTask({
       // so looking each one up directly scales regardless of total users.
       Promise.all(seniorIds.map((id) => supabaseAdmin.auth.admin.getUserById(id))),
     ]);
+
+    // Fail loudly instead of proceeding on a half-loaded picture. If this
+    // query errors, `prefs` is null, every senior reads as opted-out below,
+    // and the loop stamps reminder_sent_at without sending anything — and the
+    // stamp is permanent, because the booking query filters on
+    // `reminder_sent_at is null`. Silently burning everyone's reminder is far
+    // worse than throwing and letting the next hourly run retry.
+    if (prefsErr) throw prefsErr;
 
     const prefMap = new Map((prefs ?? []).map((p: any) => [p.user_id, !!p.notify_before_visit]));
     const tzMap = new Map(
