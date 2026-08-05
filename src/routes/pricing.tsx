@@ -25,93 +25,10 @@ import {
   PHONE,
   PHONE_HREF,
 } from "@/components/marketing/PageShell";
+// Rate bands, fees, and money formatting live in one place so this page and the
+// cost article can't quote different numbers at the same visitor.
+import { TIERS, money } from "@/lib/pricing-tiers";
 
-type ServiceTier = {
-  key: string;
-  name: string;
-  providerLow: number;
-  providerHigh: number;
-  feePct: number; // platform fee percentage on senior side
-  blurb: string;
-};
-
-const TIERS: ServiceTier[] = [
-  {
-    key: "companionship",
-    name: "Companionship & check-ins",
-    providerLow: 18,
-    providerHigh: 30,
-    feePct: 18,
-    blurb: "A friendly visit — conversation, walks, activities.",
-  },
-  {
-    key: "errands",
-    name: "Errands & grocery runs",
-    providerLow: 18,
-    providerHigh: 28,
-    feePct: 18,
-    blurb: "Shopping, pharmacy pickups, post office.",
-  },
-  {
-    key: "transport",
-    name: "Rides to appointments",
-    providerLow: 20,
-    providerHigh: 32,
-    feePct: 18,
-    blurb: "Door-to-door rides. Plus IRS-standard mileage.",
-  },
-  {
-    key: "mealprep",
-    name: "Meal prep & light cooking",
-    providerLow: 20,
-    providerHigh: 32,
-    feePct: 18,
-    blurb: "A home-cooked meal, dishes done, fridge stocked.",
-  },
-  {
-    key: "cleaning",
-    name: "House cleaning & laundry",
-    providerLow: 25,
-    providerHigh: 40,
-    feePct: 18,
-    blurb: "Weekly, bi-weekly, or one-time refreshes.",
-  },
-  {
-    key: "techhelp",
-    name: "Tech help & setup",
-    providerLow: 22,
-    providerHigh: 38,
-    feePct: 18,
-    blurb: "Phone, tablet, TV, video calls with family.",
-  },
-  {
-    key: "personal",
-    name: "Personal care (CNA / HHA)",
-    providerLow: 28,
-    providerHigh: 50,
-    feePct: 18,
-    blurb: "Bathing, dressing, mobility support.",
-  },
-  {
-    key: "handyman",
-    name: "Handyman & small repairs",
-    providerLow: 45,
-    providerHigh: 90,
-    feePct: 18,
-    blurb: "Grab bars, minor fixes, installs.",
-  },
-  {
-    key: "nursing",
-    name: "Skilled nursing",
-    providerLow: 45,
-    providerHigh: 80,
-    feePct: 15,
-    blurb: "Licensed RN / LPN visits.",
-  },
-];
-
-const money = (n: number) =>
-  n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 });
 
 export const Route = createFileRoute("/pricing")({
   head: () =>
