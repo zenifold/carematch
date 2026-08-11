@@ -104,10 +104,46 @@ const RENDERERS: Record<string, (data: TemplateData) => RenderedEmail> = {
     const { html, text } = plainShell(
       firstName,
       `<p>We got your message about "<strong>${subject}</strong>" and a real person will reply within 1 business day.</p>
-       <p>If anything is urgent, call the concierge line at 1 (800) 227-3628 — a real person answers 24/7.</p>`,
-      `We got your message about "${subject}" and a real person will reply within 1 business day.\n\nIf anything is urgent, call the concierge line at 1 (800) 227-3628 — a real person answers 24/7.`,
+       <p>If this is about someone's safety, reply to this email with "urgent" in the subject and we'll move it to the front of the queue. If someone is in immediate danger, call 911.</p>`,
+      `We got your message about "${subject}" and a real person will reply within 1 business day.\n\nIf this is about someone's safety, reply to this email with "urgent" in the subject and we'll move it to the front of the queue. If someone is in immediate danger, call 911.`,
     );
     return { subject: `We got your message: ${subject}`, html, text };
+  },
+  "waitlist-confirmation": (data) => {
+    const firstName = String(data.first_name ?? "there");
+    const segmentLabel = String(data.segment_label ?? "");
+    const { html, text } = plainShell(
+      firstName,
+      `<p>Thanks for putting your name down — you're on the list${segmentLabel ? ` as a <strong>${segmentLabel}</strong>` : ""}.</p>
+       <p>We're a new marketplace and we're still building. Rather than guess, we're opening one city at a time and talking to the people on this list first. When we're ready near you, you'll hear from a real person — not an automated blast.</p>
+       <p>Questions before then? Just reply to this email — it reaches a real person.</p>`,
+      `Thanks for putting your name down — you're on the list${segmentLabel ? ` as a ${segmentLabel}` : ""}.\n\nWe're a new marketplace and we're still building. Rather than guess, we're opening one city at a time and talking to the people on this list first. When we're ready near you, you'll hear from a real person — not an automated blast.\n\nQuestions before then? Just reply to this email — it reaches a real person.`,
+    );
+    return { subject: "You're on the CompanionCare list", html, text };
+  },
+  // Internal only — plain <pre> of the submission so whoever works the list
+  // doesn't have to open Supabase to see what someone actually asked for.
+  "waitlist-internal-notification": (data) => {
+    const segmentLabel = String(data.segment_label ?? "Unknown");
+    const name = String(data.name ?? "—");
+    const email = String(data.email ?? "—");
+    const phone = String(data.phone ?? "—");
+    const location = String(data.location ?? "—");
+    const details = String(data.details ?? "{}");
+    return {
+      subject: `New ${segmentLabel} signup: ${name}`,
+      html: `<div style="font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;max-width:560px;margin:0 auto;color:#1a1a1a">
+      <p><strong>${segmentLabel}</strong> signed up from the coming-soon page.</p>
+      <table style="border-collapse:collapse;font-size:14px">
+        <tr><td style="padding:2px 12px 2px 0;color:#666">Name</td><td>${name}</td></tr>
+        <tr><td style="padding:2px 12px 2px 0;color:#666">Email</td><td>${email}</td></tr>
+        <tr><td style="padding:2px 12px 2px 0;color:#666">Phone</td><td>${phone}</td></tr>
+        <tr><td style="padding:2px 12px 2px 0;color:#666">Location</td><td>${location}</td></tr>
+      </table>
+      <pre style="background:#f6f6f4;padding:12px;border-radius:8px;font-size:12px;white-space:pre-wrap">${details}</pre>
+    </div>`,
+      text: `${segmentLabel} signed up from the coming-soon page.\n\nName: ${name}\nEmail: ${email}\nPhone: ${phone}\nLocation: ${location}\n\n${details}`,
+    };
   },
   "visit-reminder": (data) => {
     const firstName = String(data.first_name ?? "there");
@@ -117,8 +153,8 @@ const RENDERERS: Record<string, (data: TemplateData) => RenderedEmail> = {
     const { html, text } = plainShell(
       firstName,
       `<p>Just a reminder — <strong>${providerName}</strong> is scheduled for a ${serviceType} visit ${when}.</p>
-       <p>Need to change or cancel? Open the visit in your CompanionCare app, or call the concierge at 1 (800) 227-3628.</p>`,
-      `Just a reminder — ${providerName} is scheduled for a ${serviceType} visit ${when}.\n\nNeed to change or cancel? Open the visit in your CompanionCare app, or call the concierge at 1 (800) 227-3628.`,
+       <p>Need to change or cancel? Open the visit in your CompanionCare account, or just reply to this email.</p>`,
+      `Just a reminder — ${providerName} is scheduled for a ${serviceType} visit ${when}.\n\nNeed to change or cancel? Open the visit in your CompanionCare account, or just reply to this email.`,
     );
     return { subject: `Reminder: ${providerName} visits ${when}`, html, text };
   },
