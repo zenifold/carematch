@@ -9,16 +9,14 @@ import {
   Stethoscope,
   MapPin,
   ArrowRight,
-  Phone,
+  Mail,
   Wallet,
   Check,
 } from "lucide-react";
 import {
   SiteHeader,
   SiteFooter,
-  FloatingCall,
-  PHONE,
-  PHONE_HREF,
+  SUPPORT_EMAIL_HREF,
   SITE_URL,
   marketingHead,
 } from "@/components/marketing/PageShell";
@@ -164,12 +162,12 @@ function StatePage() {
             >
               Start your care plan <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
             </Link>
-            <a
-              href={PHONE_HREF}
+            <Link
+              to="/how-it-works"
               className="inline-flex items-center gap-2 rounded-full border-2 border-primary bg-card px-6 py-3 text-base font-semibold text-primary hover:bg-secondary"
             >
-              <Phone className="size-4" /> Call {PHONE}
-            </a>
+              See how it works
+            </Link>
           </div>
         </div>
       </section>
@@ -218,7 +216,7 @@ function StatePage() {
               <h2 className="font-serif text-2xl tracking-tight sm:text-3xl">Public benefits in {s.name}</h2>
               <p className="mt-4 text-base text-muted-foreground">{s.notes}</p>
               <p className="mt-3 text-sm text-muted-foreground">
-                Ask our concierge for a plain-language walkthrough of what may apply to your household.
+                Message us for a plain-language walkthrough of what may apply to your household.
               </p>
             </div>
           </div>
@@ -247,7 +245,7 @@ function StatePage() {
           <h2 className="font-serif text-3xl tracking-tight sm:text-4xl">How CompanionCare works in {s.name}</h2>
           <ol className="mt-8 grid gap-4 md:grid-cols-3">
             {[
-              { n: 1, t: "Tell us what's needed", b: "One question at a time. Online or by phone with a real person." },
+              { n: 1, t: "Tell us what's needed", b: "One question at a time, with voice input and large text on every field." },
               { n: 2, t: "See verified matches nearby", b: "Local helpers with the exact checks that apply in {s}." },
               { n: 3, t: "Book with confidence", b: "Live selfie + GPS check-in on every visit. Cancel free up to 24 hrs ahead." },
             ].map((step) => (
@@ -303,17 +301,16 @@ function StatePage() {
               Start your care plan <ArrowRight className="size-5" />
             </Link>
             <a
-              href={PHONE_HREF}
+              href={SUPPORT_EMAIL_HREF}
               className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-primary bg-card px-6 py-3 text-lg font-semibold text-primary hover:bg-secondary"
             >
-              <Phone className="size-5" /> Call {PHONE}
+              <Mail className="size-5" /> Ask us a question
             </a>
           </div>
         </div>
       </section>
 
       <SiteFooter />
-      <FloatingCall />
     </div>
   );
 }

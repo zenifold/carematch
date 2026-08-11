@@ -252,7 +252,7 @@ function SeniorVisits() {
                         <VisitCard
                           key={r.id}
                           visit={toVisitCard(r)}
-                          onCall={() => window.location.assign("tel:18002273628")}
+                          onMessage={() => navigate({ to: "/senior/messages" })}
                           onChange={() => openVisit(r.id)}
                         />
                       ))}

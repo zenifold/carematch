@@ -135,7 +135,7 @@ function SeniorMoney() {
       classes: "border-destructive/40 bg-destructive/10 text-destructive",
       summary: `You've used ${fmt(spent)} of ${fmt(
         budget,
-      )} this month. Call the concierge and we'll adjust the plan together.`,
+      )} this month. Message us and we'll adjust the plan together.`,
     },
   };
 

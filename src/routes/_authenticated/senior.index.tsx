@@ -1,7 +1,16 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Plus, Users, Star, AlertTriangle, Phone, MessageCircle, HelpCircle } from "lucide-react";
+import {
+  Plus,
+  Users,
+  Star,
+  AlertTriangle,
+  Phone,
+  LifeBuoy,
+  MessageCircle,
+  HelpCircle,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   BudgetBar,
@@ -309,7 +318,7 @@ function SeniorHome() {
             )}
             <VisitCard
               visit={toVisitCard(nextVisit)}
-              onCall={() => window.location.assign("tel:18002273628")}
+              onMessage={() => navigate({ to: "/senior/messages" })}
               onChange={() => navigate({ to: "/senior/visits/$id", params: { id: nextVisit.id } })}
             />
           </div>
@@ -389,7 +398,7 @@ function SeniorHome() {
             <div className="flex-1">
               <p className="font-serif text-lg">Need help right now?</p>
               <p className="mt-0.5 text-sm text-muted-foreground">
-                For a medical emergency, call 911. Otherwise, our concierge is here 24/7.
+                For a medical emergency, call 911. For anything else, send us a message.
               </p>
             </div>
           </div>
@@ -400,12 +409,12 @@ function SeniorHome() {
             >
               <Phone className="size-5" /> 911
             </a>
-            <a
-              href="tel:18002273628"
+            <Link
+              to="/senior/help"
               className="inline-flex min-h-14 items-center justify-center gap-2 rounded-full border border-input bg-card text-base font-semibold"
             >
-              <Phone className="size-5" /> Concierge
-            </a>
+              <LifeBuoy className="size-5" /> Get help
+            </Link>
           </div>
         </section>
       </div>

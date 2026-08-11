@@ -5,7 +5,7 @@ import { ServiceDetail, serviceJsonLd } from "@/components/marketing/ServiceDeta
 const faqs = [
   { q: "How short or long can respite visits be?", a: "As short as 3 hours or as long as multiple days. Common patterns include a weekly 4-hour block, an overnight, or a weekend while the family caregiver travels." },
   { q: "Can respite include personal care?", a: "Yes. If your loved one needs bathing, transfers, or medication support during respite hours, we'll match with a CNA/HHA at the personal care rate." },
-  { q: "Is respite care covered by insurance?", a: "Some long-term care policies and Medicaid waivers cover respite hours. Our concierge can help you check eligibility in your state." },
+  { q: "Is respite care covered by insurance?", a: "Some long-term care policies and Medicaid waivers cover respite hours. Message us and we'll help you check eligibility in your state." },
 ];
 
 export const Route = createFileRoute("/services/respite-care")({

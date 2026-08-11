@@ -1,4 +1,4 @@
-import { CheckCircle2, Clock, MapPin, Phone } from "lucide-react";
+import { CheckCircle2, Clock, MapPin, MessageCircle } from "lucide-react";
 
 export type VisitStatus = "upcoming" | "enroute" | "in-progress" | "completed" | "issue";
 
@@ -17,7 +17,8 @@ export type VisitCardData = {
 
 type Props = {
   visit: VisitCardData;
-  onCall?: () => void;
+  /** Opens the message thread with this caregiver. */
+  onMessage?: () => void;
   onChange?: () => void;
   changeLabel?: string;
   className?: string;
@@ -31,7 +32,7 @@ const STATUS_META: Record<VisitStatus, { label: string; tone: string }> = {
   issue: { label: "Needs attention", tone: "bg-destructive/10 text-destructive" },
 };
 
-export function VisitCard({ visit, onCall, onChange, changeLabel, className = "" }: Props) {
+export function VisitCard({ visit, onMessage, onChange, changeLabel, className = "" }: Props) {
   const status = STATUS_META[visit.status];
   const fmt = (n: number) =>
     n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
@@ -77,14 +78,14 @@ export function VisitCard({ visit, onCall, onChange, changeLabel, className = ""
         </div>
       </div>
 
-      {(onCall || onChange) && (
+      {(onMessage || onChange) && (
         <div className="mt-5 flex flex-wrap gap-3">
-          {onCall && (
+          {onMessage && (
             <button
-              onClick={onCall}
+              onClick={onMessage}
               className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-lg font-semibold text-primary-foreground hover:bg-primary/90"
             >
-              <Phone className="size-5" /> Call {visit.providerName.split(" ")[0]}
+              <MessageCircle className="size-5" /> Message {visit.providerName.split(" ")[0]}
             </button>
           )}
           {onChange && (

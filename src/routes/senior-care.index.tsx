@@ -9,7 +9,7 @@ import {
   Stethoscope,
   MapPin,
   ArrowRight,
-  Phone,
+  Mail,
   Wallet,
   Check,
   BadgeCheck,
@@ -17,9 +17,7 @@ import {
 import {
   SiteHeader,
   SiteFooter,
-  FloatingCall,
-  PHONE,
-  PHONE_HREF,
+  SUPPORT_EMAIL_HREF,
   marketingHead,
 } from "@/components/marketing/PageShell";
 import heroImage from "@/assets/caregiver-plants.jpg";
@@ -64,7 +62,6 @@ function SeniorCareHub() {
       <StateDirectory />
       <BottomCTA />
       <SiteFooter />
-      <FloatingCall />
     </div>
   );
 }
@@ -92,12 +89,12 @@ function Hero() {
             >
               Start your care plan <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
             </Link>
-            <a
-              href={PHONE_HREF}
+            <Link
+              to="/how-it-works"
               className="inline-flex items-center gap-2 rounded-full border-2 border-primary bg-card px-6 py-3 text-base font-semibold text-primary hover:bg-secondary"
             >
-              <Phone className="size-4" /> Call {PHONE}
-            </a>
+              See how it works
+            </Link>
           </div>
         </div>
         <div className="lg:col-span-5">
@@ -283,7 +280,7 @@ function FamilyCollaboration() {
             <div className="surface-card p-6 md:p-8">
               <h3 className="text-xl font-semibold">For seniors on their own</h3>
               <p className="mt-2 text-base text-muted-foreground">
-                No family nearby? No adult children involved? CompanionCare works perfectly as a solo tool — verified helpers, big-text mode, voice input on every field, and a 24/7 phone line for anything the app doesn't handle.
+                No family nearby? No adult children involved? CompanionCare works perfectly as a solo tool — verified helpers, big-text mode, voice input on every field, and a real person to message about anything the app doesn't handle.
               </p>
               <div className="mt-6 border-t border-border pt-6">
                 <h3 className="text-xl font-semibold">For families across the country</h3>
@@ -345,10 +342,10 @@ function BottomCTA() {
             Start your care plan <ArrowRight className="size-5 transition-transform group-hover:translate-x-1" />
           </Link>
           <a
-            href={PHONE_HREF}
+            href={SUPPORT_EMAIL_HREF}
             className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-primary bg-card px-6 py-3 text-lg font-semibold text-primary hover:bg-secondary"
           >
-            <Phone className="size-5" /> Call {PHONE}
+            <Mail className="size-5" /> Ask us a question
           </a>
         </div>
       </div>

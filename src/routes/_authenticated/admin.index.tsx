@@ -50,7 +50,7 @@ function QueuePage() {
                 {d.queue.requested} booking {d.queue.requested === 1 ? "request needs" : "requests need"} matching
               </p>
               <p className="mt-0.5 text-amber-800">
-                Concierge SLA is 15 minutes for unmatched requests. Drill in to assign a provider.
+                Support SLA is 15 minutes for unmatched requests. Drill in to assign a provider.
               </p>
               <Link to="/admin/bookings" className="mt-2 inline-flex text-xs font-semibold text-amber-900 underline">
                 Open queue →

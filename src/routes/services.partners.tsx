@@ -46,7 +46,7 @@ const scenarios = [
 const faqs = [
   {
     q: "Who employs the caregiver — CompanionCare or the agency?",
-    a: "The caregiver is an employee of the licensed home care agency, not CompanionCare. That agency holds the state license, carries the insurance, and provides clinical supervision. CompanionCare is the technology and concierge layer that makes the whole experience feel like one.",
+    a: "The caregiver is an employee of the licensed home care agency, not CompanionCare. That agency holds the state license, carries the insurance, and provides clinical supervision. CompanionCare is the technology and coordination layer that makes the whole experience feel like one.",
   },
   {
     q: "Can I keep the same aide over time?",
@@ -54,11 +54,11 @@ const faqs = [
   },
   {
     q: "How is this different from calling an agency directly?",
-    a: "You get one dashboard for all care in your home, transparent pricing before you commit, and a concierge who compares partner agencies for you. You also keep the same CompanionCare phone number and family app whether it's a Tuesday cleaning or a Sunday overnight.",
+    a: "You get one dashboard for all care in your home, transparent pricing before you commit, and a team that compares partner agencies for you. You also keep the same CompanionCare account and family app whether it's a Tuesday cleaning or a Sunday overnight.",
   },
   {
     q: "Does insurance cover any of this?",
-    a: "Personal care is generally private pay, though long-term care insurance and some Medicaid waivers cover part or all of it depending on your state. Our concierge will help you check what's eligible in your area.",
+    a: "Personal care is generally private pay, though long-term care insurance and some Medicaid waivers cover part or all of it depending on your state. Message us and we'll help you check what's eligible in your area.",
   },
   {
     q: "What if we need to change the plan?",
@@ -119,7 +119,7 @@ function PartnersPage() {
             to="/contact"
             className="inline-flex items-center justify-center rounded-full border-2 border-primary bg-card px-6 py-3 text-base font-semibold text-primary hover:bg-secondary"
           >
-            Talk to a concierge
+            Talk to our team
           </Link>
         </div>
       </PageHero>
@@ -204,7 +204,7 @@ function PartnersPage() {
                 "CNA/HHA aides, checked against the state registry",
                 "RN supervision built into every care plan",
                 "One shared family dashboard for visits and notes",
-                "24/7 phone concierge for schedule or plan changes",
+                "One place to request schedule or plan changes",
                 "Private pay, long-term care insurance, and Medicaid waivers where eligible",
               ].map((point) => (
                 <li key={point} className="flex items-start gap-3 rounded-2xl bg-card p-4 border border-border">
@@ -237,7 +237,7 @@ function PartnersPage() {
             <span className="font-semibold text-foreground">Availability varies by state.</span> Partner agency coverage
             depends on local licensing and network density.{" "}
             <Link to="/legal/state-availability" className="font-medium text-primary hover:underline">Check your state</Link>{" "}
-            or <Link to="/contact" className="font-medium text-primary hover:underline">talk to a concierge</Link> to see
+            or <Link to="/contact" className="font-medium text-primary hover:underline">talk to our team</Link> to see
             what's available in your area.
           </p>
         </div>

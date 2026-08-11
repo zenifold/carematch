@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -15,12 +15,12 @@ import {
   Sunrise,
   Sun,
   Moon,
+  MessageCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
   MatchCard,
   VoiceInput,
-  CallButton,
   PageSkeleton,
   EmptyState,
   ErrorState,
@@ -165,7 +165,7 @@ function BookFlow() {
   const bookMutation = useMutation({
     mutationFn: bookFn,
     onSuccess: () => {
-      toast.success("Request sent — a concierge will call to confirm.");
+      toast.success("Request sent — we'll write to confirm.");
       navigate({ to: "/senior/visits" });
     },
     onError: (err) =>
@@ -175,7 +175,7 @@ function BookFlow() {
   const notifyMutation = useMutation({
     mutationFn: notifyFn,
     onSuccess: () =>
-      toast.success("You're on the list — a concierge will call you within one business day."),
+      toast.success("You're on the list — we'll write within one business day."),
     onError: (err) =>
       toast.error(err instanceof Error ? err.message : "Could not save your request."),
   });
@@ -537,10 +537,17 @@ function BookFlow() {
                 }
                 description={
                   needTier > 0 && !broaden
-                    ? "That need requires an advanced caregiver tier we're still building in your area. You can broaden your search to any available caregiver, ask us to notify you when a specialist joins, or call the concierge."
-                    : "We're still onboarding caregivers in your area. Ask us to notify you the moment someone joins, or call the concierge and we'll match you personally."
+                    ? "That need requires an advanced caregiver tier we're still building in your area. You can broaden your search to any available caregiver, ask us to notify you when a specialist joins, or message us and we'll look ourselves."
+                    : "We're still onboarding caregivers in your area. Ask us to notify you the moment someone joins, or message us and we'll match you personally."
                 }
-                action={<CallButton variant="inline" label="Call concierge" />}
+                action={
+                  <Link
+                    to="/senior/help"
+                    className="inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-accent px-6 py-4 text-lg font-semibold text-accent-foreground shadow-soft hover:opacity-95"
+                  >
+                    <MessageCircle className="size-6" /> Ask us to match you
+                  </Link>
+                }
               />
               <div className="grid gap-3 sm:grid-cols-2">
                 {needTier > 0 && !broaden && (
@@ -667,7 +674,12 @@ function BookFlow() {
           </button>
 
           <div className="mt-4 text-center">
-            <CallButton variant="inline" label="Prefer to talk? Call us" />
+            <Link
+              to="/senior/help"
+              className="inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-accent px-6 py-4 text-lg font-semibold text-accent-foreground shadow-soft hover:opacity-95"
+            >
+              <MessageCircle className="size-6" /> Rather have us do it? Message us
+            </Link>
           </div>
         </section>
       )}

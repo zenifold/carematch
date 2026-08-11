@@ -122,7 +122,7 @@ const stats = [
   { value: "5", label: "Verification stages" },
   { value: "30", label: "Days between re-checks", suffix: " days" },
   { value: "100%", label: "Visits with live check-in" },
-  { value: "24/7", label: "Concierge escalation" },
+  { value: "1 day", label: "Support reply, guaranteed" },
 ];
 
 const comparison: {
@@ -137,17 +137,17 @@ const comparison: {
   { feature: "Selfie + GPS check-in at every visit", care: true, typical: false },
   { feature: "Verification date visible on every profile", care: true, typical: false },
   { feature: "Access log for every record view", care: true, typical: false },
-  { feature: "24/7 human concierge for escalations", care: true, typical: "Business hours" },
+  { feature: "Safety reports jump the support queue", care: true, typical: "Same queue as billing" },
 ];
 
 const faqs = [
   {
     q: "What happens if a helper's background check flags something after they're hired?",
-    a: "The helper is paused from booking within hours of the flag surfacing. Any families with upcoming visits are notified by the concierge team before the next booking, and we help arrange a substitute if you want one.",
+    a: "The helper is paused from booking within hours of the flag surfacing. Any families with upcoming visits are notified before the next booking, and we help arrange a substitute if you want one.",
   },
   {
     q: "Who sees my verification records?",
-    a: "You do — on your account, any time. CompanionCare staff access is limited to concierge and trust-and-safety roles, and every view is logged with a timestamp and reason. We never sell or share verification data.",
+    a: "You do — on your account, any time. CompanionCare staff access is limited to support and trust-and-safety roles, and every view is logged with a timestamp and reason. We never sell or share verification data.",
   },
   {
     q: "Can I request a specific verification level for my match?",
@@ -155,7 +155,7 @@ const faqs = [
   },
   {
     q: "What if the person who arrives isn't the person I booked?",
-    a: "The live selfie match at arrival prevents this. If a substitution ever happens without prior notice from the helper, tap 'not the right person' in the app and the visit is cancelled with no charge — the concierge handles the rest.",
+    a: "The live selfie match at arrival prevents this. If a substitution ever happens without prior notice from the helper, tap 'not the right person' in the app and the visit is cancelled with no charge — our team handles the rest.",
   },
 ];
 

@@ -156,7 +156,7 @@ function ArticlePage() {
         </ol>
 
         <p>
-          Not sure yet? A short intake with our concierge helps you triage in about
+          Not sure yet? A short intake with our team helps you triage in about
           ten minutes — no obligation.{" "}
           <Link to="/how-it-works">See how the intake works</Link>.
         </p>

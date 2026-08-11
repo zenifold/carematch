@@ -167,7 +167,7 @@ function FamilyOverview() {
     flags.push({
       tone: "warn",
       label: `${unmatched} visit${unmatched === 1 ? "" : "s"} waiting on a caregiver`,
-      detail: "We're still matching — call the concierge if you need it filled fast.",
+      detail: "We're still matching — message us if you need it filled fast.",
       to: "/family/visits",
     });
   }

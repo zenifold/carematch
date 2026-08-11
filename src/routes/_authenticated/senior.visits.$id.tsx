@@ -7,7 +7,7 @@ import {
   CalendarClock,
   CheckCircle2,
   MapPin,
-  Phone,
+  MessageCircle,
   RotateCw,
   ShieldCheck,
 } from "lucide-react";
@@ -75,7 +75,7 @@ function VisitDay() {
     onSuccess: (_res, rating) => {
       qc.invalidateQueries({ queryKey: ["visit-detail", id] });
       if (rating === "bad") {
-        toast.success("A concierge is calling you now — no forms, we handle this.");
+        toast.success("Reported — our team is on it and will write to you today.");
       } else {
         toast.success("Thanks — your feedback is saved.");
       }
@@ -165,12 +165,12 @@ function VisitDay() {
               <MapPin className="mr-2 size-6" /> Live map preview
             </div>
             <div className="mt-5 grid grid-cols-2 gap-3">
-              <a
-                href="tel:18002273628"
+              <Link
+                to="/senior/messages"
                 className="inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground"
               >
-                <Phone className="size-5" /> Call
-              </a>
+                <MessageCircle className="size-5" /> Message
+              </Link>
               <button
                 type="button"
                 onClick={() => setRescheduleOpen((v) => !v)}
@@ -284,7 +284,7 @@ function VisitDay() {
                 </div>
                 <p className="mt-4 flex items-start gap-2 rounded-2xl bg-sage-50 p-4 text-sm text-sage-700">
                   <CheckCircle2 className="mt-0.5 size-4 shrink-0" />
-                  "Not good" gets a same-day concierge call. Not a form.
+                  "Not good" gets a same-day reply from a real person on our team.
                 </p>
               </>
             )}

@@ -17,11 +17,10 @@ export const Route = createFileRoute("/about")({
         description:
           "CompanionCare matches older adults and their families with verified in-home helpers for companionship, personal care, housekeeping, and errands.",
         areaServed: { "@type": "Country", name: "United States" },
-        telephone: "+1-800-COMPANION",
         contactPoint: {
           "@type": "ContactPoint",
-          telephone: "+1-800-COMPANION",
-          contactType: "customer service",
+          email: "support@getcompanioncare.com",
+          contactType: "customer support",
           availableLanguage: ["English", "Spanish"],
         },
       },
@@ -44,7 +43,7 @@ function AboutPage() {
           <p className="mt-3 text-lg text-muted-foreground">
             To make verified, dignified in-home care accessible to every older adult who
             wants to age at home. That means transparent pricing, real verification on
-            every visit, and a phone line staffed by real people 24 hours a day.
+            every visit, and support threads answered by real people.
           </p>
 
           <h2 className="mt-12 font-serif text-3xl tracking-tight">What we believe</h2>
@@ -52,7 +51,7 @@ function AboutPage() {
             {[
               { icon: ShieldCheck, title: "Trust, shown not promised", body: "Every helper is re-checked continuously — at hire, monthly, and again at every visit." },
               { icon: Heart, title: "The older adult is in charge", body: "Family can suggest and support, but the senior always has the final say." },
-              { icon: Users, title: "A real person is always a call away", body: "Everything you can do in the app can also be done by phone with the same friendly team — day or night." },
+              { icon: Users, title: "A real person reads every message", body: "Support is a tracked thread with the same small team, not a queue of strangers — and we reply within one business day." },
               { icon: Sparkles, title: "Clear prices, honest plans", body: "You see real hourly rates and weekly totals up front. If your budget doesn't cover what you'd like, we'll say so kindly." },
             ].map((v) => (
               <li key={v.title} className="surface-card p-6">

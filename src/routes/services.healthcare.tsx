@@ -6,12 +6,12 @@ import {
   Brain,
   Building2,
   Check,
-  Phone,
+  Mail,
   MessageCircle,
   ClipboardList,
   Sparkles,
 } from "lucide-react";
-import { PageShell, PageHero, CTASection, marketingHead, PHONE, PHONE_HREF, SITE_URL } from "@/components/marketing/PageShell";
+import { PageShell, PageHero, CTASection, marketingHead, SITE_URL } from "@/components/marketing/PageShell";
 
 const services = [
   { icon: Stethoscope, name: "Skilled nursing visits", blurb: "RN and LPN visits ordered by a physician — assessments, injections, medication management, and clinical check-ins." },
@@ -21,10 +21,10 @@ const services = [
 ];
 
 const steps = [
-  { icon: Phone, title: "Tell us what's needed", body: "Call or fill in a short form. Tell us the clinical need, the ZIP code, and any hospital or physician already involved." },
-  { icon: ClipboardList, title: "We prepare the introduction", body: "Our concierge picks the Medicare-certified home health agency in your area with the right specialty and availability." },
+  { icon: Mail, title: "Tell us what's needed", body: "Fill in a short form. Tell us the clinical need, the ZIP code, and any hospital or physician already involved." },
+  { icon: ClipboardList, title: "We prepare the introduction", body: "Our team picks the Medicare-certified home health agency in your area with the right specialty and availability." },
   { icon: MessageCircle, title: "The agency takes over clinical care", body: "They coordinate physician orders, staff the clinicians, and handle Medicare, Medicaid, or insurance billing directly." },
-  { icon: Sparkles, title: "We stay involved with everything else", body: "Your CompanionCare dashboard still holds marketplace helpers, personal care, family messages, and the phone we always answer." },
+  { icon: Sparkles, title: "We stay involved with everything else", body: "Your CompanionCare dashboard still holds marketplace helpers, personal care, family messages, and a support thread with a real person." },
 ];
 
 const scenarios = [
@@ -49,7 +49,7 @@ const faqs = [
   },
   {
     q: "Will Medicare or insurance cover it?",
-    a: "For most patients with a qualifying physician order, home health visits are covered by Medicare, Medicaid, or private insurance — billed directly by the agency. Our concierge will help you check what's likely covered before the first visit.",
+    a: "For most patients with a qualifying physician order, home health visits are covered by Medicare, Medicaid, or private insurance — billed directly by the agency. Our team will help you check what's likely covered before the first visit.",
   },
   {
     q: "How quickly can it start?",
@@ -57,7 +57,7 @@ const faqs = [
   },
   {
     q: "What if we already have a doctor or discharge planner involved?",
-    a: "Even better. Share their information when you call and our concierge will coordinate the referral directly with them, so nobody's chasing paperwork on their own.",
+    a: "Even better. Share their information when you get in touch and our team will coordinate the referral directly with them, so nobody's chasing paperwork on their own.",
   },
   {
     q: "Can this be layered with a marketplace helper or personal care aide?",
@@ -71,18 +71,18 @@ export const Route = createFileRoute("/services/healthcare")({
       path: "/services/healthcare",
       title: "CompanionCare Healthcare — Skilled nursing and therapy at home",
       description:
-        "Skilled nursing, wound care, and physical, occupational, and speech therapy at home — delivered by Medicare-certified home health agencies introduced by CompanionCare. One dashboard, one concierge, one phone number.",
+        "Skilled nursing, wound care, and physical, occupational, and speech therapy at home — delivered by Medicare-certified home health agencies introduced by CompanionCare. One dashboard, one team, everything at home in one place.",
       jsonLd: [
         {
           "@context": "https://schema.org",
           "@type": "Service",
           name: "CompanionCare Healthcare",
-          serviceType: "Home health referral concierge",
+          serviceType: "Home health referral coordination",
           areaServed: { "@type": "Country", name: "United States" },
           provider: { "@type": "Organization", name: "CompanionCare", url: SITE_URL },
           url: `${SITE_URL}/services/healthcare`,
           description:
-            "Concierge referrals to Medicare-certified home health agencies for skilled nursing, wound care, and physical, occupational, and speech therapy at home.",
+            "Coordinated referrals to Medicare-certified home health agencies for skilled nursing, wound care, and physical, occupational, and speech therapy at home.",
         },
         {
           "@context": "https://schema.org",
@@ -107,17 +107,11 @@ function HealthcarePage() {
         lead="When clinical care comes home, the last thing a family needs is a scramble. CompanionCare introduces you to a Medicare-certified home health agency in your area — and keeps the rest of home life together in one place."
       >
         <div className="flex flex-col gap-3 sm:flex-row">
-          <a
-            href={PHONE_HREF}
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-base font-semibold text-primary-foreground shadow-soft hover:bg-primary/90"
-          >
-            <Phone className="size-5" /> Call {PHONE}
-          </a>
           <Link
             to="/contact"
-            className="inline-flex items-center justify-center rounded-full border-2 border-primary bg-card px-6 py-3 text-base font-semibold text-primary hover:bg-secondary"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-base font-semibold text-primary-foreground shadow-soft hover:bg-primary/90"
           >
-            Request a referral
+            <Mail className="size-5" /> Request a referral
           </Link>
         </div>
       </PageHero>
@@ -188,7 +182,7 @@ function HealthcarePage() {
               </span>
               <h2 className="mt-4 font-serif text-3xl sm:text-4xl">Held to a clinical standard</h2>
               <p className="mt-4 text-lg text-muted-foreground">
-                We only refer to Medicare-certified home health agencies — the same standard your hospital's discharge planner would use, but with the added benefit of a concierge who keeps track of everything else at home.
+                We only refer to Medicare-certified home health agencies — the same standard your hospital's discharge planner would use, but with the added benefit of a team that keeps track of everything else at home.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <Link to="/services/partners" className="inline-flex items-center gap-1 text-base font-semibold text-primary hover:underline">
@@ -245,7 +239,7 @@ function HealthcarePage() {
 
       <CTASection
         title="Need a clinical referral at home?"
-        lead="Call our concierge or send a note. We'll make the introduction and stay by your side for everything else at home."
+        lead="Send us a note. We'll make the introduction and stay by your side for everything else at home."
       />
     </PageShell>
   );

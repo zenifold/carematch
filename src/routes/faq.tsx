@@ -18,7 +18,7 @@ const faqs = [
   },
   {
     q: "What if something goes wrong during a visit?",
-    a: "Call our 24/7 concierge at 1-800-COMPANION. Every helper is covered by CompanionCare's insurance, and our safety team responds within minutes — not business days.",
+    a: "Report it from the visit itself and it goes straight to our trust and safety team as a tracked case. Every helper is covered by CompanionCare's insurance, and safety reports are prioritised ahead of every other kind of message. If someone is in immediate danger, call 911 first.",
   },
   {
     q: "Can my family see what's happening?",
@@ -26,11 +26,11 @@ const faqs = [
   },
   {
     q: "Does CompanionCare accept Medicare, Medicaid, or long-term care insurance?",
-    a: "Skilled care visits can be billed to insurance where eligible via CompanionCare's licensed partners. Household help, companionship, and personal care are typically private-pay. Our concierge can walk you through what's coverable in your state.",
+    a: "Skilled care visits can be billed to insurance where eligible via CompanionCare's licensed partners. Household help, companionship, and personal care are typically private-pay. Message us and we'll walk you through what's coverable in your state.",
   },
   {
-    q: "What if I don't have a smartphone?",
-    a: "You never need one. Everything CompanionCare does digitally can be done by phone with a real concierge team. Same options, same helpers, same care.",
+    q: "What if I'm not confident with technology?",
+    a: "The whole thing is built for that: one question per screen, no jargon, voice input on every field, and text you can scale up to 23px. If you get stuck, message us and a real person will walk you through it — or invite a family member to help set it up, with you approving each step.",
   },
   {
     q: "How do I know the person showing up is the right person?",
@@ -38,7 +38,7 @@ const faqs = [
   },
   {
     q: "What areas does CompanionCare serve?",
-    a: "CompanionCare matches families with verified helpers across all 50 U.S. states, in major metros and many smaller communities. Call the concierge for local availability in your ZIP code.",
+    a: "CompanionCare matches families with verified helpers across all 50 U.S. states, in major metros and many smaller communities. Message us for local availability in your ZIP code.",
   },
   {
     q: "Is CompanionCare different from Care.com or Honor?",

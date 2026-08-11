@@ -2,7 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   ShieldCheck,
-  Phone,
+  Mail,
+  MessageCircle,
+  Type,
   Sparkles,
   Clock,
   Wallet,
@@ -18,7 +20,6 @@ import {
   Ear,
   Eye,
   Mic,
-  Smartphone,
   ChevronDown,
   Check,
   X,
@@ -35,12 +36,12 @@ import caregiverLinda from "@/assets/caregiver-linda.jpg";
 import {
   SiteHeader,
   SiteFooter,
-  FloatingCall,
-  PHONE,
-  PHONE_HREF,
+  SUPPORT_EMAIL,
+  SUPPORT_EMAIL_HREF,
   SITE_URL,
   marketingHead,
 } from "@/components/marketing/PageShell";
+import { rateBand } from "@/lib/pricing-tiers";
 
 export const Route = createFileRoute("/")({
   head: () =>
@@ -82,7 +83,6 @@ function Landing() {
       <LocalDirectory />
       <FooterCTA />
       <SiteFooter />
-      <FloatingCall />
     </div>
   );
 }
@@ -156,7 +156,8 @@ function CareTypeTiles() {
               <h3 className="text-xl font-semibold">{t.title}</h3>
               <p className="mt-1 text-base text-muted-foreground">{t.blurb}</p>
               <p className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-primary">
-                Learn more <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+                Learn more{" "}
+                <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
               </p>
             </div>
           </Link>
@@ -173,7 +174,11 @@ const DIRECTORY_STATES: { name: string; slug: string; cities: string[] }[] = [
   { name: "Texas", slug: "texas", cities: ["Houston", "Dallas", "Austin"] },
   { name: "Florida", slug: "florida", cities: ["Miami", "Tampa", "Orlando"] },
   { name: "New York", slug: "new-york", cities: ["New York City", "Buffalo", "Rochester"] },
-  { name: "Pennsylvania", slug: "pennsylvania", cities: ["Philadelphia", "Pittsburgh", "Allentown"] },
+  {
+    name: "Pennsylvania",
+    slug: "pennsylvania",
+    cities: ["Philadelphia", "Pittsburgh", "Allentown"],
+  },
   { name: "Illinois", slug: "illinois", cities: ["Chicago", "Aurora", "Naperville"] },
   { name: "Ohio", slug: "ohio", cities: ["Columbus", "Cleveland", "Cincinnati"] },
   { name: "Georgia", slug: "georgia", cities: ["Atlanta", "Augusta", "Savannah"] },
@@ -192,7 +197,8 @@ function LocalDirectory() {
               Senior care, where you live.
             </h2>
             <p className="mt-3 text-lg text-muted-foreground">
-              Local rates, licensing rules, and what to expect — starting with our eight largest states.
+              Local rates, licensing rules, and what to expect — starting with our eight largest
+              states.
             </p>
           </div>
           <Link
@@ -251,21 +257,21 @@ function Hero() {
         <div className="grid items-center gap-12 lg:grid-cols-12">
           <div className="min-w-0 lg:col-span-6">
             <span className="inline-flex items-center gap-2 rounded-full bg-secondary px-3 py-1.5 text-sm font-medium text-secondary-foreground animate-fade-in sm:px-4 sm:py-2 sm:text-base">
-              <ShieldCheck className="size-4 shrink-0 text-primary sm:size-5" /> A marketplace built for older adults
+              <ShieldCheck className="size-4 shrink-0 text-primary sm:size-5" /> A marketplace built
+              for older adults
             </span>
             <h1 className="mt-6 font-serif text-[32px] leading-[1.05] tracking-tight text-balance sm:text-5xl lg:text-6xl">
               Find in-home help you can trust —{" "}
               <span className="relative inline-block">
                 <span className="relative z-10">on your terms</span>
-                <span
-                  aria-hidden
-                  className="absolute inset-x-0 bottom-1 -z-0 h-3 bg-accent/40"
-                />
+                <span aria-hidden className="absolute inset-x-0 bottom-1 -z-0 h-3 bg-accent/40" />
               </span>
               .
             </h1>
             <p className="mt-6 max-w-xl text-lg text-muted-foreground text-pretty sm:text-xl">
-              Browse verified helpers for companionship, cleaning, personal care, and more. You choose who comes, when, and for how long — and family can be looped in when you invite them.
+              Browse verified helpers for companionship, cleaning, personal care, and more. You
+              choose who comes, when, and for how long — and family can be looped in when you invite
+              them.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link
@@ -276,12 +282,12 @@ function Hero() {
                 Get started
                 <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
               </Link>
-              <a
-                href={PHONE_HREF}
+              <Link
+                to="/how-it-works"
                 className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-primary bg-card px-5 py-2.5 text-sm font-semibold text-primary hover:bg-secondary sm:px-6 sm:py-3 sm:text-base"
               >
-                <Phone className="size-4" /> <span className="truncate">Call {PHONE}</span>
-              </a>
+                <span className="truncate">See how it works</span>
+              </Link>
             </div>
           </div>
 
@@ -316,7 +322,7 @@ function HowItWorks() {
       icon: HandHeart,
       title: "Tell us what you need",
       teaser: "One question at a time",
-      body: "Answer one question at a time — by voice, by text, or over the phone with a real person doing it with you.",
+      body: "Answer one question at a time — type it or speak it, with large text and voice input on every field.",
     },
     {
       icon: UserCheck,
@@ -344,7 +350,8 @@ function HowItWorks() {
             Three steps. No surprises.
           </h2>
           <p className="mt-3 text-xl text-muted-foreground">
-            You stay in control the entire way — online, on the phone, or both.
+            You stay in control the entire way, and you can hand nothing over that you don't want
+            to.
           </p>
         </div>
 
@@ -373,13 +380,17 @@ function HowItWorks() {
                 >
                   <span
                     className={`grid size-10 shrink-0 place-items-center rounded-full font-serif text-lg transition-colors ${
-                      isActive ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground"
+                      isActive
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-card text-muted-foreground"
                     }`}
                   >
                     {i + 1}
                   </span>
                   <span className="min-w-0">
-                    <span className={`block truncate font-semibold ${isActive ? "text-foreground" : "text-muted-foreground"}`}>
+                    <span
+                      className={`block truncate font-semibold ${isActive ? "text-foreground" : "text-muted-foreground"}`}
+                    >
                       {s.title}
                     </span>
                     <span className="hidden truncate text-sm text-muted-foreground lg:block">
@@ -390,7 +401,10 @@ function HowItWorks() {
               );
             })}
 
-            <div className="relative mt-1 hidden h-1 overflow-hidden rounded-full bg-border lg:block" aria-hidden>
+            <div
+              className="relative mt-1 hidden h-1 overflow-hidden rounded-full bg-border lg:block"
+              aria-hidden
+            >
               <div
                 className="h-full rounded-full bg-primary transition-all duration-500 ease-out"
                 style={{ width: `${((active + 1) / steps.length) * 100}%` }}
@@ -431,7 +445,8 @@ function HowItWorks() {
                 disabled={active === steps.length - 1}
                 className="group inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-30"
               >
-                Next <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+                Next{" "}
+                <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
               </button>
             </div>
           </div>
@@ -481,7 +496,8 @@ function MeetNeighbors() {
             Real profiles. Verified. Nearby.
           </h2>
           <p className="mt-4 text-xl text-muted-foreground">
-            These are sample profiles that show what you'll browse on the marketplace — experience, tags, and exactly what was verified, when, and by whom.
+            These are sample profiles that show what you'll browse on the marketplace — experience,
+            tags, and exactly what was verified, when, and by whom.
           </p>
         </div>
         <Link
@@ -491,7 +507,6 @@ function MeetNeighbors() {
           How helpers join <ArrowRight className="size-4" />
         </Link>
       </div>
-
 
       <div className="mt-10 grid gap-6 md:grid-cols-3">
         {people.map((p) => (
@@ -550,11 +565,31 @@ function MeetNeighbors() {
 
 function TrustLayer() {
   const checks = [
-    { icon: FileCheck2, title: "Identity Proofing", blurb: "Government ID + liveness selfie, matched at signup." },
-    { icon: ShieldCheck, title: "Background Check", blurb: "National criminal + sex offender registry, refreshed yearly." },
-    { icon: BadgeCheck, title: "Credential Verify", blurb: "Licenses checked against state registries for care roles." },
-    { icon: Repeat, title: "Continuous Monitoring", blurb: "Re-checked every 30 days — new issues surface in days." },
-    { icon: MapPin, title: "Visit Confirmation", blurb: "Live selfie match + GPS check-in at the start of every visit." },
+    {
+      icon: FileCheck2,
+      title: "Identity Proofing",
+      blurb: "Government ID + liveness selfie, matched at signup.",
+    },
+    {
+      icon: ShieldCheck,
+      title: "Background Check",
+      blurb: "National criminal + sex offender registry, refreshed yearly.",
+    },
+    {
+      icon: BadgeCheck,
+      title: "Credential Verify",
+      blurb: "Licenses checked against state registries for care roles.",
+    },
+    {
+      icon: Repeat,
+      title: "Continuous Monitoring",
+      blurb: "Re-checked every 30 days — new issues surface in days.",
+    },
+    {
+      icon: MapPin,
+      title: "Visit Confirmation",
+      blurb: "Live selfie match + GPS check-in at the start of every visit.",
+    },
   ];
 
   const [open, setOpen] = useState<number | null>(0);
@@ -584,11 +619,15 @@ function TrustLayer() {
                 aria-expanded={isOpen}
                 className="flex w-full items-center gap-4 p-4 text-left hover:bg-secondary/40"
               >
-                <span className={`grid size-11 shrink-0 place-items-center rounded-xl transition-colors ${isOpen ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary"}`}>
+                <span
+                  className={`grid size-11 shrink-0 place-items-center rounded-xl transition-colors ${isOpen ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary"}`}
+                >
                   <c.icon className="size-5" />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-primary">Check {i + 1}</p>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+                    Check {i + 1}
+                  </p>
                   <p className="mt-0.5 text-base font-semibold">{c.title}</p>
                 </div>
                 <ChevronDown
@@ -697,11 +736,12 @@ function RateExplorer() {
               Pay by the hour, not by the month.
             </h2>
             <p className="mt-4 text-xl text-muted-foreground">
-              Pick a service to see the typical hourly rate — and what a normal week of
-              visits looks like. No lump-sum surprises, no long contracts.
+              Pick a service to see the typical hourly rate — and what a normal week of visits looks
+              like. No lump-sum surprises, no long contracts.
             </p>
             <p className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary">
-              <ShieldCheck className="size-4" /> Prices exclude the 15–18% service fee, shown as one total before you book.
+              <ShieldCheck className="size-4" /> Prices exclude the 15–18% service fee, shown as one
+              total before you book.
             </p>
 
             <div className="mt-8">
@@ -737,10 +777,10 @@ function RateExplorer() {
                 Build a plan with real hours <ArrowRight className="size-4" />
               </Link>
               <a
-                href={PHONE_HREF}
+                href={SUPPORT_EMAIL_HREF}
                 className="inline-flex items-center gap-2 rounded-full border-2 border-primary bg-card px-5 py-2.5 text-sm font-semibold text-primary hover:bg-secondary"
               >
-                <Phone className="size-4" /> Or talk it through
+                <Mail className="size-4" /> Or ask us to help
               </a>
             </div>
           </div>
@@ -793,10 +833,7 @@ function RateExplorer() {
                     const low = w.hours * tier.low;
                     const high = w.hours * tier.high;
                     return (
-                      <li
-                        key={w.label}
-                        className="rounded-2xl border border-border bg-card p-5"
-                      >
+                      <li key={w.label} className="rounded-2xl border border-border bg-card p-5">
                         <p className="text-base font-semibold">{w.label}</p>
                         <p className="text-sm text-muted-foreground">{w.hint}</p>
                         <p className="mt-3 font-serif text-2xl text-foreground">
@@ -843,12 +880,36 @@ function RateExplorer() {
 
 function OldWayVsCompanionCare() {
   const rows = [
-    { label: "Who's coming to the door?", old: "A stranger from a printed roster", cm: "A verified helper with a live selfie match" },
-    { label: "Background checks", old: "Once at hire, maybe", cm: "Refreshed every 30 days, automatically" },
-    { label: "Pricing", old: "Opaque agency invoices", cm: "Transparent plans that fit your budget" },
-    { label: "Booking changes", old: "Phone tag, business hours only", cm: "Cancel or reschedule up to 24 hrs before, any time" },
-    { label: "Family visibility", old: "Whatever mom remembers to tell you", cm: "Real-time updates — if the senior invites you" },
-    { label: "If something goes wrong", old: "A voicemail on Monday", cm: "24/7 concierge, response in minutes" },
+    {
+      label: "Who's coming to the door?",
+      old: "A stranger from a printed roster",
+      cm: "A verified helper with a live selfie match",
+    },
+    {
+      label: "Background checks",
+      old: "Once at hire, maybe",
+      cm: "Refreshed every 30 days, automatically",
+    },
+    {
+      label: "Pricing",
+      old: "Opaque agency invoices",
+      cm: "Transparent plans that fit your budget",
+    },
+    {
+      label: "Booking changes",
+      old: "Phone tag, business hours only",
+      cm: "Cancel or reschedule up to 24 hrs before, any time",
+    },
+    {
+      label: "Family visibility",
+      old: "Whatever mom remembers to tell you",
+      cm: "Real-time updates — if the senior invites you",
+    },
+    {
+      label: "If something goes wrong",
+      old: "A voicemail on Monday",
+      cm: "Report it in the app, tracked until it's closed",
+    },
   ];
   return (
     <section className="mx-auto max-w-7xl px-5 py-20 lg:px-10">
@@ -871,8 +932,8 @@ function OldWayVsCompanionCare() {
             A kinder way to bring care into the home.
           </h2>
           <p className="mt-4 text-xl text-muted-foreground">
-            No paperwork mazes, no rotating strangers. Just a small, familiar
-            circle of helpers you already trust — built around your family's routine.
+            No paperwork mazes, no rotating strangers. Just a small, familiar circle of helpers you
+            already trust — built around your family's routine.
           </p>
 
           <div className="mt-8 overflow-hidden rounded-3xl border border-border bg-card">
@@ -954,8 +1015,8 @@ function ServiceSpectrum() {
             One platform. The whole spectrum of care.
           </h2>
           <p className="mt-4 text-xl text-muted-foreground">
-            Start with what you need today. Grow into more when the time comes —
-            the same trusted helpers, the same account.
+            Start with what you need today. Grow into more when the time comes — the same trusted
+            helpers, the same account.
           </p>
         </div>
 
@@ -987,7 +1048,10 @@ function ServiceSpectrum() {
         </div>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-center text-lg text-muted-foreground">
           <span>Start with any tier. Grow as you need.</span>
-          <Link to="/pricing" className="inline-flex items-center gap-1 font-semibold text-primary hover:underline">
+          <Link
+            to="/pricing"
+            className="inline-flex items-center gap-1 font-semibold text-primary hover:underline"
+          >
             See full pricing <ArrowRight className="size-4" />
           </Link>
         </div>
@@ -1038,7 +1102,8 @@ function SocialProof() {
                 <p className="text-base font-semibold">A new marketplace</p>
               </div>
               <p className="mt-2 text-sm text-muted-foreground">
-                CompanionCare is just opening. We'd rather earn your first review than borrow someone else's.
+                CompanionCare is just opening. We'd rather earn your first review than borrow
+                someone else's.
               </p>
             </div>
           </div>
@@ -1052,7 +1117,8 @@ function SocialProof() {
             No stock testimonials. Just what we promise.
           </h2>
           <p className="mt-4 text-xl text-muted-foreground">
-            CompanionCare is a new marketplace — so instead of borrowed quotes, here's exactly how we've built it and what you can hold us to.
+            CompanionCare is a new marketplace — so instead of borrowed quotes, here's exactly how
+            we've built it and what you can hold us to.
           </p>
 
           <div className="mt-8 grid gap-4">
@@ -1082,7 +1148,7 @@ function AccessibilitySupport() {
     { icon: Eye, label: "Large Text Mode" },
     { icon: Mic, label: "Voice input on every field" },
     { icon: Ear, label: "Screen reader optimized" },
-    { icon: Smartphone, label: "No app required" },
+    { icon: Type, label: "Text as large as you need it" },
   ];
   return (
     <section className="border-y border-border bg-secondary/40">
@@ -1090,22 +1156,22 @@ function AccessibilitySupport() {
         <div className="surface-card grid gap-8 p-8 md:grid-cols-2 md:p-12">
           <div>
             <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-base font-semibold text-primary">
-              <Phone className="size-5" /> Phone is a peer channel
+              <MessageCircle className="size-5" /> A real person, not a bot
             </span>
             <h2 className="mt-4 font-serif text-4xl tracking-tight">
-              Prefer to talk?
+              Stuck on something?
               <br />
-              Call us: <span className="text-primary">{PHONE}</span>
+              <span className="text-primary">Send us a message.</span>
             </h2>
             <p className="mt-4 text-xl text-muted-foreground">
-              No app required. We can do everything by phone with you — intake,
-              matching, booking, and updates. Same team. Same care.
+              Support lives inside your account, so we can already see the visit you're asking
+              about. A real person reads every message and replies within one business day.
             </p>
             <a
-              href={PHONE_HREF}
+              href={SUPPORT_EMAIL_HREF}
               className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-soft hover:bg-primary/90 sm:px-6 sm:py-3 sm:text-base"
             >
-              <Phone className="size-4" /> Call {PHONE}
+              <Mail className="size-4" /> {SUPPORT_EMAIL}
             </a>
           </div>
           <ul className="grid gap-3 self-center">
@@ -1131,7 +1197,10 @@ function FAQ() {
   const items = [
     {
       q: "How much does this cost?",
-      a: "Providers set their own hourly rates within suggested market bands: cleaning $25–$45/hr, companionship $20–$35/hr, personal care $28–$50/hr, skilled nursing $45–$80/hr. CompanionCare adds a flat 15–18% service fee — shown as one total before you book. Full plans typically run $800–$3,500/month depending on hours and tier. Optional CompanionCare Plus is $29/month and waives fees on the first $200 of bookings.",
+      // Rate bands are interpolated from src/lib/pricing-tiers.ts rather than
+      // retyped — this answer had drifted to $20–$35 companionship and
+      // $25–$45 cleaning, neither of which matched the canonical tiers.
+      a: `Helpers set their own hourly rates within suggested market bands: companionship ${rateBand("companionship")}, house cleaning ${rateBand("cleaning")}, personal care ${rateBand("personal")}, skilled nursing ${rateBand("nursing")}. CompanionCare adds a flat 15–18% service fee — shown as one total before you book. You're billed per completed visit, with no subscription and no contract.`,
     },
     {
       q: "How do you verify helpers?",
@@ -1143,7 +1212,7 @@ function FAQ() {
     },
     {
       q: "What if something goes wrong?",
-      a: "Call our 24/7 concierge at 1-800-COMPANION. Every helper is covered by our insurance, and our team responds to safety concerns within minutes — not business days.",
+      a: "Report it from the visit itself and it goes straight to our trust and safety team as a tracked case, so nothing gets lost in an inbox. Every helper is covered by our insurance, and safety reports are prioritised ahead of everything else.",
     },
     {
       q: "Can my family see what's happening?",
@@ -1154,8 +1223,8 @@ function FAQ() {
       a: "Skilled care visits can be billed to insurance where eligible via our licensed partners. Household help, companionship, and personal care are typically out-of-pocket — the budget optimizer helps you plan.",
     },
     {
-      q: "What if I don't have a smartphone?",
-      a: "You never need one. Everything CompanionCare does digitally can be done by phone with a real person on our concierge team. Same options, same helpers, same care.",
+      q: "What if I'm not confident with technology?",
+      a: "The whole thing is built for that. One question per screen, text you can scale up to 23px, voice input on every field, and no jargon. If you get stuck, send us a message and a real person will walk you through it — or invite a family member to help you set it up, with you approving each step.",
     },
     {
       q: "How do I know the person showing up is the right person?",
@@ -1218,7 +1287,7 @@ function FooterCTA() {
             Ready to find your match?
           </h2>
           <p className="mt-4 text-xl text-muted-foreground text-pretty">
-            Start with one question. We'll take it from there — online or on the phone.
+            Start with one question. We'll take it from there, and a real person is a message away.
           </p>
           <p className="mt-6 flex items-center gap-2 text-base text-muted-foreground">
             <Clock className="size-5" /> Takes about 3 minutes
@@ -1234,10 +1303,10 @@ function FooterCTA() {
             <ArrowRight className="size-6 transition-transform group-hover:translate-x-1" />
           </Link>
           <a
-            href={PHONE_HREF}
+            href={SUPPORT_EMAIL_HREF}
             className="inline-flex min-h-16 items-center justify-center gap-2 rounded-full border-2 border-accent bg-card px-8 py-5 text-2xl font-semibold text-accent hover:bg-accent/10"
           >
-            <Phone className="size-6" /> Call {PHONE}
+            <Mail className="size-6" /> Email us first
           </a>
         </div>
       </div>

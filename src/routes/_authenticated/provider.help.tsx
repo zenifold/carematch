@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
   LifeBuoy,
+  Mail,
   Phone,
   AlertTriangle,
   ShieldAlert,
@@ -23,8 +24,7 @@ export const Route = createFileRoute("/_authenticated/provider/help")({
   errorComponent: RouteErrorBoundary,
 });
 
-const OPS_TEL = "18002273628";
-const OPS_DISPLAY = "1 (800) 227-3628";
+const OPS_EMAIL = "support@getcompanioncare.com";
 
 function ProviderHelp() {
   const create = useServerFn(createSupportTicket);
@@ -56,8 +56,8 @@ function ProviderHelp() {
         </div>
         <h1 className="mt-1 font-serif text-2xl lg:text-3xl">Provider help</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Reach Ops any time — emergencies, payment questions, or safety
-          concerns during a visit.
+          Message Ops about payment questions or safety concerns during a visit.
+          For a medical emergency, call 911 first.
         </p>
       </div>
 
@@ -78,16 +78,16 @@ function ProviderHelp() {
       </a>
 
       <a
-        href={`tel:${OPS_TEL}`}
+        href={`mailto:${OPS_EMAIL}`}
         className="flex items-center gap-4 rounded-3xl border-2 border-primary/40 bg-primary/5 p-5 hover:bg-primary/10"
       >
         <span className="grid size-12 place-items-center rounded-full bg-primary text-primary-foreground">
-          <Phone className="size-6" />
+          <Mail className="size-6" />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="font-serif text-lg">Call Ops</p>
-          <p className="text-sm text-muted-foreground">
-            {OPS_DISPLAY} · real dispatcher, 24/7.
+          <p className="font-serif text-lg">Email Ops</p>
+          <p className="text-sm break-words text-muted-foreground">
+            {OPS_EMAIL} · a real person replies within one business day.
           </p>
         </div>
       </a>

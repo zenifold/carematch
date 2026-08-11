@@ -1,9 +1,14 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { Phone, Menu, X, ChevronDown } from "lucide-react";
+import { Mail, Menu, X, ChevronDown } from "lucide-react";
 
-export const PHONE = "1-800-COMPANION";
-export const PHONE_HREF = `tel:${PHONE.replace(/[^0-9]/g, "")}`;
+/**
+ * Support runs through email and in-app messaging, not a phone line — there is
+ * no call centre to answer one. Every "call us" affordance was replaced with
+ * this; don't reintroduce a tel: link without staffing behind it.
+ */
+export const SUPPORT_EMAIL = "support@getcompanioncare.com";
+export const SUPPORT_EMAIL_HREF = `mailto:${SUPPORT_EMAIL}`;
 export const SITE_URL = "https://getcompanioncare.com";
 
 type NavLink = { to: string; label: string };
@@ -102,12 +107,12 @@ export function SiteHeader() {
               </div>
             )}
           </div>
-          <a
-            href={PHONE_HREF}
+          <Link
+            to="/contact"
             className="ml-2 inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1.5 text-xs font-semibold text-accent-foreground hover:opacity-95"
           >
-            <Phone className="size-3" /> {PHONE}
-          </a>
+            <Mail className="size-3" /> Contact us
+          </Link>
           <Link
             to="/auth"
             search={{ mode: "signup" }}
@@ -120,13 +125,13 @@ export function SiteHeader() {
 
 
         <div className="flex items-center gap-2 lg:hidden">
-          <a
-            href={PHONE_HREF}
-            aria-label={`Call ${PHONE}`}
+          <Link
+            to="/contact"
+            aria-label="Contact us"
             className="grid size-10 place-items-center rounded-full bg-accent text-accent-foreground"
           >
-            <Phone className="size-4" />
-          </a>
+            <Mail className="size-4" />
+          </Link>
           <button
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
@@ -247,10 +252,10 @@ export function SiteFooter() {
               Verified in-home helpers for older adults — matched to care needs, personality, and budget.
             </p>
             <a
-              href={PHONE_HREF}
+              href={SUPPORT_EMAIL_HREF}
               className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground"
             >
-              <Phone className="size-3.5" /> Call {PHONE}
+              <Mail className="size-3.5" /> {SUPPORT_EMAIL}
             </a>
           </div>
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-[repeat(4,minmax(0,1fr))]">
@@ -281,26 +286,12 @@ export function SiteFooter() {
   );
 }
 
-export function FloatingCall() {
-  return (
-    <a
-      href={PHONE_HREF}
-      aria-label={`Call ${PHONE}`}
-      className="fixed bottom-4 right-4 z-40 inline-flex min-h-10 items-center gap-1.5 rounded-full bg-accent px-3 py-2 text-sm font-semibold text-accent-foreground shadow-lifted hover:opacity-95 sm:bottom-5 sm:right-5 sm:min-h-11 sm:px-4 sm:py-2.5 sm:text-base"
-    >
-      <Phone className="size-4 sm:size-5" />
-      <span className="hidden sm:inline">Call us</span>
-    </a>
-  );
-}
-
 export function PageShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-dvh overflow-x-hidden bg-background text-foreground">
       <SiteHeader />
       <main>{children}</main>
       <SiteFooter />
-      <FloatingCall />
     </div>
   );
 }
@@ -338,7 +329,7 @@ export function PageHero({
 
 export function CTASection({
   title = "Ready to find your match?",
-  lead = "Start with one question. We'll take it from there — online or on the phone.",
+  lead = "Start with one question. We'll take it from there, and a real person is a message away.",
 }: {
   title?: string;
   lead?: string;
@@ -359,10 +350,10 @@ export function CTASection({
             Get started
           </Link>
           <a
-            href={PHONE_HREF}
+            href={SUPPORT_EMAIL_HREF}
             className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-accent bg-card px-5 py-2.5 text-sm font-semibold text-accent hover:bg-accent/10 sm:px-6 sm:py-3 sm:text-base"
           >
-            <Phone className="size-4 sm:size-5" /> Call {PHONE}
+            <Mail className="size-4 sm:size-5" /> Email us
           </a>
         </div>
       </div>

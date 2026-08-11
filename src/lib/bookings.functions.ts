@@ -242,7 +242,7 @@ export const matchProviders = createServerFn({ method: "GET" })
   });
 
 // ============================================================
-// Notify-me: senior asks concierge to reach out when a matching
+// Notify-me: senior asks the team to reach out when a matching
 // provider becomes available. Creates a CS task via admin client.
 // ============================================================
 

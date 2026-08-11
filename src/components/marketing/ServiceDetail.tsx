@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { Check, ShieldCheck, Phone } from "lucide-react";
-import { PageShell, PageHero, CTASection, PHONE, PHONE_HREF } from "./PageShell";
+import { Check, ShieldCheck, Mail } from "lucide-react";
+import { PageShell, PageHero, CTASection, SUPPORT_EMAIL_HREF } from "./PageShell";
 import type { ReactNode } from "react";
 
 export type ServiceDetailProps = {
@@ -27,10 +27,10 @@ export function ServiceDetail(p: ServiceDetailProps) {
             Start with this service
           </Link>
           <a
-            href={PHONE_HREF}
+            href={SUPPORT_EMAIL_HREF}
             className="inline-flex items-center gap-2 rounded-full border-2 border-primary bg-card px-6 py-3 text-base font-semibold text-primary"
           >
-            <Phone className="size-5" /> Call {PHONE}
+            <Mail className="size-5" /> Ask us a question
           </a>
         </div>
       </PageHero>

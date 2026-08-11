@@ -5,7 +5,6 @@ export { MatchCard } from "./MatchCard";
 export type { MatchCardData } from "./MatchCard";
 export { VisitCard } from "./VisitCard";
 export type { VisitCardData, VisitStatus } from "./VisitCard";
-export { CallButton } from "./CallButton";
 export { VoiceInput } from "./VoiceInput";
 export { RoleSwitcher } from "./RoleSwitcher";
 export { VerificationModal } from "./VerificationModal";
