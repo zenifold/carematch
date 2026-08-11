@@ -120,15 +120,26 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    /* The rem anchor, and the single lever Large Text Mode pulls.
+       This MUST live on html, not body: every Tailwind text-*, spacing, and
+       size utility is rem-based, and rem resolves against the root element.
+       Scaling body (as this used to) left all of them untouched, so Large
+       Text Mode moved only the handful of nodes with no explicit size class —
+       measured at 6 of 14 elements and a 2px change in page height. */
+    font-size: 100%;
   }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    /* Radical accessibility: 18px base so all text scales up. */
-    font-size: 17px;
+    /* Radical accessibility: ~17px base so all text scales up. Expressed in
+       rem rather than px so it rides the root scale instead of pinning. */
+    font-size: 1.0625rem;
     line-height: 1.55;
   }
-  h1, h2, h3, h4 {
+  h1,
+  h2,
+  h3,
+  h4 {
     font-family: var(--font-serif);
     letter-spacing: -0.01em;
   }
@@ -141,12 +152,16 @@
   box-shadow: var(--shadow-soft);
 }
 
-/* Senior accessibility preferences — driven by data attrs on <html>. */
-html[data-text-size="large"] body {
-  font-size: 20px;
+/* Senior accessibility preferences — driven by data attrs on <html>.
+   Percentages on the root scale text, spacing, and component sizes together,
+   which is what a text-size preference is supposed to do. 125% = 20px root,
+   143.75% = 23px, matching the sizes this feature has always advertised.
+   Default (100%) renders identically to before this was fixed. */
+html[data-text-size="large"] {
+  font-size: 125%;
 }
-html[data-text-size="xlarge"] body {
-  font-size: 23px;
+html[data-text-size="xlarge"] {
+  font-size: 143.75%;
 }
 
 html[data-contrast="high"] {

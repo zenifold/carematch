@@ -15,7 +15,6 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { SeniorPreferencesProvider } from "@/hooks/use-senior-preferences";
 import { UnreadMessagesBadge, SupportWidget, IncomingRequestsBadge } from "@/components/carematch";
 import {
   Drawer,
@@ -27,12 +26,11 @@ import {
 } from "@/components/ui/drawer";
 import { toast } from "sonner";
 
+// SeniorPreferencesProvider now lives in __root.tsx so preferences apply to
+// public pages too; a second provider here would shadow it and duplicate the
+// preference fetch.
 export const Route = createFileRoute("/_authenticated/senior")({
-  component: () => (
-    <SeniorPreferencesProvider>
-      <SeniorLayout />
-    </SeniorPreferencesProvider>
-  ),
+  component: SeniorLayout,
 });
 
 function SeniorLayout() {
@@ -45,7 +43,13 @@ function SeniorLayout() {
     navigate({ to: "/", replace: true });
   };
 
-  const tabs: { to: string; label: string; icon: typeof Home; exact?: boolean; external?: boolean }[] = [
+  const tabs: {
+    to: string;
+    label: string;
+    icon: typeof Home;
+    exact?: boolean;
+    external?: boolean;
+  }[] = [
     { to: "/senior", label: "Home", icon: Home, exact: true },
     { to: "/senior/visits", label: "Visits", icon: Calendar },
     { to: "/senior/care-plan", label: "Care plan", icon: ClipboardList },
@@ -58,10 +62,16 @@ function SeniorLayout() {
   // The bottom tab bar is the only nav on this portal, shown at every screen
   // size — seniors need it dead simple, not a 7-wide scrolling row. Pin the 4
   // most time-sensitive destinations; everything else lives behind "More".
-  const MOBILE_PRIMARY_PATHS = ["/senior", "/senior/visits", "/senior/care-plan", "/senior/messages"];
+  const MOBILE_PRIMARY_PATHS = [
+    "/senior",
+    "/senior/visits",
+    "/senior/care-plan",
+    "/senior/messages",
+  ];
   const primaryTabs = MOBILE_PRIMARY_PATHS.map((p) => tabs.find((t) => t.to === p)!);
   const moreTabs = tabs.filter((t) => !MOBILE_PRIMARY_PATHS.includes(t.to));
-  const isActive = (to: string, exact?: boolean) => (exact ? pathname === to : pathname.startsWith(to));
+  const isActive = (to: string, exact?: boolean) =>
+    exact ? pathname === to : pathname.startsWith(to);
   const moreActive = moreTabs.some((t) => isActive(t.to, t.exact));
 
   return (
@@ -108,7 +118,6 @@ function SeniorLayout() {
       </main>
 
       <SupportWidget portal="senior" />
-
 
       <nav
         aria-label="Senior portal sections"
@@ -165,7 +174,9 @@ function SeniorLayout() {
                   {moreTabs.map(({ to, label, icon: Icon, exact, external }) => {
                     const active = !external && isActive(to, exact);
                     const className = `flex items-center gap-3 rounded-lg px-3 py-3 text-base ${
-                      active ? "bg-primary/10 font-semibold text-primary" : "text-foreground hover:bg-secondary"
+                      active
+                        ? "bg-primary/10 font-semibold text-primary"
+                        : "text-foreground hover:bg-secondary"
                     }`;
                     return (
                       <DrawerClose key={to} asChild>
@@ -192,4 +203,3 @@ function SeniorLayout() {
     </div>
   );
 }
-

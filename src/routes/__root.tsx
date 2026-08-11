@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
+import { SeniorPreferencesProvider } from "@/hooks/use-senior-preferences";
 
 function NotFoundComponent() {
   return (
@@ -101,14 +102,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           url: "https://getcompanioncare.com",
           description:
             "Verified in-home helpers for older adults — companionship, personal care, housekeeping, errands, and respite care. 5-stage verification, transparent pricing.",
-          telephone: "+1-800-COMPANION",
           areaServed: { "@type": "Country", name: "United States" },
+          // No `telephone` — there is no phone line, and publishing one in
+          // structured data makes search engines render a call button for it.
           contactPoint: {
             "@type": "ContactPoint",
-            telephone: "+1-800-COMPANION",
-            contactType: "customer service",
+            email: "support@getcompanioncare.com",
+            contactType: "customer support",
             availableLanguage: ["English", "Spanish"],
-            hoursAvailable: "Mo-Su 00:00-23:59",
           },
         }),
       },
@@ -119,7 +120,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   notFoundComponent: NotFoundComponent,
   errorComponent: ErrorComponent,
 });
-
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
@@ -150,7 +150,12 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      {/* Site-wide, not portal-only: text size, contrast, and reduced motion
+          have to work on the marketing pages an older adult sees first. Signed
+          -out visitors are served from localStorage. */}
+      <SeniorPreferencesProvider>
+        <Outlet />
+      </SeniorPreferencesProvider>
       <Toaster richColors position="top-center" />
     </QueryClientProvider>
   );
