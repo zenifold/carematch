@@ -12,14 +12,18 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TrustRouteImport } from './routes/trust'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as SeniorCareRouteImport } from './routes/senior-care'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as LegalRouteImport } from './routes/legal'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as ForFamiliesRouteImport } from './routes/for-families'
 import { Route as ForCaregiversRouteImport } from './routes/for-caregivers'
 import { Route as FaqRouteImport } from './routes/faq'
+import { Route as EmployeeRouteImport } from './routes/employee'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as ComingSoonRouteImport } from './routes/coming-soon'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
@@ -106,6 +110,7 @@ import { Route as AuthenticatedFamilyJoinRouteImport } from './routes/_authentic
 import { Route as AuthenticatedFamilyHelpRouteImport } from './routes/_authenticated/family.help'
 import { Route as AuthenticatedFamilyCarePlanRouteImport } from './routes/_authenticated/family.care-plan'
 import { Route as AuthenticatedFamilyBudgetRouteImport } from './routes/_authenticated/family.budget'
+import { Route as AuthenticatedAdminWaitlistRouteImport } from './routes/_authenticated/admin.waitlist'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminTrustSafetyRouteImport } from './routes/_authenticated/admin.trust-safety'
 import { Route as AuthenticatedAdminSupportRouteImport } from './routes/_authenticated/admin.support'
@@ -146,6 +151,11 @@ const SeniorCareRoute = SeniorCareRouteImport.update({
   path: '/senior-care',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResourcesRoute = ResourcesRouteImport.update({
   id: '/resources',
   path: '/resources',
@@ -154,6 +164,11 @@ const ResourcesRoute = ResourcesRouteImport.update({
 const PricingRoute = PricingRouteImport.update({
   id: '/pricing',
   path: '/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
+  id: '/llms.txt',
+  path: '/llms.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LegalRoute = LegalRouteImport.update({
@@ -181,9 +196,19 @@ const FaqRoute = FaqRouteImport.update({
   path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EmployeeRoute = EmployeeRouteImport.update({
+  id: '/employee',
+  path: '/employee',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComingSoonRoute = ComingSoonRouteImport.update({
+  id: '/coming-soon',
+  path: '/coming-soon',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -666,6 +691,12 @@ const AuthenticatedFamilyBudgetRoute =
     path: '/budget',
     getParentRoute: () => AuthenticatedFamilyRoute,
   } as any)
+const AuthenticatedAdminWaitlistRoute =
+  AuthenticatedAdminWaitlistRouteImport.update({
+    id: '/waitlist',
+    path: '/waitlist',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -812,14 +843,18 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
+  '/coming-soon': typeof ComingSoonRoute
   '/contact': typeof ContactRoute
+  '/employee': typeof EmployeeRoute
   '/faq': typeof FaqRoute
   '/for-caregivers': typeof ForCaregiversRoute
   '/for-families': typeof ForFamiliesRoute
   '/how-it-works': typeof HowItWorksRoute
   '/legal': typeof LegalRouteWithChildren
+  '/llms.txt': typeof LlmsDottxtRoute
   '/pricing': typeof PricingRoute
   '/resources': typeof ResourcesRouteWithChildren
+  '/robots.txt': typeof RobotsDottxtRoute
   '/senior-care': typeof SeniorCareRouteWithChildren
   '/services': typeof ServicesRouteWithChildren
   '/trust': typeof TrustRoute
@@ -883,6 +918,7 @@ export interface FileRoutesByFullPath {
   '/admin/support': typeof AuthenticatedAdminSupportRoute
   '/admin/trust-safety': typeof AuthenticatedAdminTrustSafetyRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/admin/waitlist': typeof AuthenticatedAdminWaitlistRoute
   '/family/budget': typeof AuthenticatedFamilyBudgetRoute
   '/family/care-plan': typeof AuthenticatedFamilyCarePlanRoute
   '/family/help': typeof AuthenticatedFamilyHelpRoute
@@ -934,12 +970,16 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
+  '/coming-soon': typeof ComingSoonRoute
   '/contact': typeof ContactRoute
+  '/employee': typeof EmployeeRoute
   '/faq': typeof FaqRoute
   '/for-caregivers': typeof ForCaregiversRoute
   '/for-families': typeof ForFamiliesRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/pricing': typeof PricingRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/trust': typeof TrustRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRouteWithChildren
@@ -997,6 +1037,7 @@ export interface FileRoutesByTo {
   '/admin/support': typeof AuthenticatedAdminSupportRoute
   '/admin/trust-safety': typeof AuthenticatedAdminTrustSafetyRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/admin/waitlist': typeof AuthenticatedAdminWaitlistRoute
   '/family/budget': typeof AuthenticatedFamilyBudgetRoute
   '/family/care-plan': typeof AuthenticatedFamilyCarePlanRoute
   '/family/help': typeof AuthenticatedFamilyHelpRoute
@@ -1048,14 +1089,18 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
+  '/coming-soon': typeof ComingSoonRoute
   '/contact': typeof ContactRoute
+  '/employee': typeof EmployeeRoute
   '/faq': typeof FaqRoute
   '/for-caregivers': typeof ForCaregiversRoute
   '/for-families': typeof ForFamiliesRoute
   '/how-it-works': typeof HowItWorksRoute
   '/legal': typeof LegalRouteWithChildren
+  '/llms.txt': typeof LlmsDottxtRoute
   '/pricing': typeof PricingRoute
   '/resources': typeof ResourcesRouteWithChildren
+  '/robots.txt': typeof RobotsDottxtRoute
   '/senior-care': typeof SeniorCareRouteWithChildren
   '/services': typeof ServicesRouteWithChildren
   '/trust': typeof TrustRoute
@@ -1119,6 +1164,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/support': typeof AuthenticatedAdminSupportRoute
   '/_authenticated/admin/trust-safety': typeof AuthenticatedAdminTrustSafetyRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/_authenticated/admin/waitlist': typeof AuthenticatedAdminWaitlistRoute
   '/_authenticated/family/budget': typeof AuthenticatedFamilyBudgetRoute
   '/_authenticated/family/care-plan': typeof AuthenticatedFamilyCarePlanRoute
   '/_authenticated/family/help': typeof AuthenticatedFamilyHelpRoute
@@ -1172,14 +1218,18 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/auth'
+    | '/coming-soon'
     | '/contact'
+    | '/employee'
     | '/faq'
     | '/for-caregivers'
     | '/for-families'
     | '/how-it-works'
     | '/legal'
+    | '/llms.txt'
     | '/pricing'
     | '/resources'
+    | '/robots.txt'
     | '/senior-care'
     | '/services'
     | '/trust'
@@ -1243,6 +1293,7 @@ export interface FileRouteTypes {
     | '/admin/support'
     | '/admin/trust-safety'
     | '/admin/users'
+    | '/admin/waitlist'
     | '/family/budget'
     | '/family/care-plan'
     | '/family/help'
@@ -1294,12 +1345,16 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/auth'
+    | '/coming-soon'
     | '/contact'
+    | '/employee'
     | '/faq'
     | '/for-caregivers'
     | '/for-families'
     | '/how-it-works'
+    | '/llms.txt'
     | '/pricing'
+    | '/robots.txt'
     | '/trust'
     | '/dashboard'
     | '/onboarding'
@@ -1357,6 +1412,7 @@ export interface FileRouteTypes {
     | '/admin/support'
     | '/admin/trust-safety'
     | '/admin/users'
+    | '/admin/waitlist'
     | '/family/budget'
     | '/family/care-plan'
     | '/family/help'
@@ -1407,14 +1463,18 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/about'
     | '/auth'
+    | '/coming-soon'
     | '/contact'
+    | '/employee'
     | '/faq'
     | '/for-caregivers'
     | '/for-families'
     | '/how-it-works'
     | '/legal'
+    | '/llms.txt'
     | '/pricing'
     | '/resources'
+    | '/robots.txt'
     | '/senior-care'
     | '/services'
     | '/trust'
@@ -1478,6 +1538,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/support'
     | '/_authenticated/admin/trust-safety'
     | '/_authenticated/admin/users'
+    | '/_authenticated/admin/waitlist'
     | '/_authenticated/family/budget'
     | '/_authenticated/family/care-plan'
     | '/_authenticated/family/help'
@@ -1531,14 +1592,18 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRoute
+  ComingSoonRoute: typeof ComingSoonRoute
   ContactRoute: typeof ContactRoute
+  EmployeeRoute: typeof EmployeeRoute
   FaqRoute: typeof FaqRoute
   ForCaregiversRoute: typeof ForCaregiversRoute
   ForFamiliesRoute: typeof ForFamiliesRoute
   HowItWorksRoute: typeof HowItWorksRoute
   LegalRoute: typeof LegalRouteWithChildren
+  LlmsDottxtRoute: typeof LlmsDottxtRoute
   PricingRoute: typeof PricingRoute
   ResourcesRoute: typeof ResourcesRouteWithChildren
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
   SeniorCareRoute: typeof SeniorCareRouteWithChildren
   ServicesRoute: typeof ServicesRouteWithChildren
   TrustRoute: typeof TrustRoute
@@ -1573,6 +1638,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SeniorCareRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/resources': {
       id: '/resources'
       path: '/resources'
@@ -1585,6 +1657,13 @@ declare module '@tanstack/react-router' {
       path: '/pricing'
       fullPath: '/pricing'
       preLoaderRoute: typeof PricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/llms.txt': {
+      id: '/llms.txt'
+      path: '/llms.txt'
+      fullPath: '/llms.txt'
+      preLoaderRoute: typeof LlmsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/legal': {
@@ -1622,11 +1701,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/employee': {
+      id: '/employee'
+      path: '/employee'
+      fullPath: '/employee'
+      preLoaderRoute: typeof EmployeeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contact': {
       id: '/contact'
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/coming-soon': {
+      id: '/coming-soon'
+      path: '/coming-soon'
+      fullPath: '/coming-soon'
+      preLoaderRoute: typeof ComingSoonRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -2231,6 +2324,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFamilyBudgetRouteImport
       parentRoute: typeof AuthenticatedFamilyRoute
     }
+    '/_authenticated/admin/waitlist': {
+      id: '/_authenticated/admin/waitlist'
+      path: '/waitlist'
+      fullPath: '/admin/waitlist'
+      preLoaderRoute: typeof AuthenticatedAdminWaitlistRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/users': {
       id: '/_authenticated/admin/users'
       path: '/users'
@@ -2415,6 +2515,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminSupportRoute: typeof AuthenticatedAdminSupportRoute
   AuthenticatedAdminTrustSafetyRoute: typeof AuthenticatedAdminTrustSafetyRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
+  AuthenticatedAdminWaitlistRoute: typeof AuthenticatedAdminWaitlistRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
@@ -2431,6 +2532,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminSupportRoute: AuthenticatedAdminSupportRoute,
   AuthenticatedAdminTrustSafetyRoute: AuthenticatedAdminTrustSafetyRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
+  AuthenticatedAdminWaitlistRoute: AuthenticatedAdminWaitlistRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 
@@ -2740,14 +2842,18 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   AuthRoute: AuthRoute,
+  ComingSoonRoute: ComingSoonRoute,
   ContactRoute: ContactRoute,
+  EmployeeRoute: EmployeeRoute,
   FaqRoute: FaqRoute,
   ForCaregiversRoute: ForCaregiversRoute,
   ForFamiliesRoute: ForFamiliesRoute,
   HowItWorksRoute: HowItWorksRoute,
   LegalRoute: LegalRouteWithChildren,
+  LlmsDottxtRoute: LlmsDottxtRoute,
   PricingRoute: PricingRoute,
   ResourcesRoute: ResourcesRouteWithChildren,
+  RobotsDottxtRoute: RobotsDottxtRoute,
   SeniorCareRoute: SeniorCareRouteWithChildren,
   ServicesRoute: ServicesRouteWithChildren,
   TrustRoute: TrustRoute,

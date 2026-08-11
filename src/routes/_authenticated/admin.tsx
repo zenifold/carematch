@@ -26,6 +26,7 @@ import {
   DollarSign,
   Settings,
   BadgeCheck,
+  ClipboardList,
   MoreHorizontal,
 } from "lucide-react";
 
@@ -67,6 +68,7 @@ type NavItem = { to: string; label: string; icon: typeof Inbox; exact?: boolean 
 const NAV_ROLES: Record<string, readonly string[]> = {
   "/admin": [],
   "/admin/users": [],
+  "/admin/waitlist": ["success", "support", "staff"],
   "/admin/support": ["support", "staff"],
   "/admin/success": ["success", "support", "staff"],
   "/admin/finance": ["finance", "staff"],
@@ -83,6 +85,7 @@ const NAV_ROLES: Record<string, readonly string[]> = {
 const nav: NavItem[] = [
   { to: "/admin", label: "Queue", icon: Inbox, exact: true },
   { to: "/admin/users", label: "Users", icon: UserCog },
+  { to: "/admin/waitlist", label: "Waitlist", icon: ClipboardList },
   { to: "/admin/support", label: "Support", icon: Inbox },
   { to: "/admin/success", label: "Success", icon: CheckSquare },
   { to: "/admin/finance", label: "Finance", icon: DollarSign },
