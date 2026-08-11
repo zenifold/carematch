@@ -8,6 +8,7 @@ import { STATE_AVAILABILITY, isStateOpen } from "@/lib/state-availability";
 import { tierByKey } from "@/lib/pricing-tiers";
 import heroImage from "@/assets/hero.jpg";
 import handsTea from "@/assets/hands-tea.jpg";
+import caregiverPlants from "@/assets/caregiver-plants.jpg";
 
 /**
  * Pre-launch landing page. Every public marketing route redirects here while
@@ -19,12 +20,17 @@ import handsTea from "@/assets/hands-tea.jpg";
  * throughout, because a hard navigation is re-evaluated by the gate while a
  * client-side <Link> would render a gated route straight out of the bundle.
  *
- * Content order is the reader's journey: what this is, what you can ask for,
- * how it works, who else gets a say, where we operate, then the ask. The
- * rollout precedes the form because coverage is the reason to leave details.
+ * Visual language is the site's own (src/routes/index.tsx and styles.css):
+ * warm-cream gradients, surface-card, the sage/terracotta pair, Fraunces at
+ * full size, hover-lift on things you can act on. An earlier version opted out
+ * of all of that and read like a different company.
+ *
+ * Motion is deliberately near-absent. The audience is older adults, the product
+ * ships a reduce-motion preference, and boldness here comes from type, colour
+ * and density rather than movement.
  *
  * Service names, blurbs and rates render from src/lib/pricing-tiers.ts. Do not
- * retype them here; that is how the homepage FAQ drifted to wrong numbers.
+ * retype them; that is how the homepage FAQ drifted to wrong numbers.
  *
  * Voice follows / and /about: candid about being new. No testimonials, no
  * metrics, no verification automation we haven't built. See PRODUCT.md.
@@ -39,8 +45,6 @@ export const Route = createFileRoute("/coming-soon")({
         content:
           "A marketplace for in-home help for older adults. Browse local helpers, see their rate, pick who comes and when. Opening in Virginia, with the Carolinas and Tennessee next.",
       },
-      // Belt and braces with the X-Robots-Tag the gate sets, in case this page
-      // is ever reached directly.
       { name: "robots", content: "noindex, nofollow, noarchive" },
       { property: "og:title", content: "CompanionCare: choose the person who comes to your door" },
       {
@@ -54,7 +58,6 @@ export const Route = createFileRoute("/coming-soon")({
   component: ComingSoonPage,
 });
 
-/** The six most-asked-for services. Names, blurbs and rates come from TIERS. */
 const FEATURED_SERVICES = [
   "companionship",
   "errands",
@@ -64,11 +67,6 @@ const FEATURED_SERVICES = [
   "personal",
 ];
 
-/**
- * The contrast that makes the product worth caring about. Left column is what
- * families already know, so it needs no evidence; right column describes
- * mechanisms that exist in the product today.
- */
 const CONTRAST = [
   {
     usual: "An agency sends whoever is on shift",
@@ -80,7 +78,7 @@ const CONTRAST = [
   },
   {
     usual: "An invoice that arrives later",
-    ours: "The helper's hourly rate and your total, before you book",
+    ours: "The helper's rate and your total, before you book",
   },
   {
     usual: "Packages and minimum hours",
@@ -90,27 +88,19 @@ const CONTRAST = [
 
 const STEPS = [
   {
-    n: 1,
     title: "Tell us what would help",
     body: "One question per screen, in plain words. Type it or say it out loud. About ten minutes, at your pace, and you can stop and come back.",
   },
   {
-    n: 2,
     title: "Meet your matches",
     body: "Real profiles: who they are, what they do, what they charge, and what we checked. You decide who to message, and you can meet before anyone starts.",
   },
   {
-    n: 3,
     title: "Book, then keep who you like",
     body: "Pick your hours and confirm. After the visit you get a short note about how it went, and rebooking the same person takes one tap.",
   },
 ];
 
-/**
- * What's true today, stated as fact. No percentages, no borrowed proof: the
- * homepage already commits to not doing that, and a pre-launch page is the
- * worst place to break it.
- */
 const TRUE_TODAY = [
   {
     term: "Who decides",
@@ -118,15 +108,13 @@ const TRUE_TODAY = [
       "The older adult, always. Family can propose visits and be given scoped access to view, change or pay, but the senior grants it and can revoke it in one tap. No bookings happen behind anyone's back.",
   },
   {
-    // Process, not cadence or vendor: verification is manual today
-    // (BACKGROUND_CHECK_VENDOR and IDV_VENDOR are both "manual").
+    // Process, not cadence or vendor: verification is manual today.
     term: "How helpers are checked",
     detail:
       "Five ways before anyone can take a visit: who they say they are, a national background check, credentials against state registries, a re-check while they stay active, and a photo match at your door. We do this by hand right now, and we will say so plainly when that changes.",
   },
   {
-    // No subscription claim: whether a paid membership exists is recorded as an
-    // explicitly undecided product fact.
+    // No subscription claim: that is an explicitly undecided product fact.
     term: "What it costs",
     detail:
       "Helpers set their own hourly rate. We add a service fee of 15 to 18 percent and show you one total before you book, charged per completed visit rather than up front. You set a spending cap, and it is a limit rather than a commitment.",
@@ -139,149 +127,196 @@ const TRUE_TODAY = [
 ];
 
 function ComingSoonPage() {
+  const openStates = STATE_AVAILABILITY.filter(isStateOpen);
+  const comingStates = STATE_AVAILABILITY.filter((s) => !isStateOpen(s));
+
   return (
-    <div className="min-h-dvh bg-background text-foreground">
-      {/* Wordmark plus the text-size control. No public nav, because every other
-          destination is gated; the staff entrance lives in the footer. */}
-      <header className="border-b border-border">
-        <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-5 py-4 lg:px-8">
-          <span className="font-serif text-xl font-bold tracking-tight">CompanionCare</span>
+    <div className="min-h-dvh overflow-x-hidden bg-background text-foreground">
+      <header className="border-b border-border/60 bg-background/85 backdrop-blur">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-4 lg:px-10">
+          <span className="font-serif text-2xl font-bold tracking-tight">CompanionCare</span>
           <TextSizeControl />
         </div>
       </header>
 
-      <main className="mx-auto max-w-3xl px-5 lg:px-8">
-        {/* Beat 1: the thesis is the mechanism. */}
-        <section className="border-b border-border py-14 lg:py-20">
-          <p className="text-sm font-bold uppercase tracking-[0.12em] text-primary">
-            Opening in Virginia
-          </p>
-          <h1 className="mt-4 font-serif text-[clamp(2.25rem,7vw,3.75rem)] font-semibold leading-[1.05] tracking-tight text-balance">
-            Choose the person who comes to your door.
-          </h1>
+      <main>
+        {/* Hero. No eyebrow above the headline: the heading carries itself, and
+            the "opening in Virginia" fact belongs with the rollout. */}
+        <section className="relative overflow-hidden border-b border-border">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-warm-cream via-background to-background"
+          />
+          <div className="mx-auto grid max-w-6xl gap-12 px-5 pb-16 pt-14 lg:grid-cols-12 lg:px-10 lg:pb-24 lg:pt-20">
+            <div className="lg:col-span-7">
+              <h1 className="font-serif text-[clamp(2.5rem,7vw,4.5rem)] font-semibold leading-[1.02] tracking-[-0.03em] text-balance">
+                Choose the person who comes to your door.
+              </h1>
 
-          <div className="mt-7 max-w-[62ch] space-y-4 text-xl leading-relaxed text-pretty">
-            <p>
-              CompanionCare is a marketplace for help at home: a friendly visit, a clean kitchen, a
-              ride to the doctor, a hand with bathing. You browse local helpers, see what each one
-              charges, and pick who comes and when.
-            </p>
-            <p>
-              Not an agency sending a stranger from a roster. You choose, and you can keep choosing
-              the same person for as long as you both want.
+              <div className="mt-8 max-w-[62ch] space-y-5 text-xl leading-relaxed text-pretty sm:text-[1.375rem]">
+                <p>
+                  CompanionCare is a marketplace for help at home: a friendly visit, a clean
+                  kitchen, a ride to the doctor, a hand with bathing. You browse local helpers, see
+                  what each one charges, and pick who comes and when.
+                </p>
+                <p className="text-muted-foreground">
+                  Not an agency sending a stranger from a roster. You choose, and you can keep
+                  choosing the same person for as long as you both want.
+                </p>
+              </div>
+
+              <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
+                <a
+                  href="#interest"
+                  className="group inline-flex min-h-14 items-center justify-center gap-2.5 rounded-full bg-primary px-8 text-lg font-semibold text-primary-foreground shadow-lifted transition-all hover:bg-primary/90 hover:shadow-soft"
+                >
+                  Tell us where you are
+                  <ArrowDown
+                    className="size-5 transition-transform group-hover:translate-y-0.5"
+                    aria-hidden
+                  />
+                </a>
+                <p className="text-base text-muted-foreground">
+                  Not open yet. Two questions, about thirty seconds.
+                </p>
+              </div>
+            </div>
+
+            <div className="lg:col-span-5">
+              <div className="relative">
+                <img
+                  src={heroImage}
+                  alt="An older woman and her helper talking together at home"
+                  width={1000}
+                  height={1000}
+                  loading="eager"
+                  className="aspect-square w-full rounded-3xl object-cover shadow-lifted"
+                />
+                {/* The accent, spent once and deliberately: the one fact a
+                    visitor most needs is where we actually operate. */}
+                {/* Ink rather than accent-foreground: white on terracotta
+                    measures 2.57:1, ink on terracotta 6.44:1. */}
+                <p className="absolute -bottom-5 left-5 right-5 rounded-2xl bg-accent px-5 py-4 text-center text-lg font-semibold text-foreground shadow-lifted sm:left-8 sm:right-8">
+                  Open in {openStates.map((s) => s.state).join(", ")}
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* The contrast. Sage surface so the "ours" column reads as the answer. */}
+        <section className="border-b border-border bg-secondary/40">
+          <div className="mx-auto max-w-6xl px-5 py-16 lg:px-10 lg:py-24">
+            <h2 className="max-w-3xl font-serif text-4xl tracking-tight text-balance sm:text-5xl">
+              You have arranged care before. You know the left column.
+            </h2>
+
+            <ul className="mt-12 grid gap-4">
+              {CONTRAST.map((row) => (
+                <li
+                  key={row.usual}
+                  className="grid items-center gap-3 rounded-2xl bg-card p-5 shadow-soft sm:grid-cols-2 sm:gap-8 sm:p-6"
+                >
+                  <p className="flex items-start gap-3 text-lg text-muted-foreground">
+                    <X className="mt-1 size-5 shrink-0" aria-hidden />
+                    <span>{row.usual}</span>
+                  </p>
+                  <p className="flex items-start gap-3 text-lg font-semibold">
+                    <Check className="mt-1 size-5 shrink-0 text-primary" aria-hidden />
+                    <span>{row.ours}</span>
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        {/* Services. The rate leads, because a number is the most reassuring
+            thing on a page about buying care. */}
+        <section className="border-b border-border">
+          <div className="mx-auto max-w-6xl px-5 py-16 lg:px-10 lg:py-24">
+            <div className="max-w-3xl">
+              <h2 className="font-serif text-4xl tracking-tight text-balance sm:text-5xl">
+                What you can ask for
+              </h2>
+              <p className="mt-5 text-xl text-muted-foreground text-pretty">
+                These are what helpers in this range charge per hour. You always see the full total,
+                our fee included, before anything is booked.
+              </p>
+            </div>
+
+            <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {FEATURED_SERVICES.map((key) => {
+                const tier = tierByKey(key);
+                return (
+                  <div
+                    key={tier.key}
+                    className="surface-card flex flex-col p-7 transition-all hover:-translate-y-1 hover:shadow-lifted"
+                  >
+                    <p className="font-serif text-3xl tabular-nums tracking-tight">
+                      ${tier.providerLow}
+                      <span className="text-muted-foreground">–</span>${tier.providerHigh}
+                      <span className="ml-1 font-sans text-base font-normal text-muted-foreground">
+                        /hr
+                      </span>
+                    </p>
+                    <h3 className="mt-4 text-xl font-semibold">{tier.name}</h3>
+                    <p className="mt-1.5 text-base text-muted-foreground text-pretty">
+                      {tier.blurb}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+
+            <p className="mt-8 max-w-[62ch] text-base text-muted-foreground">
+              Also tech help, small repairs, and skilled nursing through licensed partners. Personal
+              care is delivered by a state-licensed agency in states that require one.
             </p>
           </div>
-
-          <img
-            src={heroImage}
-            alt="An older woman and her helper talking together at home"
-            width={1200}
-            height={675}
-            loading="eager"
-            className="mt-9 aspect-[16/9] w-full rounded-2xl object-cover shadow-soft"
-          />
-
-          <a
-            href="#interest"
-            className="mt-9 inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-6 text-lg font-semibold text-primary-foreground hover:bg-primary/90"
-          >
-            Tell us where you are
-            <ArrowDown className="size-5" aria-hidden />
-          </a>
-          <p className="mt-3 text-base text-muted-foreground">
-            We are not open yet. Two questions, about thirty seconds.
-          </p>
         </section>
 
-        {/* Beat 2: the contrast. Genuinely comparison-shaped, so it is a table. */}
-        <section className="border-b border-border py-14 lg:py-16">
-          <h2 className="font-serif text-3xl tracking-tight text-balance">
-            What makes this different
-          </h2>
-          <p className="mt-2 max-w-[62ch] text-lg text-muted-foreground text-pretty">
-            If you have arranged care before, you already know the left column.
-          </p>
-
-          <ul className="mt-8 space-y-4">
-            {CONTRAST.map((row) => (
-              <li key={row.usual} className="grid gap-2 sm:grid-cols-2 sm:gap-6">
-                <p className="flex items-start gap-2.5 text-lg text-muted-foreground">
-                  <X className="mt-1.5 size-4 shrink-0" aria-hidden />
-                  <span>{row.usual}</span>
-                </p>
-                <p className="flex items-start gap-2.5 text-lg font-medium">
-                  <Check className="mt-1.5 size-4 shrink-0 text-primary" aria-hidden />
-                  <span>{row.ours}</span>
-                </p>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        {/* Beat 3: what you can actually ask for, with real numbers. */}
-        <section className="border-b border-border py-14 lg:py-16">
-          <h2 className="font-serif text-3xl tracking-tight text-balance">What you can ask for</h2>
-          <p className="mt-2 max-w-[62ch] text-lg text-muted-foreground text-pretty">
-            Rates are what helpers in this range charge per hour. You will always see the full
-            total, including our fee, before anything is booked.
-          </p>
-
-          <dl className="mt-8 divide-y divide-border border-y border-border">
-            {FEATURED_SERVICES.map((key) => {
-              const tier = tierByKey(key);
-              return (
-                <div
-                  key={tier.key}
-                  className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 py-4"
-                >
-                  <div className="min-w-0">
-                    <dt className="text-lg font-semibold">{tier.name}</dt>
-                    <dd className="text-base text-muted-foreground">{tier.blurb}</dd>
-                  </div>
-                  <dd className="text-lg font-medium tabular-nums">
-                    ${tier.providerLow}&ndash;${tier.providerHigh}
-                    <span className="text-base font-normal text-muted-foreground">/hr</span>
-                  </dd>
-                </div>
-              );
-            })}
-          </dl>
-
-          <p className="mt-5 text-base text-muted-foreground">
-            Also tech help, small repairs, and skilled nursing through licensed partners. Personal
-            care is delivered by a state-licensed agency in states that require one.
-          </p>
-        </section>
-
-        {/* Beat 4: how it works. */}
-        <section className="border-b border-border py-14 lg:py-16">
-          <h2 className="font-serif text-3xl tracking-tight text-balance">How it will work</h2>
-          <ol className="mt-8 space-y-8">
-            {STEPS.map((step) => (
-              <li key={step.n} className="grid gap-2 sm:grid-cols-[3rem_minmax(0,1fr)] sm:gap-5">
-                <span aria-hidden className="font-serif text-3xl leading-none text-primary sm:pt-1">
-                  {step.n}
-                </span>
-                <div>
-                  <h3 className="font-serif text-xl tracking-tight">{step.title}</h3>
-                  <p className="mt-1.5 max-w-[58ch] text-lg text-muted-foreground text-pretty">
+        {/* Steps. Numbers earn their place here: the order is the information. */}
+        <section className="border-b border-border bg-secondary/40">
+          <div className="mx-auto max-w-6xl px-5 py-16 lg:px-10 lg:py-24">
+            <h2 className="max-w-3xl font-serif text-4xl tracking-tight text-balance sm:text-5xl">
+              How it will work
+            </h2>
+            <ol className="mt-12 grid gap-6 lg:grid-cols-3">
+              {STEPS.map((step, i) => (
+                <li key={step.title} className="rounded-2xl bg-card p-7 shadow-soft">
+                  <span
+                    aria-hidden
+                    className="grid size-12 place-items-center rounded-full bg-primary font-serif text-2xl text-primary-foreground"
+                  >
+                    {i + 1}
+                  </span>
+                  <h3 className="mt-5 font-serif text-2xl tracking-tight">{step.title}</h3>
+                  <p className="mt-2 text-lg text-secondary-foreground/80 text-pretty">
                     {step.body}
                   </p>
-                </div>
-              </li>
-            ))}
-          </ol>
+                </li>
+              ))}
+            </ol>
+          </div>
         </section>
 
-        {/* Beat 5: the consent model, which is the differentiator for both the
-            senior and the adult child, and the reason each can relax. */}
-        <section className="border-b border-border py-14 lg:py-16">
-          <div className="grid gap-8 sm:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)] sm:items-center">
-            <div>
-              <h2 className="font-serif text-3xl tracking-tight text-balance">
-                Family can help without taking over
+        {/* Family. Image at full strength, text given room. */}
+        <section className="border-b border-border">
+          <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 py-16 lg:grid-cols-2 lg:px-10 lg:py-24">
+            <img
+              src={handsTea}
+              alt="An older woman and her helper sharing tea at a kitchen table"
+              width={900}
+              height={700}
+              loading="lazy"
+              className="aspect-[4/3] w-full rounded-3xl object-cover shadow-lifted lg:order-2"
+            />
+            <div className="lg:order-1">
+              <h2 className="font-serif text-4xl tracking-tight text-balance sm:text-5xl">
+                Family can help without taking over.
               </h2>
-              <div className="mt-4 max-w-[58ch] space-y-4 text-lg text-pretty">
+              <div className="mt-6 max-w-[58ch] space-y-4 text-xl leading-relaxed text-pretty">
                 <p>
                   A daughter three states away can suggest a visit, follow along, and pick up the
                   bill. What she cannot do is arrange anything without you knowing.
@@ -293,97 +328,127 @@ function ComingSoonPage() {
                 </p>
               </div>
             </div>
-            <img
-              src={handsTea}
-              alt="An older woman and her helper sharing tea at a kitchen table"
-              width={800}
-              height={800}
-              loading="lazy"
-              className="aspect-square w-full rounded-2xl object-cover shadow-soft"
-            />
           </div>
         </section>
 
-        {/* Beat 6: the rollout, from the same source as
-            /legal/state-availability, so the two can never disagree. */}
-        <section className="border-b border-border py-14 lg:py-16">
-          <h2 className="font-serif text-3xl tracking-tight">Where we are today</h2>
-          <p className="mt-2 max-w-[62ch] text-lg text-muted-foreground text-pretty">
-            Live in Virginia, and building in the Carolinas and Tennessee. Coverage depends on state
-            licensing and on how many verified helpers we have nearby rather than on ambition, so
-            this list stays short until each one is genuinely ready.
-          </p>
+        {/* Rollout. Open states get the card treatment and the accent dot; the
+            rest stay quiet, so the shape of the list carries the message. */}
+        <section className="border-b border-border bg-secondary/40">
+          <div className="mx-auto max-w-6xl px-5 py-16 lg:px-10 lg:py-24">
+            <div className="max-w-3xl">
+              <h2 className="font-serif text-4xl tracking-tight text-balance sm:text-5xl">
+                Where we are today
+              </h2>
+              <p className="mt-5 text-xl text-muted-foreground text-pretty">
+                Coverage depends on state licensing and on how many verified helpers we have nearby
+                rather than on ambition, so this list stays short until each one is genuinely ready.
+              </p>
+            </div>
 
-          <ul className="mt-8 divide-y divide-border border-y border-border">
-            {STATE_AVAILABILITY.map((row) => {
-              const open = isStateOpen(row);
-              return (
-                <li
-                  key={row.code}
-                  className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 py-3.5"
-                >
-                  <span className="flex items-baseline gap-3">
-                    <span className="text-lg font-medium">{row.state}</span>
-                    <span className="text-sm tabular-nums text-muted-foreground">{row.code}</span>
-                  </span>
-                  {/* Text carries the status, not colour alone. */}
-                  <span
-                    className={`text-base ${open ? "font-semibold text-primary" : "text-muted-foreground"}`}
-                  >
-                    {open
-                      ? row.partners === "partner" || row.health === "partner"
-                        ? "Open, some care via partner"
-                        : "Open for companionship and household help"
-                      : "In progress"}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-
-          <p className="mt-5 text-base text-muted-foreground">
-            Somewhere else entirely? That is the most useful thing you can tell us. Where people ask
-            from is how we choose what opens after these.
-          </p>
-        </section>
-
-        {/* Beat 7: the ask. */}
-        <section id="interest" className="scroll-mt-6 border-b border-border py-14 lg:py-16">
-          <h2 className="font-serif text-3xl tracking-tight text-balance">
-            Tell us where you are.
-          </h2>
-          <p className="mt-2 max-w-[62ch] text-lg text-muted-foreground text-pretty">
-            Leave your details and we will write when it is your turn. That is the whole offer.
-            Nothing to buy, nothing to install, and a real person reads every one of these.
-          </p>
-          <InterestForms />
-        </section>
-
-        {/* Beat 8: the trust close. */}
-        <section className="py-14 lg:py-16">
-          <h2 className="font-serif text-3xl tracking-tight">What you can hold us to</h2>
-          <dl className="mt-8 space-y-7">
-            {TRUE_TODAY.map((item) => (
-              <div
-                key={item.term}
-                className="grid gap-1.5 sm:grid-cols-[13rem_minmax(0,1fr)] sm:gap-6"
-              >
-                <dt className="text-sm font-bold uppercase tracking-[0.12em] text-primary sm:pt-2">
-                  {item.term}
-                </dt>
-                <dd className="max-w-[58ch] text-lg leading-relaxed text-pretty">{item.detail}</dd>
+            <div className="mt-12 grid gap-8 lg:grid-cols-2">
+              <div>
+                <h3 className="text-sm font-bold uppercase tracking-[0.12em] text-primary">
+                  Open now
+                </h3>
+                <ul className="mt-4 space-y-3">
+                  {openStates.map((row) => (
+                    <li
+                      key={row.code}
+                      className="surface-card flex flex-wrap items-baseline gap-x-4 p-6"
+                    >
+                      <span
+                        className="size-2.5 shrink-0 translate-y-[-2px] rounded-full bg-accent"
+                        aria-hidden
+                      />
+                      <span className="font-serif text-3xl tracking-tight">{row.state}</span>
+                      <span className="text-lg text-muted-foreground">
+                        Companionship and household help
+                      </span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-            ))}
-          </dl>
+
+              <div>
+                {/* Full opacity: at /70 this measured 3.86:1 against the sage
+                    surface, under the 4.5 floor. */}
+                <h3 className="text-sm font-bold uppercase tracking-[0.12em] text-secondary-foreground">
+                  Building now
+                </h3>
+                <ul className="mt-4 divide-y divide-border rounded-2xl border border-border bg-card/60">
+                  {comingStates.map((row) => (
+                    <li
+                      key={row.code}
+                      className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 px-6 py-4"
+                    >
+                      <span className="text-xl font-medium">{row.state}</span>
+                      <span className="text-base text-muted-foreground">In progress</span>
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-5 text-base text-muted-foreground">
+                  Somewhere else entirely? That is the most useful thing you can tell us. Where
+                  people ask from is how we choose what opens after these.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* The ask. Sits on card over the warm ground so it reads as the
+            destination the whole page has been walking toward. */}
+        <section id="interest" className="scroll-mt-4 border-b border-border bg-warm-cream">
+          <div className="mx-auto max-w-4xl px-5 py-16 lg:px-10 lg:py-24">
+            <div className="max-w-2xl">
+              <h2 className="font-serif text-4xl tracking-tight text-balance sm:text-5xl">
+                Tell us where you are.
+              </h2>
+              <p className="mt-5 text-xl text-muted-foreground text-pretty">
+                Leave your details and we will write when it is your turn. That is the whole offer.
+                Nothing to buy, nothing to install, and a real person reads every one of these.
+              </p>
+            </div>
+            <div className="surface-card mt-10 p-6 sm:p-10">
+              <InterestForms />
+            </div>
+          </div>
+        </section>
+
+        {/* The trust close. */}
+        <section className="border-b border-border">
+          <div className="mx-auto grid max-w-6xl gap-12 px-5 py-16 lg:grid-cols-12 lg:px-10 lg:py-24">
+            <div className="lg:col-span-5">
+              <h2 className="font-serif text-4xl tracking-tight text-balance sm:text-5xl">
+                What you can hold us to
+              </h2>
+              <img
+                src={caregiverPlants}
+                alt="A helper watering plants in an older adult's home"
+                width={800}
+                height={600}
+                loading="lazy"
+                className="mt-8 hidden aspect-[4/3] w-full rounded-3xl object-cover shadow-soft lg:block"
+              />
+            </div>
+            <dl className="space-y-9 lg:col-span-7">
+              {TRUE_TODAY.map((item) => (
+                <div key={item.term}>
+                  <dt className="font-serif text-2xl tracking-tight text-primary">{item.term}</dt>
+                  <dd className="mt-2 max-w-[62ch] text-lg leading-relaxed text-pretty">
+                    {item.detail}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
         </section>
       </main>
 
-      <footer className="border-t border-border bg-secondary/40">
-        <div className="mx-auto flex max-w-3xl flex-col gap-3 px-5 py-9 text-base text-muted-foreground lg:flex-row lg:items-center lg:justify-between lg:px-8">
+      <footer className="bg-secondary/40">
+        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-5 py-10 text-base text-muted-foreground lg:flex-row lg:items-center lg:justify-between lg:px-10">
           <p>© {new Date().getFullYear()} CompanionCare</p>
           {/* /legal/privacy and /legal/terms are allowlisted through the gate
-              precisely because this page collects personal data. min-h-11 to
-              clear the 44px touch floor. */}
+              precisely because this page collects personal data. */}
           <nav className="flex flex-wrap items-center gap-x-6">
             <a
               href="/legal/privacy"

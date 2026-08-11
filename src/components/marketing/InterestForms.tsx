@@ -483,12 +483,17 @@ export function InterestForms() {
           <div
             ref={confirmRef}
             role="status"
-            className="rounded-2xl border-l-4 border-primary bg-secondary/50 p-6 sm:p-8"
+            className="rounded-2xl border border-primary/30 bg-secondary/60 p-6 shadow-soft sm:p-8"
           >
-            <p className="inline-flex items-center gap-2 text-base font-bold uppercase tracking-[0.12em] text-primary">
-              <Check className="size-5" aria-hidden /> You&rsquo;re on the list
+            <p className="inline-flex items-center gap-2.5">
+              <span className="grid size-9 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground">
+                <Check className="size-5" aria-hidden />
+              </span>
+              <span className="text-base font-bold uppercase tracking-[0.12em] text-primary">
+                You&rsquo;re on the list
+              </span>
             </p>
-            <p className="mt-3 max-w-xl font-serif text-2xl leading-snug text-pretty">
+            <p className="mt-4 max-w-xl font-serif text-2xl leading-snug text-pretty">
               {SEGMENTS.find((s) => s.key === done)!.confirmation}
             </p>
             {submitted?.email && (
