@@ -23,6 +23,14 @@ enabled = true
 # STRIPE_SECRET_KEY, etc.) are set via `wrangler secret put <NAME>` instead —
 # never put them here, this file is committed to git.
 [vars]
+# Pre-launch gate (src/lib/coming-soon-gate.ts). "1" redirects every public
+# marketing route to /coming-soon and serves a full Disallow to crawlers; set to
+# "0" or delete the line to open the site. The preview token that lets the team
+# see the real site is a secret: `wrangler secret put COMING_SOON_TOKEN`.
+COMING_SOON = "1"
+# Where new waitlist signups get emailed. Optional — the row is stored either
+# way, this just saves someone having to poll Supabase.
+WAITLIST_NOTIFY_ADDRESS = "hello@getcompanioncare.com"
 SUPABASE_URL = "https://wcjahuathjuzocvpmewu.supabase.co"
 SUPABASE_PROJECT_ID = "wcjahuathjuzocvpmewu"
 SUPABASE_PUBLISHABLE_KEY = "sb_publishable_zZKtE4bhhKEjSAardvcmwQ_5skfgwt0"
