@@ -22,6 +22,11 @@ SVC = ENV["SUPABASE_SERVICE_ROLE_KEY"]
 
 PACE = 1.2
 
+# PostgREST status conventions worth stating once: a function RETURNING a value
+# answers 200, a RETURNS void function answers 204, and raising a PTxxx SQLSTATE
+# sets the status to xxx. Assertions below pin the exact code, because "any 4xx"
+# would have hidden the 500 that a wrong errcode was producing.
+
 
 def req(path, method="GET", body=None, token=None, key=None, prefer=None):
     time.sleep(PACE)
@@ -141,17 +146,20 @@ s, _ = rpc(
     "agent_update_ticket",
     {"_ticket_id": TICKET, "_priority": "high", "_expected_last_activity_at": BEFORE},
 )
-check("stale precondition blocked (no lock convoy)", s >= 400, f"HTTP {s}")
+check("stale precondition -> 409, not a hang", s == 409, f"HTTP {s}")
 
 s, _ = rpc(
     "agent_update_ticket",
     {"_ticket_id": TICKET, "_status": "resolved", "_approved_by": APPROVER, "_approval_ref": "buzz-2"},
 )
-check("resolve allowed with approver", s == 200, f"HTTP {s}")
+check("resolve allowed with approver", s == 204, f"HTTP {s}")
 _, res = svc(f"/rest/v1/support_tickets?select=resolved_at&id=eq.{TICKET}")
 check("resolved_at derived (second bug fixed)", res[0]["resolved_at"] is not None, str(res[0]["resolved_at"])[:19])
 
-s, _ = rpc("agent_update_ticket", {"_ticket_id": TICKET, "_status": ORIG_STATUS})
+# Explicitly "open", not ORIG_STATUS: the fixture is whichever ticket comes back
+# first, and if that one is already resolved then re-setting its own status
+# correctly leaves resolved_at in place and the assertion is meaningless.
+s, _ = rpc("agent_update_ticket", {"_ticket_id": TICKET, "_status": "open"})
 _, res = svc(f"/rest/v1/support_tickets?select=resolved_at&id=eq.{TICKET}")
 check("reopening clears resolved_at", res[0]["resolved_at"] is None, str(res[0]["resolved_at"]))
 
@@ -166,7 +174,7 @@ if incs:
         "agent_triage_incident",
         {"_incident_id": INC["id"], "_status": "triaged", "_approved_by": APPROVER},
     )
-    check("incident triage allowed with approver", s == 200, f"HTTP {s}")
+    check("incident triage allowed with approver", s == 204, f"HTTP {s}")
 
     s, _ = rpc("agent_triage_incident", {"_incident_id": INC["id"], "_severity": 9, "_approved_by": APPROVER})
     check("severity out of range blocked", s >= 400, f"HTTP {s}")
@@ -182,7 +190,7 @@ if incs:
         "agent_triage_incident",
         {"_incident_id": INC["id"], "_status": "dismissed", "_approved_by": APPROVER, "_approval_ref": "buzz-3"},
     )
-    check("harm-category close allowed with admin approver", s == 200, f"HTTP {s}")
+    check("harm-category close allowed with admin approver", s == 204, f"HTTP {s}")
     _, cl = svc(f"/rest/v1/incidents?select=resolved_by&id=eq.{INC['id']}")
     check(
         "resolved_by records the approver, not the agent",
@@ -207,7 +215,7 @@ s, _ = rpc(
     "agent_create_ticket_for",
     {"_requester_id": "00000000-0000-4000-8000-000000000000", "_subject": "abc", "_body": "abcd"},
 )
-check("create_for blocks unknown requester", s >= 400, f"HTTP {s}")
+check("create_for blocks unknown requester -> 404", s == 404, f"HTTP {s}")
 
 s, new_ticket = rpc(
     "agent_create_ticket_for",
@@ -244,16 +252,29 @@ s, _ = rpc("agent_assert_under_rate_limit", {})
 check("internal helper not callable by the agent", s >= 400, f"HTTP {s}")
 
 # --- cleanup --------------------------------------------------------------
-svc("/rest/v1/support_messages?body=like.*rpc check*", "DELETE")
-if "new_ticket" in dir() and isinstance(new_ticket, str):
-    svc(f"/rest/v1/support_messages?ticket_id=eq.{new_ticket}", "DELETE")
-    svc(f"/rest/v1/support_tickets?id=eq.{new_ticket}", "DELETE")
+# Removes residue from THIS run and any earlier interrupted one, so a crashed run
+# never leaves the database dirty for the next.
+#
+# Two things this got wrong before: urllib rejects a raw space in a URL (node's
+# fetch tolerated it, so it shipped broken), and the probe tickets created by
+# agent_create_ticket_for carry "[rpc check]" in their *subject* while their
+# opening message body is ordinary customer text — so a body-only filter never
+# matched them and they accumulated one per run.
+svc("/rest/v1/support_messages?body=like.*rpc%20check*", "DELETE")
+
+_, probe_tickets = svc("/rest/v1/support_tickets?select=id&subject=like.*rpc%20check*")
+for t in probe_tickets or []:
+    # Messages first: support_messages.ticket_id references support_tickets.
+    svc(f"/rest/v1/support_messages?ticket_id=eq.{t['id']}", "DELETE")
+    svc(f"/rest/v1/support_tickets?id=eq.{t['id']}", "DELETE")
+
+# Restore the fixture ticket to exactly how it was found.
 svc(
     f"/rest/v1/support_tickets?id=eq.{TICKET}",
     "PATCH",
-    {"status": ORIG_STATUS, "last_activity_at": BEFORE, "resolved_at": None, "priority": "normal"},
+    {"status": ORIG_STATUS, "last_activity_at": BEFORE, "resolved_at": None},
 )
-svc(f"/rest/v1/admin_audit_log?actor_id=eq.{AGENT}&action=like.agent.*", "DELETE")
+svc(f"/rest/v1/admin_audit_log?action=like.agent.*", "DELETE")
 
 failed = 0
 for label, ok, detail in results:
