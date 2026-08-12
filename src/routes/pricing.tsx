@@ -66,14 +66,6 @@ export const Route = createFileRoute("/pricing")({
           },
           {
             "@type": "Question",
-            name: "Is there a membership option?",
-            acceptedAnswer: {
-              "@type": "Answer",
-              text: "Yes. CompanionCare Plus is $29/month and waives service fees on the first $200 of bookings each month, plus unlocks priority booking with top-rated providers. Membership is optional — you can book without it.",
-            },
-          },
-          {
-            "@type": "Question",
             name: "What happens if I cancel?",
             acceptedAnswer: {
               "@type": "Answer",
@@ -585,59 +577,11 @@ function PricingPage() {
         </div>
       </section>
 
-      {/* Membership */}
-      <section className="border-y border-border bg-primary/5">
-        <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 lg:grid-cols-2 lg:px-10">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-wider text-primary">
-              Optional membership
-            </p>
-            <h2 className="mt-2 font-serif text-3xl tracking-tight">CompanionCare Plus — $29/month</h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              For families booking regular care. Waives service fees on the first $200 of bookings
-              each month and unlocks priority access to top-rated providers.
-            </p>
-            <ul className="mt-6 space-y-3">
-              {[
-                "Service fees waived on first $200/month of bookings",
-                "Priority booking with top-rated providers",
-                "Dedicated care coordinator",
-                "Cancel anytime — no contracts",
-              ].map((i) => (
-                <li key={i} className="flex items-start gap-2 text-base">
-                  <Check className="mt-1 size-4 shrink-0 text-primary" />
-                  <span>{i}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="surface-card p-6">
-            <p className="font-semibold">When Plus pays for itself</p>
-            <p className="mt-2 text-base text-muted-foreground">
-              At an 18% service fee, waiving fees on $200/month saves $36. Plus costs $29.
-              Break-even is one recurring visit a month.
-            </p>
-            <div className="mt-6 rounded-2xl bg-secondary/50 p-5 font-mono text-sm">
-              <div className="flex justify-between">
-                <span>Bookings/month</span>
-                <span>$200.00</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Fees waived (18%)</span>
-                <span>−$36.00</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Plus membership</span>
-                <span>+$29.00</span>
-              </div>
-              <div className="mt-2 flex justify-between border-t border-border pt-2 font-semibold">
-                <span>Net savings</span>
-                <span className="text-primary">$7.00 / mo</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* A paid membership tier is explicitly undecided (see PRODUCT.md) and
+          backlog.md commits to pay-as-you-go with no subscription as positioning
+          against care.com. Nothing in the schema or Stripe code implements one,
+          so the section that sold "CompanionCare Plus — $29/month" was removed
+          rather than restated. Don't re-add a price here until it exists. */}
 
       {/* Cancellation & payment flow */}
       <section className="mx-auto max-w-6xl px-5 py-16 lg:px-10">
@@ -760,10 +704,6 @@ function PricingPage() {
               {
                 q: "How much does the provider actually keep?",
                 a: "Providers keep 82–85% of their listed hourly rate. They set their own rates, set their own schedule, and can raise them anytime. Payouts run every Monday by direct deposit.",
-              },
-              {
-                q: "Do I need CompanionCare Plus to book?",
-                a: "No. Plus is optional and pays for itself at roughly one recurring visit per month. Most families start without it and add it after their second or third booking.",
               },
               {
                 q: "What if I cancel a visit?",

@@ -78,11 +78,21 @@ within one business day. Safety reports jump the queue. Emergencies route to 911
 
 **Explicitly undecided.** Future work must not resolve these by assumption:
 
-- **Membership tier.** Whether a paid membership exists is open. `/pricing` currently sells
-  "CompanionCare Plus" at $29/month while `backlog.md` says pay-as-you-go with no subscription.
-  The live claim is being removed until this is settled.
-- **Cancellation policy.** No policy or fee window exists in the system. Three pages currently
-  promise free cancellation 24 hours out; that promise is being removed until terms are set.
+- **Membership tier.** Whether a paid membership exists is open. Nothing implements one: no
+  table, no Stripe subscription, and `backlog.md` commits to pay-as-you-go as positioning
+  against care.com. The terms of service and `/family/budget` both already stated that no
+  membership fee is charged, so `/pricing`'s "CompanionCare Plus — $29/month" section was the
+  lone outlier and has been removed. Don't publish a price until the tier exists.
+
+**Corrected.** The cancellation policy was previously recorded here as undecided and unbuilt.
+That was wrong, and acting on it would have deleted accurate copy:
+
+- **Cancellation policy is implemented and documented correctly.**
+  `src/lib/stripe/charge-visit.server.ts` defines `LATE_CANCEL_WINDOW_MS` at 24 hours and
+  `refundCancelledBooking` applies it — full refund outside the window; inside it, half the
+  visit cost is kept and split evenly between provider and platform, half refunded. It skips
+  bookings already paid out. The 13 places that describe this (including the terms of service)
+  match the code, down to the even split. Change the constant and the copy together.
 
 ## Brand Commitments
 

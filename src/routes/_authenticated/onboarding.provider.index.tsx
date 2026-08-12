@@ -207,7 +207,7 @@ function ProviderOnboarding() {
               <Input
                 value={serviceArea}
                 onChange={(e) => setServiceArea(e.target.value)}
-                placeholder="e.g. Sarasota, FL"
+                placeholder="e.g. Richmond, VA"
               />
             </Field>
           </div>

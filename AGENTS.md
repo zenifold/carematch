@@ -34,3 +34,40 @@ Supabase, one project shared by local dev and production — there is no
 separate staging database. `.env` points at the same project the deployed
 Worker uses, so exercising a write path locally writes production rows.
 All tables have RLS enabled; keep it that way when adding one.
+
+## Demo and test accounts
+
+`npm run seed:demo` (`scripts/seed-demo.mjs`) owns every non-real account.
+Password for all of them: **`CompanionCare123!`**
+
+| Sign in as | Email                               | What you see                                                              |
+| ---------- | ----------------------------------- | ------------------------------------------------------------------------- |
+| Admin      | `demo-admin@companioncare.test`     | Every staff queue with real rows in it                                    |
+| Senior     | `demo-senior@companioncare.test`    | Marta Alvarez — 6 rated visits, 2 upcoming, a message thread, a spend cap |
+| Family     | `demo-family@companioncare.test`    | Dana Alvarez — financial access to Marta, an open billing ticket          |
+| Caregiver  | `demo-caregiver@companioncare.test` | Andrea Rivera — 4.8 rating, payout history, a pending request             |
+
+Nine more populated personas exist for list density: `eleanor.vance@`,
+`robert.chen@`, `james.vance@`, `sophie.vance@`, and providers `priya.shah@`,
+`marcus.chen@`, `nia.okafor@`, `luisa.fernandez@`, `diego.martinez@` (all
+`@companioncare.test`).
+
+The four `test-*@companioncare.test` accounts (`test-senior`, `test-family`,
+`test-caregiver`, `test-staff`) are deliberately empty, for walking through
+onboarding and first-run states the way a new user would.
+
+Three things to know before touching it:
+
+- **Everything lives on `companioncare.test`**, which RFC 2606 reserves, so no
+  address can receive mail or collide with a real signup. That domain is also
+  the only marker the seed needs: `--reset` deletes every account on it and the
+  foreign keys cascade the data away.
+- **Re-running is how you refresh it.** Every date is relative to run time, so
+  a seed left alone for a month starts showing "upcoming" visits in the past.
+  A re-run clears the previous seed data first, so it never doubles up.
+- **It writes to production**, per the note above. Inserting bookings, messages,
+  and verifications also fires the app's notification triggers, so the row counts
+  come out higher than what the script inserts directly — that's expected.
+
+`node scripts/seed-demo.mjs --verify` signs in as all 17 without changing
+anything, which is the quickest check that a rename or password reset landed.

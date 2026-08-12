@@ -60,7 +60,7 @@ const roleMeta: Record<Role, {
     image: authSenior,
     icon: Heart,
     quote: "It feels like family, not a stranger walking through the door.",
-    attribution: "Marta, 78 — Sarasota, FL",
+    attribution: "Marta, 78 — Richmond, VA",
     benefits: [
       "Meet your helper before the first visit — no surprises",
       "Same friendly face week after week, not a rotating stranger",
@@ -90,7 +90,7 @@ const roleMeta: Record<Role, {
     image: authProvider,
     icon: HandHeart,
     quote: "The families see me, not just a resume. That changed everything.",
-    attribution: "Andrea — home helper, Phoenix, AZ",
+    attribution: "Andrea — home helper, Richmond, VA",
     benefits: [
       "Set your own hourly rate",
       "Keep clients week after week",
@@ -867,7 +867,7 @@ function BasicsStep({
             className="mt-1 h-12 text-base"
             value={city}
             onChange={(e) => setCity(e.target.value)}
-            placeholder="Sarasota, FL"
+            placeholder="Richmond, VA"
           />
         </div>
       </div>
