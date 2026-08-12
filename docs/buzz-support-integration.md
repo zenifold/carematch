@@ -390,6 +390,63 @@ there's a reason to.
 `severity >= 3`) so the routing rule lives in one place and is covered by tests.
 Use it to decide whether to @-mention.
 
+### Credential expiry payload
+
+```json
+{
+  "event": "credential_expiry.warning",
+  "id": "credential-expiry-2026-08-12",
+  "expiring": [
+    {
+      "credential_id": "uuid",
+      "provider_id": "uuid",
+      "provider_name": "Andrea Rivera",
+      "kind": "background_check",
+      "expires_on": "2026-08-19",
+      "days_until_expiry": 7
+    }
+  ],
+  "already_expired_count": 1,
+  "already_expired_sample": [
+    {
+      "credential_id": "uuid",
+      "provider_id": "uuid",
+      "provider_name": "Diego Martinez",
+      "kind": "license_check",
+      "expires_on": "2026-08-03",
+      "days_overdue": 9
+    }
+  ],
+  "urgent": true,
+  "admin_url": "https://getcompanioncare.com/admin/credentials"
+}
+```
+
+A digest, not one event per credential — a batch of renewals is one post rather than
+twenty.
+
+**It fires only on the day a credential crosses 30, 14, 7, 1 or 0 days**, not every
+day it sits inside the window. That is what keeps the channel worth reading: a
+warning repeated daily for a month gets muted, and then the real one is missed too.
+Because it is stateless, a run missed during an outage skips that threshold rather
+than catching up — there are four more chances.
+
+`already_expired_*` is the part that matters most. Those are credentials whose date
+has passed while the row still says `passed`, so the provider reads as verified and
+can keep taking bookings. Reported as a count plus up to five named examples, so the
+backlog stays visible without renaming everyone every day.
+
+**Provider names are included here**, unlike incident payloads. A lapsed licence is
+an operational fact about a contractor rather than an allegation about a person, and
+whoever picks it up needs to know who to chase. No contact details either way.
+
+`id` is stable per calendar day, so deduping on `x-companioncare-delivery-id` drops a
+second post if the task ever runs twice.
+
+**The sweep does not change any state.** It would be one line to flip a lapsed row to
+`expired`, but that un-verifies a provider and may stop them working — a decision for
+a person looking at the case, not a cron job. Acting on the alert is a human step.
+
 ### Verifying a delivery
 
 Three headers arrive: `x-companioncare-timestamp`, `x-companioncare-signature`
