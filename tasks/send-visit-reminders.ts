@@ -13,7 +13,8 @@ export default defineTask({
   },
   run: async () => {
     const { supabaseAdmin } = await import("../src/integrations/supabase/client.server");
-    const { sendTemplateEmail } = await import("../src/lib/email-templates/send-email");
+    const { sendTemplateEmail, UNROUTABLE_REASON } =
+      await import("../src/lib/email-templates/send-email");
     const { formatVisitTime } = await import("../src/lib/format-visit-time");
 
     const now = new Date();
@@ -69,6 +70,7 @@ export default defineTask({
     );
 
     let sent = 0;
+    let unroutable = 0;
     for (const booking of bookings as any[]) {
       // Opted out (or no row = defaults to off) — mark handled without emailing.
       if (!prefMap.get(booking.senior_id)) {
@@ -97,15 +99,23 @@ export default defineTask({
         idempotencyKey: `visit-reminder-${booking.id}`,
       });
 
-      // Only mark as sent if it actually went out (or there's genuinely no
-      // provider configured yet) — a transient Resend error should let the
-      // next hourly run retry instead of marking it handled forever.
-      if (result.sent || result.reason === "no_provider_configured") {
+      // Only mark as sent if it actually went out, or the failure is terminal —
+      // no provider configured, or a recipient on a reserved domain that can never
+      // receive mail (the demo accounts live on companioncare.test). A *transient*
+      // Resend error must fall through so the next hourly run retries; a permanent
+      // one must not, or the sweep re-attempts the same impossible send every hour
+      // forever. Both demo bookings and a misconfigured provider hit that path.
+      if (
+        result.sent ||
+        result.reason === "no_provider_configured" ||
+        result.reason === UNROUTABLE_REASON
+      ) {
         await supabaseAdmin
           .from("bookings")
           .update({ reminder_sent_at: new Date().toISOString() })
           .eq("id", booking.id);
         if (result.sent) sent += 1;
+        else if (result.reason === UNROUTABLE_REASON) unroutable += 1;
       }
     }
 
@@ -113,7 +123,8 @@ export default defineTask({
     // this the only trace of an hourly run is the absence of a complaint.
     // Retained via [observability] in wrangler.toml.
     console.log(
-      `[send-visit-reminders] checked=${bookings.length} sent=${sent} skipped=${bookings.length - sent}`,
+      `[send-visit-reminders] checked=${bookings.length} sent=${sent} ` +
+        `unroutable=${unroutable} skipped=${bookings.length - sent - unroutable}`,
     );
     return { result: { sent, checked: bookings.length } };
   },
