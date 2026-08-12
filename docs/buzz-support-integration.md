@@ -139,8 +139,8 @@ Derives `resolved_at`. `resolved`/`closed` require an approver.
 flag leaves assignment alone, setting it applies `_assignee_id` including null.
 
 `_expected_last_activity_at` is optimistic concurrency: pass the value you read a
-moment ago and the call fails with `serialization_failure` if anything touched the
-ticket since, instead of silently overwriting a human's decision. Pass null to skip.
+moment ago and the call returns **409 Conflict** if anything touched the ticket
+since, instead of silently overwriting a human's decision. Pass null to skip.
 **Use it.** An agent and a human working the same queue will collide.
 
 ### `agent_triage_incident`
@@ -185,10 +185,23 @@ it appears in their own portal as their words. Rejects a missing or deleted prof
 
 ### Errors
 
-Failures come back as PostgREST errors with a readable `message`. Codes worth
-handling distinctly: `insufficient_privilege` (bad or missing approver — do not
-retry, escalate), `serialization_failure` (re-read and retry), `check_violation`
-(validation or rate limit — the message says which).
+Failures come back as PostgREST errors with a readable `message`. Handle the status
+codes distinctly rather than lumping them as "4xx" — they call for different actions,
+and treating them alike is how a bad approver turns into a retry loop.
+
+| Code  | Meaning                                            | What to do                                               |
+| ----- | -------------------------------------------------- | -------------------------------------------------------- |
+| `200` | Success, value returned                            | —                                                        |
+| `204` | Success, void function                             | Not an error                                             |
+| `400` | Validation failed, or the hourly rate limit is hit | Fix the input; do not retry                              |
+| `403` | Bad or missing approver                            | Escalate to a human; never retry                         |
+| `404` | Unknown ticket, incident, or requester             | Fix the input                                            |
+| `409` | `_expected_last_activity_at` did not match         | Re-read and decide again — **never** retry the same call |
+
+The 409 is deliberately not a retryable code. An earlier version raised
+`serialization_failure` (40001) here, which tells PostgREST the transaction is safe
+to replay — so it retried a deterministically failing call and the request never
+returned.
 
 ### Reading the queue
 
