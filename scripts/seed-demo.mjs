@@ -22,15 +22,21 @@
  *   node scripts/seed-demo.mjs --verify   verify logins only, change nothing
  *   node scripts/seed-demo.mjs --reset    delete every seeded account and its data
  *
- * Needs SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (read from .env if not
- * already in the environment). The service-role key bypasses RLS, which is why
- * this is a local operator script and not a server function.
+ * Needs SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, and DEMO_PASSWORD (read from
+ * .env if not already in the environment). The service-role key bypasses RLS,
+ * which is why this is a local operator script and not a server function.
+ *
+ * DEMO_PASSWORD is deliberately NOT hardcoded here. This repo is public, and
+ * `demo-admin@` holds a real admin role against the production project — the
+ * same one storing `waitlist_signups`, the only table with real people's contact
+ * details in it. A password committed here is a working admin login published to
+ * the internet, because the pre-launch gate intentionally leaves /auth open.
+ * Keep it in .env (gitignored) and hand it to colleagues out of band.
  */
 
 import { readFileSync } from "node:fs";
 
 const SEED_DOMAIN = "companioncare.test";
-const PASSWORD = "CompanionCare123!";
 /** Matches src/lib/stripe/client.server.ts, which reads PLATFORM_FEE_BPS. */
 const PLATFORM_FEE_BPS = 1500;
 
@@ -56,9 +62,21 @@ function loadEnv(key) {
 const SUPABASE_URL = loadEnv("SUPABASE_URL");
 const SERVICE_KEY = loadEnv("SUPABASE_SERVICE_ROLE_KEY");
 const ANON_KEY = loadEnv("SUPABASE_PUBLISHABLE_KEY") ?? loadEnv("VITE_SUPABASE_PUBLISHABLE_KEY");
+const PASSWORD = loadEnv("DEMO_PASSWORD");
 
 if (!SUPABASE_URL || !SERVICE_KEY) {
   console.error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY (env or .env).");
+  process.exit(1);
+}
+
+// No fallback on purpose. A default here would end up committed, and every
+// account it applies to is reachable from the public internet.
+if (!PASSWORD) {
+  console.error(
+    "Missing DEMO_PASSWORD (env or .env).\n" +
+      "This is not hardcoded because the repo is public and these accounts reach\n" +
+      "production. Add DEMO_PASSWORD=<value> to .env, or export it for this run.",
+  );
   process.exit(1);
 }
 
@@ -1538,7 +1556,8 @@ async function main() {
   console.log("\nVerifying logins");
   const ok = await verifyLogins();
 
-  console.log(`\nPassword for every account: ${PASSWORD}`);
+  // Not echoed — this output gets pasted into tickets and chat logs.
+  console.log("\nEvery account uses DEMO_PASSWORD from your .env.");
   process.exitCode = ok ? 0 : 1;
 }
 

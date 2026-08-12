@@ -38,7 +38,15 @@ All tables have RLS enabled; keep it that way when adding one.
 ## Demo and test accounts
 
 `npm run seed:demo` (`scripts/seed-demo.mjs`) owns every non-real account.
-Password for all of them: **`CompanionCare123!`**
+
+**The shared password is not in this repo, and must not be put back.** It lives
+in `DEMO_PASSWORD` in `.env` (gitignored); ask someone on the team for it. The
+reason is specific rather than reflexive: this repo is public, the pre-launch gate
+intentionally leaves `/auth` reachable, `demo-admin@` carries a real `admin`
+role, and there is one Supabase project shared by dev and production — so a
+password committed here is a working production admin login published to the
+internet. The account can read `waitlist_signups`, the only table holding real
+people's names, emails, and phone numbers.
 
 | Sign in as | Email                               | What you see                                                              |
 | ---------- | ----------------------------------- | ------------------------------------------------------------------------- |
