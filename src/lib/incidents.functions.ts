@@ -76,6 +76,31 @@ export const reportIncident = createServerFn({ method: "POST" })
       .select("id")
       .single();
     if (error) throw error;
+
+    // Best-effort push to the support channel, same contract as the support-ticket
+    // hook: an incident report must never fail because a chat integration is down.
+    // Reports of harm are the last thing that should be silently dropped, so a
+    // failed delivery is logged rather than swallowed. No-ops unless
+    // SUPPORT_WEBHOOK_URL and SUPPORT_WEBHOOK_SECRET are both set.
+    try {
+      const { notifyNewIncident } = await import("./support-webhook.server");
+      const result = await notifyNewIncident({
+        id: row.id as string,
+        category: data.category,
+        severity: data.severity ?? 2,
+        summary: data.summary,
+        reporterId: context.userId,
+        subjectUserId: data.subject_user_id ?? null,
+        bookingId: data.booking_id ?? null,
+        createdAt: new Date().toISOString(),
+      });
+      if (!result.delivered && result.reason !== "not_configured") {
+        console.error(`[support-webhook] incident ${row.id} not delivered: ${result.reason}`);
+      }
+    } catch (err) {
+      console.error("[support-webhook] unexpected error notifying incident", err);
+    }
+
     return { id: row.id };
   });
 
