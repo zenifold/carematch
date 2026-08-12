@@ -41,3 +41,7 @@ supabase/.temp
 .claude/skills/
 .claude/settings.local.json
 .impeccable/
+
+# Shareable credentials sheet for the team. Contains the demo password, so it
+# must never be committed — this repo is public.
+TEAM-LOGINS.md

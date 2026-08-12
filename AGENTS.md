@@ -77,5 +77,27 @@ Three things to know before touching it:
   and verifications also fires the app's notification triggers, so the row counts
   come out higher than what the script inserts directly — that's expected.
 
+## External agent access to support tickets
+
+`docs/buzz-support-integration.md` is the reference. The short version: there is no
+bespoke support API. RLS already grants `admin`/`support`/`staff` everything an
+agent needs, so `buzz-agent@integrations.getcompanioncare.com` holds the `support`
+role and calls Supabase REST directly, with Postgres enforcing the boundary.
+
+`node scripts/provision-agent-account.mjs --verify` re-asserts that boundary as
+nine live assertions — including the negative ones, that the agent cannot read
+`incidents` or `payment_ledger`, cannot forge an `author_id`, and cannot delete
+support history. Run it after touching any support RLS policy.
+
+Never hand an external agent `SUPABASE_SERVICE_ROLE_KEY`; it bypasses RLS entirely.
+The account is deliberately not on `companioncare.test`, because
+`seed-demo.mjs --reset` deletes everything on that domain.
+
+New tickets notify `SUPPORT_WEBHOOK_URL` from `createSupportTicket` — the only path
+a customer ticket can take, since RLS pins INSERT to `requester_id = auth.uid()`.
+Inert unless both `SUPPORT_WEBHOOK_URL` and `SUPPORT_WEBHOOK_SECRET` are set.
+
+## Verifying seeded accounts
+
 `node scripts/seed-demo.mjs --verify` signs in as all 17 without changing
 anything, which is the quickest check that a rename or password reset landed.

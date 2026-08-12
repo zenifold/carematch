@@ -91,21 +91,29 @@ export const createSupportTicket = createServerFn({ method: "POST" })
       internal: false,
     });
 
+    // One profile read serves both side-effects below.
+    let requesterName: string | null = null;
+    try {
+      const { data: profile } = await context.supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("id", context.userId)
+        .maybeSingle();
+      requesterName = profile?.full_name ?? null;
+    } catch {
+      // swallow — both consumers tolerate a missing name
+    }
+
     // Best-effort confirmation email — never let a delivery failure fail
     // the ticket itself; sendTemplateEmail already no-ops quietly if no
     // provider is configured.
     try {
       const email = context.claims.email as string | undefined;
       if (email) {
-        const { data: profile } = await context.supabase
-          .from("profiles")
-          .select("full_name")
-          .eq("id", context.userId)
-          .maybeSingle();
         const { sendTemplateEmail } = await import("./email-templates/send-email");
         await sendTemplateEmail("support-ticket-confirmation", email, {
           templateData: {
-            first_name: profile?.full_name?.split(" ")[0] ?? "there",
+            first_name: requesterName?.split(" ")[0] ?? "there",
             ticket_subject: data.subject,
           },
           idempotencyKey: `support-ticket-confirm-${row.id}`,
@@ -113,6 +121,32 @@ export const createSupportTicket = createServerFn({ method: "POST" })
       }
     } catch {
       // swallow — confirmation email is best-effort
+    }
+
+    // Best-effort push to the support channel integration, same contract as the
+    // email above: a chat integration being down must not fail a support ticket.
+    // No-ops unless SUPPORT_WEBHOOK_URL and SUPPORT_WEBHOOK_SECRET are both set.
+    try {
+      const { notifyNewSupportTicket } = await import("./support-webhook.server");
+      const result = await notifyNewSupportTicket({
+        id: row.id as string,
+        subject: data.subject,
+        body: data.body,
+        category: data.category ?? null,
+        portal: data.portal,
+        priority: data.priority,
+        requesterId: context.userId,
+        requesterName,
+        createdAt: new Date().toISOString(),
+      });
+      // Logged rather than swallowed silently: a webhook that has been quietly
+      // failing for a week is otherwise invisible, and the symptom (tickets never
+      // reaching the channel) looks like nobody filed any.
+      if (!result.delivered && result.reason !== "not_configured") {
+        console.error(`[support-webhook] delivery failed for ${row.id}: ${result.reason}`);
+      }
+    } catch (err) {
+      console.error("[support-webhook] unexpected error", err);
     }
 
     return { ok: true, id: row.id as string };
