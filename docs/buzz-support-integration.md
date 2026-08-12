@@ -64,7 +64,7 @@ re-checks on every run.
 | Post as someone else          | **no**  | policy pins `author_id` to `auth.uid()`; returns 403   |
 | Delete a message              | **no**  | no DELETE grant and no policy — history is append-only |
 | Read `payment_ledger`         | **no**  | returns 0 rows                                         |
-| Open a ticket _as a customer_ | **no**  | see the gap below                                      |
+| Open a ticket _as a customer_ | yes     | via `agent_create_ticket_for` only                     |
 
 ### What the agent can see that you may not expect
 
@@ -83,6 +83,113 @@ referencing it, `trust_safety` adds exactly `incidents`, `message_flags`, and
 `user_legal_acceptances`. `admin` and `staff` would additionally open
 `payment_ledger`, `bookings`, and `visits`.
 
+## Writes go through RPCs, not raw table calls
+
+**Reads use `/rest/v1/<table>` directly. Writes must use the `agent_*` RPCs below.**
+An earlier version of this document pointed writes at the tables too; that was
+wrong, for three reasons that only show up in production:
+
+- **`last_activity_at` is maintained in application code, not by a trigger.** A raw
+  insert into `support_messages` leaves it untouched, and both staff inbox queries
+  order by `last_activity_at DESC` — so every ticket an agent replied to would sink
+  to the bottom of the queue humans work from. Silent, and the inbox still looks
+  healthy.
+- **`resolved_at` is derived, not stored by the caller.** `PATCH status=resolved`
+  over raw REST leaves it null forever and breaks resolution-time reporting.
+- **Approval provenance has nowhere to live.** When a human approves a draft inside
+  the agent's own tool, that fact has to cross the boundary, or every write is
+  attributed to "the Buzz account" and nobody can answer who authorised it.
+
+All four RPCs are `POST /rest/v1/rpc/<name>` with a JSON body of named parameters,
+under the same auth headers as everything else. They rate-limit the caller to 200
+agent actions per hour and write `admin_audit_log` on success.
+
+### `agent_post_reply`
+
+```json
+POST /rest/v1/rpc/agent_post_reply
+{ "_ticket_id": "uuid", "_body": "...", "_internal": false,
+  "_approved_by": "approving human's uuid", "_approval_ref": "your approval record id" }
+```
+
+Returns the new message id. Bumps `last_activity_at`.
+
+`_internal: true` needs no approver — that's how an agent proposes a draft or shows
+its reasoning. `_internal: false` reaches the customer and **requires
+`_approved_by`**, which must be a staff user and must not be the agent itself.
+
+### `agent_update_ticket`
+
+```json
+{
+  "_ticket_id": "uuid",
+  "_status": "pending",
+  "_priority": "high",
+  "_assignee_id": "uuid",
+  "_set_assignee": true,
+  "_approved_by": "uuid",
+  "_approval_ref": "...",
+  "_expected_last_activity_at": "2026-08-12T14:00:00+00:00"
+}
+```
+
+Derives `resolved_at`. `resolved`/`closed` require an approver.
+
+`_set_assignee` exists because null is a meaningful assignee value — omitting the
+flag leaves assignment alone, setting it applies `_assignee_id` including null.
+
+`_expected_last_activity_at` is optimistic concurrency: pass the value you read a
+moment ago and the call fails with `serialization_failure` if anything touched the
+ticket since, instead of silently overwriting a human's decision. Pass null to skip.
+**Use it.** An agent and a human working the same queue will collide.
+
+### `agent_triage_incident`
+
+```json
+{
+  "_incident_id": "uuid",
+  "_status": "triaged",
+  "_severity": 3,
+  "_resolution_notes": "...",
+  "_approved_by": "uuid",
+  "_approval_ref": "..."
+}
+```
+
+**Always requires an approver**, including for a severity change. Incidents are
+reports about something that may have gone wrong for a person in their own home;
+that bar is intentional.
+
+Moving an `abuse`, `safety`, or `theft` incident to `resolved` or `dismissed`
+additionally requires an approver holding the **`admin`** role. RLS cannot express
+that — `trust_safety` grants UPDATE on the whole row — so it is enforced here.
+`resolved_by` records the approving human, not the agent.
+
+### `agent_create_ticket_for`
+
+```json
+{
+  "_requester_id": "customer uuid",
+  "_subject": "...",
+  "_body": "...",
+  "_portal": "senior",
+  "_priority": "normal",
+  "_category": "billing",
+  "_approval_ref": "..."
+}
+```
+
+Returns the new ticket id. For inbound email or chat picked up outside the app. The
+ticket and its opening message are attributed to the **customer**, not the agent, so
+it appears in their own portal as their words. Rejects a missing or deleted profile.
+
+### Errors
+
+Failures come back as PostgREST errors with a readable `message`. Codes worth
+handling distinctly: `insufficient_privilege` (bad or missing approver — do not
+retry, escalate), `serialization_failure` (re-read and retry), `check_violation`
+(validation or rate limit — the message says which).
+
 ### Reading the queue
 
 ```http
@@ -95,27 +202,16 @@ Full thread for one ticket:
 GET /rest/v1/support_messages?select=id,author_id,body,internal,created_at&ticket_id=eq.<id>&order=created_at.asc
 ```
 
-### Replying
+### Writing
 
-```http
-POST /rest/v1/support_messages
-{ "ticket_id": "<id>", "author_id": "<agent uuid>", "body": "…", "internal": false }
-```
+Use `agent_post_reply` and `agent_update_ticket` above, not raw table writes. RLS
+would permit a direct `POST /rest/v1/support_messages` — `author_id` is still pinned
+to your own user id, so you can never forge another author — but it skips the
+`last_activity_at` bump and the audit row, which is the bug the RPCs exist to
+prevent.
 
-`author_id` must be the agent's own user id — anything else is rejected. That is
-deliberate: it keeps every agent action attributable, and means a compromised
-agent cannot forge a message from a staff member or a customer.
-
-### Changing state
-
-```http
-PATCH /rest/v1/support_tickets?id=eq.<id>
-{ "status": "pending", "assignee_id": "<staff uuid>" }
-```
-
-`status` is one of `open`, `pending`, `resolved`, `closed`. `priority` is `low`,
-`normal`, `high`, `urgent`. Setting `resolved_at` is the app's job, not the
-agent's — leave it alone.
+Enum values, for either path. `status`: `open`, `pending`, `resolved`, `closed`.
+`priority`: `low`, `normal`, `high`, `urgent`.
 
 ### Incidents
 
@@ -271,12 +367,25 @@ by the existing hourly scheduled task — not retries inside the request.
 
 ## Known gaps
 
-**The agent cannot open a ticket on a customer's behalf.** INSERT is
-`WITH CHECK (requester_id = auth.uid())`, so it can only file as itself. If Buzz
-needs to create tickets for customers (say, from an inbound email), add a
-`SECURITY DEFINER` RPC — `create_ticket_for(requester, subject, body, portal)` —
-rather than widening the INSERT policy. The RPC can validate input and write an
-`admin_audit_log` row, which a policy cannot.
+**Direct INSERT on `support_tickets` is still restricted** to
+`requester_id = auth.uid()`, which is correct for the browser and was left alone
+deliberately. Filing on a customer's behalf goes through
+`agent_create_ticket_for`, which validates the requester and writes an audit row —
+things an RLS policy cannot do.
+
+**Writes through the `agent_*` RPCs are audited; raw table writes are not.** That is
+the other reason to use them: the RPC records the actor, the approving human, and
+your approval reference in `admin_audit_log`. A raw PATCH records nothing.
+
+**Approval state lives in Buzz, not here.** CompanionCare stores _that_ a named
+human approved a given action, via `_approved_by` and `_approval_ref`, but not the
+draft history or the reasoning. If approval history needs to be reviewable from the
+CompanionCare admin console rather than only from Buzz, that wants a
+`support_reply_drafts` table — a design decision, not a gap in this contract.
+
+**No SLA or staleness sweep yet.** Nothing notices a ticket sitting untouched. The
+hourly scheduled task on the CompanionCare side is the natural home for that;
+until it exists, staleness detection is Buzz's job.
 
 **The agent can read care notes,** via the staff profiles policy described above.
 Narrowing that is a deliberate piece of work, not a config change, because the
