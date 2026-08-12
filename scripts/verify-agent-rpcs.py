@@ -25,6 +25,7 @@ PACE = 1.2
 
 def req(path, method="GET", body=None, token=None, key=None, prefer=None):
     time.sleep(PACE)
+    print(f"    -> {method} {path[:78]}", flush=True)
     key = key or ANON
     headers = {"apikey": key, "Content-Type": "application/json"}
     headers["Authorization"] = f"Bearer {token or key}"
@@ -53,6 +54,7 @@ results = []
 
 def check(label, ok, detail=""):
     results.append((label, ok, detail))
+    print(f"  {'ok  ' if ok else 'FAIL'}  {label:<52} {detail}", flush=True)
 
 
 # --- setup ----------------------------------------------------------------
