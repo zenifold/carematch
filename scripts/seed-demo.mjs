@@ -881,6 +881,8 @@ async function clearSeedData(ids) {
   await remove("messages", `sender_id=in.${inList}`);
   await remove("conversations", `or=(participant_a.in.${inList},participant_b.in.${inList})`);
   await remove("notifications", `user_id=in.${inList}`);
+  // support_messages.ticket_id is ON DELETE CASCADE, so the threads seeded below
+  // go with their tickets — no separate delete, and re-runs cannot double them up.
   await remove("support_tickets", `requester_id=in.${inList}`);
   // The rating trigger opens a coaching task when a provider's rolling average
   // slips, so these accumulate across runs if left alone.
@@ -1340,57 +1342,187 @@ async function seedThreads(ids) {
 }
 
 async function seedSupportAndNotifications(ids) {
-  await insert("support_tickets", [
+  /**
+   * Tickets and their threads together, because the two have to agree:
+   * `last_activity_at` is derived from the newest message below rather than written
+   * by hand, so the staff inbox (which orders by it) matches what the thread
+   * actually shows.
+   *
+   * `thread` holds only the *replies*. The opening message is generated from the
+   * ticket body, which is what createSupportTicket does — seeding it separately
+   * would let the two drift, and a thread whose first message contradicts the
+   * ticket body is worse than no thread at all.
+   *
+   * Each entry: [author, dayOffset, hour, body, internal].
+   */
+  const ticketSpecs = [
     {
-      requester_id: ids.family,
-      assignee_id: null,
-      portal: "family",
-      status: "open",
-      priority: "normal",
-      category: "billing",
-      subject: "Can I be billed instead of my mother?",
-      body: "Mum's card is on the account but I'd rather the visits came to me. Is there a way to switch who pays without changing anything else?",
-      created_at: at(-2, 14),
-      last_activity_at: at(-2, 14),
+      ticket: {
+        requester_id: ids.family,
+        assignee_id: null,
+        portal: "family",
+        status: "open",
+        priority: "normal",
+        category: "billing",
+        subject: "Can I be billed instead of my mother?",
+        body: "Mum's card is on the account but I'd rather the visits came to me. Is there a way to switch who pays without changing anything else?",
+        created_at: at(-2, 14),
+      },
+      // Open with a customer reply outstanding: something a human or an agent
+      // genuinely has to act on next.
+      thread: [
+        [
+          ids.admin,
+          -2,
+          16,
+          "Yes, that's straightforward. I can move billing to your card and leave everything else — the schedule, the caregiver, her spending cap — exactly as it is. Do you want me to send the card form to this email address?",
+          false,
+        ],
+        [
+          ids.family,
+          -1,
+          9,
+          "Please do. And can Mum still see what the visits cost? I don't want her to feel it's been taken out of her hands.",
+          false,
+        ],
+      ],
     },
     {
-      requester_id: ids.caregiver,
-      assignee_id: ids.admin,
-      portal: "provider",
-      status: "pending",
-      priority: "high",
-      category: "payouts",
-      subject: "Payout for the 8th hasn't landed",
-      body: "Two visits from last week show as posted in my ledger but the transfer isn't in my account yet. Account details haven't changed.",
-      created_at: at(-4, 9),
-      last_activity_at: at(-1, 11),
+      ticket: {
+        requester_id: ids.caregiver,
+        assignee_id: ids.admin,
+        portal: "provider",
+        status: "pending",
+        priority: "high",
+        category: "payouts",
+        subject: "Payout for the 8th hasn't landed",
+        body: "Two visits from last week show as posted in my ledger but the transfer isn't in my account yet. Account details haven't changed.",
+        created_at: at(-4, 9),
+      },
+      // Carries an internal note, so a client rendering threads has a real
+      // `internal: true` row to handle — these must never reach the requester.
+      thread: [
+        [
+          ids.admin,
+          -4,
+          11,
+          "Both visits show as posted on our side, so the money left us. Checking with the payment provider now.",
+          false,
+        ],
+        [
+          ids.admin,
+          -3,
+          15,
+          "Provider says the transfer was returned by the receiving bank — likely a name mismatch on the account rather than anything we did. Do not tell her it's her error until we've confirmed.",
+          true,
+        ],
+        [
+          ids.admin,
+          -1,
+          11,
+          "The transfer bounced back to us rather than failing to send. Could you check the account holder name on your payout details matches your bank exactly? Once it does I'll re-run both payments the same day.",
+          false,
+        ],
+      ],
     },
     {
-      requester_id: ids.eleanor,
-      assignee_id: ids.admin,
-      portal: "senior",
-      status: "resolved",
-      priority: "normal",
-      category: "scheduling",
-      subject: "Moving my Tuesday visit an hour later",
-      body: "Tuesdays at eight are a little early for me now. Could we make it nine?",
-      created_at: at(-11, 10),
-      last_activity_at: at(-9, 15),
-      resolved_at: at(-9, 15),
+      ticket: {
+        requester_id: ids.eleanor,
+        assignee_id: ids.admin,
+        portal: "senior",
+        status: "resolved",
+        priority: "normal",
+        category: "scheduling",
+        subject: "Moving my Tuesday visit an hour later",
+        body: "Tuesdays at eight are a little early for me now. Could we make it nine?",
+        created_at: at(-11, 10),
+      },
+      // A finished conversation, so the resolved view isn't a single orphan message.
+      thread: [
+        [
+          ids.eleanor,
+          -11,
+          10,
+          "Tuesdays at eight are a little early for me now. Could we make it nine?",
+          false,
+        ],
+        [
+          ids.admin,
+          -10,
+          9,
+          "Priya has nine free on Tuesdays, so that works from next week onwards. Your standing Tuesday booking is now 9am — nothing else changes.",
+          false,
+        ],
+        [ids.eleanor, -9, 14, "Thank you. That extra hour makes a real difference.", false],
+        [
+          ids.admin,
+          -9,
+          15,
+          "Glad to hear it. Closing this off — reply here any time if you'd like to move it again.",
+          false,
+        ],
+      ],
     },
     {
-      requester_id: ids.robert,
-      assignee_id: null,
-      portal: "senior",
-      status: "open",
-      priority: "low",
-      category: "account",
-      subject: "Turning off text-message reminders",
-      body: "I get the reminder twice, once by email and once by text. One is plenty.",
-      created_at: at(-1, 16),
-      last_activity_at: at(-1, 16),
+      ticket: {
+        requester_id: ids.robert,
+        assignee_id: null,
+        portal: "senior",
+        status: "open",
+        priority: "low",
+        category: "account",
+        subject: "Turning off text-message reminders",
+        body: "I get the reminder twice, once by email and once by text. One is plenty.",
+        created_at: at(-1, 16),
+      },
+      // Deliberately unanswered: the "nobody has picked this up yet" case, which is
+      // the one an agent is most likely to be handed first.
+      thread: [],
     },
-  ]);
+  ];
+
+  const createdTickets = await insert(
+    "support_tickets",
+    ticketSpecs.map((s) => {
+      const replies = s.thread;
+      const last = replies.length > 0 ? replies[replies.length - 1] : null;
+      const lastAt = last ? at(last[1], last[2]) : s.ticket.created_at;
+      return {
+        ...s.ticket,
+        last_activity_at: lastAt,
+        // Derived, never independent — mirrors updateTicket.
+        resolved_at: s.ticket.status === "resolved" || s.ticket.status === "closed" ? lastAt : null,
+      };
+    }),
+  );
+
+  // Matched back by subject rather than insert order, same reasoning as bookings.
+  const messageRows = [];
+  for (const row of createdTickets) {
+    const spec = ticketSpecs.find((s) => s.ticket.subject === row.subject);
+    if (!spec) continue;
+    // The opening message: the requester's own words, identical to the ticket body.
+    messageRows.push({
+      ticket_id: row.id,
+      author_id: row.requester_id,
+      body: row.body,
+      internal: false,
+      created_at: row.created_at,
+    });
+    for (const [author, day, hour, body, internal] of spec.thread) {
+      // Eleanor's thread repeats her opening line as its first entry so the
+      // conversation reads naturally; skip it rather than duplicating the body.
+      if (body === row.body) continue;
+      messageRows.push({
+        ticket_id: row.id,
+        author_id: author,
+        body,
+        internal,
+        created_at: at(day, hour),
+      });
+    }
+  }
+  const messages = await insert("support_messages", messageRows);
 
   // Only the kinds nothing else produces. Inserting bookings, messages, and
   // verifications already fires trg_notify_booking_change,
@@ -1454,7 +1586,9 @@ async function seedSupportAndNotifications(ids) {
     },
   ]);
   console.log(
-    `  4 support tickets, ${rows.length} notifications (plus the ones triggers generate)`,
+    `  ${createdTickets.length} support tickets, ${messages.length} thread messages ` +
+      `(${messages.filter((m) => m.internal).length} internal), ` +
+      `${rows.length} notifications (plus the ones triggers generate)`,
   );
 }
 
