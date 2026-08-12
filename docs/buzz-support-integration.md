@@ -362,6 +362,33 @@ GET /rest/v1/incidents?select=id,category,severity,created_at&created_at=gt.<las
 Reconcile **both**. A missed incident matters more than a missed ticket, so if only
 one sweep gets built, build the incidents one.
 
+### New items only — never backfill
+
+The channel carries **newly arrived** tickets and incidents, not history. Two rules
+make that hold:
+
+**Initialise the cursor to now, not to zero.** On a first run with no stored
+high-water mark, set it to the current time and post nothing. An unset cursor
+defaulting to epoch means `created_at=gt.1970-01-01`, which matches every ticket the
+platform has ever had and dumps the entire backlog into the channel in one burst.
+That is the failure mode to design against, and it is easy to ship by accident.
+
+**Filter on `created_at`, not `last_activity_at`.** They differ in a way that
+matters here: `created_at` is when the item arrived and never changes, so it gives
+exactly "new since I last looked". `last_activity_at` moves every time anyone
+replies, so filtering on it re-surfaces old tickets as though they were new each time
+a human touches one.
+
+Two consequences worth planning for:
+
+- **Advance the cursor only past items you have actually posted.** Persist it after
+  the post succeeds, not before the query — otherwise a crash between the two loses
+  items silently, which is the exact thing reconciliation exists to prevent.
+- **A long outage produces a large batch.** If Buzz is down for a day, the next sweep
+  legitimately returns a day of items. Prefer that over losing them, but cap what
+  goes to the channel in one pass and post a summary line for the remainder rather
+  than several hundred messages.
+
 If guaranteed delivery is ever required, the right shape is an outbox table drained
 by the existing hourly scheduled task — not retries inside the request.
 
