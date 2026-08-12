@@ -165,21 +165,16 @@ function ComingSoonPage() {
                 </p>
               </div>
 
-              <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
-                <a
-                  href="#interest"
-                  className="group inline-flex min-h-14 items-center justify-center gap-2.5 rounded-full bg-primary px-8 text-lg font-semibold text-primary-foreground shadow-lifted transition-all hover:bg-primary/90 hover:shadow-soft"
-                >
-                  Tell us where you are
-                  <ArrowDown
-                    className="size-5 transition-transform group-hover:translate-y-0.5"
-                    aria-hidden
-                  />
-                </a>
-                <p className="text-base text-muted-foreground">
-                  Not open yet. Two questions, about thirty seconds.
-                </p>
-              </div>
+              <a
+                href="#interest"
+                className="group mt-10 inline-flex min-h-14 items-center justify-center gap-2.5 rounded-full bg-primary px-8 text-lg font-semibold text-primary-foreground shadow-lifted transition-all hover:bg-primary/90 hover:shadow-soft"
+              >
+                Tell us where you are
+                <ArrowDown
+                  className="size-5 transition-transform group-hover:translate-y-0.5"
+                  aria-hidden
+                />
+              </a>
             </div>
 
             <div className="lg:col-span-5">
