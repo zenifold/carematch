@@ -12,7 +12,8 @@
     "typecheck": "tsc --noEmit -p .",
     "test": "vitest run",
     "format": "prettier --write .",
-    "deploy": "vite build && wrangler deploy"
+    "deploy": "vite build && wrangler deploy",
+    "seed:demo": "node scripts/seed-demo.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

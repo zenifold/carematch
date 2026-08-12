@@ -741,7 +741,7 @@ export function InterestForms() {
                   </label>
                   <input
                     id="wl-states"
-                    placeholder="FL, GA, AL"
+                    placeholder="VA, NC, SC"
                     value={form.statesServed}
                     onChange={(e) => set("statesServed", e.target.value)}
                     className={field}

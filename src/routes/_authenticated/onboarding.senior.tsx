@@ -151,7 +151,7 @@ function SeniorOnboarding() {
                 id="city"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
-                placeholder="Portland, OR"
+                placeholder="Richmond, VA"
               />
             </div>
           </div>
