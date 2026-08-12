@@ -30,10 +30,21 @@ export default defineConfig({
         handler: fileURLToPath(new URL("./tasks/send-visit-reminders.ts", import.meta.url)),
         description: "Email seniors who opted in when a visit is starting soon",
       },
+      "check-credential-expiry": {
+        handler: fileURLToPath(new URL("./tasks/check-credential-expiry.ts", import.meta.url)),
+        description: "Warn when provider credentials are close to expiry or already lapsed",
+      },
     },
     // cloudflare_module has native Cron Trigger support — Nitro writes the
     // matching trigger into .output/server/wrangler.json at build time, no
     // manual wrangler cron config needed.
-    scheduledTasks: { "0 * * * *": "send-visit-reminders" },
+    // Reminders run hourly because a visit window is hours wide. Credential expiry
+    // moves in days, so a daily run at 07:00 UTC lands in the European morning and
+    // before the US working day — and an hourly one would either repeat the same
+    // warning 24 times or need state purely to avoid doing so.
+    scheduledTasks: {
+      "0 * * * *": "send-visit-reminders",
+      "0 7 * * *": "check-credential-expiry",
+    },
   } as any,
 });

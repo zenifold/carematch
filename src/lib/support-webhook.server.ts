@@ -5,17 +5,25 @@ import {
   buildTicketEvent,
   signatureHeader,
   signingPayload,
-  type WebhookEvent,
 } from "./support-webhook";
 
 /**
  * Delivery half of the support webhook. Server-only: it reads secrets and uses
  * node:crypto (available because wrangler.toml sets nodejs_compat).
  *
- * Carries two event types to one endpoint — support tickets and trust-and-safety
- * incidents — so the receiving channel sees everything. They are distinguishable
- * by the `event` field and the x-companioncare-event header.
+ * Carries every event type to one endpoint — support tickets, trust-and-safety
+ * incidents, credential expiry — so a receiver can fan them out to its own channels.
+ * They are distinguishable by the `event` field and the x-companioncare-event
+ * header; see docs/buzz-support-integration.md for the routing table.
  */
+
+/**
+ * What delivery actually needs: a discriminator for the header and routing, and an
+ * id for dedupe. Typed structurally rather than as the event union so a new event
+ * type does not have to be threaded through this file to be sendable — the payload
+ * shape is the sender's business, not the transport's.
+ */
+type DeliverableEvent = { event: string; id: string } & Record<string, unknown>;
 
 /** Single attempt, tight timeout. See notifyNewSupportTicket for why. */
 const DELIVERY_TIMEOUT_MS = 3000;
@@ -45,7 +53,7 @@ export function isSupportWebhookConfigured(): boolean {
  * an agent can reconcile by listing. If guaranteed delivery becomes a requirement,
  * that wants an outbox table drained by the existing hourly task, not retries here.
  */
-async function deliver(event: WebhookEvent & { urgent?: boolean }): Promise<DeliveryResult> {
+async function deliver(event: DeliverableEvent): Promise<DeliveryResult> {
   const url = process.env.SUPPORT_WEBHOOK_URL;
   const secret = process.env.SUPPORT_WEBHOOK_SECRET;
   if (!url || !secret) return { delivered: false, reason: "not_configured" };
@@ -114,4 +122,17 @@ export async function notifyNewIncident(input: {
 }): Promise<DeliveryResult> {
   if (!isSupportWebhookConfigured()) return { delivered: false, reason: "not_configured" };
   return deliver(buildIncidentEvent({ ...input, siteOrigin: siteOrigin() }));
+}
+
+/**
+ * Credential expiry digest, from the daily sweep. Routed to the platform channel by
+ * its `event` value like the others.
+ *
+ * Takes a fully built event rather than raw rows: the selection and threshold rules
+ * live in credential-expiry.ts where they are unit-tested, and this half only
+ * signs and posts.
+ */
+export async function notifyCredentialExpiry(event: DeliverableEvent): Promise<DeliveryResult> {
+  if (!isSupportWebhookConfigured()) return { delivered: false, reason: "not_configured" };
+  return deliver(event);
 }
