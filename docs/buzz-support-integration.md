@@ -239,6 +239,62 @@ An incident is not a ticket, and the difference is worth respecting: `abuse`,
 auto-resolving one of those is a materially worse mistake than mishandling a
 billing question. Triage and route them; leave the judgement to a human.
 
+## Channel routing
+
+Four channels, each with one accountable owner from `RACI.md` — so every event has
+someone who answers for it rather than a committee.
+
+| Channel            | Owner | Events                                                                                 | Built?              |
+| ------------------ | ----- | -------------------------------------------------------------------------------------- | ------------------- |
+| `customer-support` | COO   | `support_ticket.created`, replies awaiting approval, `cs_task` opened, change requests | ticket event live   |
+| `safety`           | COO   | `incident.created`, message flags, credential decisions                                | incident event live |
+| `growth`           | CEO   | Waitlist signups, partner enquiries                                                    | not built           |
+| `platform`         | CTO   | Credential expiry, payout failures, webhook and cron failures                          | not built           |
+
+Route by **who acts and how fast**, not by which table the row came from. The split
+that carries weight is `customer-support` from `safety`: a billing question and an
+allegation about a caregiver's conduct need different audiences, different urgency,
+and different retention. Merging them means either over-exposing the second or
+under-reacting to it.
+
+Today the sender emits two event types. Buzz should switch on the `event` field
+rather than assuming one destination, so adding the rest is a routing change on its
+side and not a rebuild.
+
+### Rules worth setting before volume arrives
+
+- **One message per item, everything else in-thread.** Keeps the channel scannable
+  and gives each item's approval conversation a home. Without it, several event
+  types make a channel unreadable within a week.
+- **Dedupe on `x-companioncare-delivery-id`.** Webhook pushes and reconcile sweeps
+  overlap by design; that header is how the same ticket avoids being posted twice.
+- **Only `urgent` mentions anyone.** Already computed server-side for incidents
+  (harm categories, or severity >= 3). If everything pings, nothing does.
+- **Short retention and restricted membership on `safety`.** Those payloads
+  reference allegations. The sender deliberately includes no names and only a
+  280-character preview, but the channel is still a searchable record that outlives
+  the admin queue — an incident can be dismissed while the message stays forever.
+- **Digest unacknowledged items daily rather than re-alerting.** Repeat pings train
+  people to ignore the channel.
+
+### Approving from a channel needs an identity mapping
+
+`agent_post_reply` requires `_approved_by` to be a real staff uuid and rejects
+self-approval. So a chat-button approval only works if the bot can map the clicking
+chat user to their CompanionCare account.
+
+Without that mapping the tempting shortcut is to hardcode one admin's uuid for every
+approval, which makes the audit trail lie about who authorised what — and that audit
+trail is most of the reason the RPCs exist. Two honest options:
+
+1. **Approve in the agent's own tool or the admin console**, where the human is
+   already authenticated, and have the channel post a link. Works immediately.
+2. **Build the mapping** — chat user id to CompanionCare uuid, populated once — and
+   then channel-button approvals are genuine.
+
+Start with the first. Getting it wrong the other way is expensive to unwind, because
+you cannot retroactively reconstruct who actually decided.
+
 ## Notifications
 
 Both event types go to the same `SUPPORT_WEBHOOK_URL`, so one channel sees
