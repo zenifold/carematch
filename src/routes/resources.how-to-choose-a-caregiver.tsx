@@ -56,7 +56,7 @@ function ArticlePage() {
             <li><strong>Who is on the hook if something goes wrong?</strong> Get insurance details in writing.</li>
             <li><strong>Can we keep the same helper every visit?</strong> Rotating strangers is a red flag.</li>
             <li><strong>What's the cancellation policy?</strong> 4-hour, fee-free cancellation is reasonable.</li>
-            <li><strong>Can I speak to a human at 3 a.m.?</strong> 24/7 phone support is non-negotiable.</li>
+            <li><strong>Who do I reach when something goes wrong?</strong> A named human who can see the visit history — not a general inbox that reopens the story from scratch.</li>
           </ol>
 
           <h2>Red flags to walk away from</h2>

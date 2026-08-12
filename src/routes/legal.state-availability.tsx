@@ -1,41 +1,25 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { MapPin } from "lucide-react";
 import { PageShell, PageHero, CTASection, marketingHead } from "@/components/marketing/PageShell";
+import {
+  STATE_AVAILABILITY as rows,
+  TIER_META,
+  type TierAvail,
+} from "@/lib/state-availability";
 
-type TierAvail = "live" | "partner" | "waitlist" | "none";
-
-type StateRow = {
-  state: string;
-  helpers: TierAvail;
-  companions: TierAvail;
-  partners: TierAvail;
-  health: TierAvail;
-  note?: string;
-};
-
-const rows: StateRow[] = [
-  { state: "Florida", helpers: "live", companions: "live", partners: "partner", health: "partner" },
-  { state: "Texas", helpers: "live", companions: "live", partners: "partner", health: "partner" },
-  { state: "Arizona", helpers: "live", companions: "live", partners: "partner", health: "partner" },
-  { state: "Nevada", helpers: "live", companions: "live", partners: "waitlist", health: "partner" },
-  { state: "California", helpers: "live", companions: "live", partners: "partner", health: "partner", note: "Partner-only for personal care (CA home care licensing)." },
-  { state: "New York", helpers: "live", companions: "live", partners: "partner", health: "partner", note: "Partner-only for personal care (NY licensed home care)." },
-
-  { state: "Massachusetts", helpers: "live", companions: "waitlist", partners: "partner", health: "partner" },
-  { state: "Washington", helpers: "waitlist", companions: "waitlist", partners: "waitlist", health: "waitlist" },
-  { state: "Illinois", helpers: "waitlist", companions: "waitlist", partners: "waitlist", health: "waitlist" },
-];
-
-const tierMeta: Record<TierAvail, { label: string; className: string }> = {
-  live: { label: "Live", className: "bg-primary/10 text-primary" },
-  partner: { label: "Via partner", className: "bg-accent/15 text-accent" },
-  waitlist: { label: "Waitlist", className: "bg-secondary text-secondary-foreground" },
-  none: { label: "Not available", className: "bg-muted text-muted-foreground" },
+const tierClass: Record<TierAvail, string> = {
+  live: "bg-primary/10 text-primary",
+  partner: "bg-accent/15 text-accent",
+  waitlist: "bg-secondary text-secondary-foreground",
+  none: "bg-muted text-muted-foreground",
 };
 
 function Badge({ v }: { v: TierAvail }) {
-  const m = tierMeta[v];
-  return <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${m.className}`}>{m.label}</span>;
+  return (
+    <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${tierClass[v]}`}>
+      {TIER_META[v].label}
+    </span>
+  );
 }
 
 export const Route = createFileRoute("/legal/state-availability")({
@@ -60,15 +44,10 @@ function StateAvailabilityPage() {
 
       <section className="mx-auto max-w-6xl px-5 py-16 lg:px-10">
         <div className="mb-6 flex flex-wrap gap-3 text-sm">
-          {(Object.keys(tierMeta) as TierAvail[]).map((k) => (
+          {(Object.keys(TIER_META) as TierAvail[]).map((k) => (
             <span key={k} className="inline-flex items-center gap-2">
               <Badge v={k} />
-              <span className="text-muted-foreground">
-                {k === "live" && "Fully operational"}
-                {k === "partner" && "Delivered by licensed agency partner"}
-                {k === "waitlist" && "Coming soon — join the list"}
-                {k === "none" && "Not currently offered"}
-              </span>
+              <span className="text-muted-foreground">{TIER_META[k].description}</span>
             </span>
           ))}
         </div>

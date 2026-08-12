@@ -4,7 +4,7 @@ import { ServiceDetail, serviceJsonLd } from "@/components/marketing/ServiceDeta
 
 const faqs = [
   { q: "Are CompanionCare personal care aides licensed?", a: "Yes. Every personal care helper on CompanionCare is a CNA (Certified Nursing Assistant) or HHA (Home Health Aide) verified against their state's licensing board — with monthly re-verification." },
-  { q: "Can personal care be billed to insurance?", a: "Some personal care hours may be covered under long-term care insurance or Medicaid waivers depending on your state. Our concierge can walk you through what's eligible in your area." },
+  { q: "Can personal care be billed to insurance?", a: "Some personal care hours may be covered under long-term care insurance or Medicaid waivers depending on your state. Message us and we'll walk you through what's eligible in your area." },
   { q: "What tasks are outside the scope of personal care?", a: "Skilled nursing (IVs, wound care, injections) is provided by our licensed clinical partners under our Skilled Care service — not by CNAs/HHAs. Non-medical companionship or housekeeping is a separate service." },
 ];
 

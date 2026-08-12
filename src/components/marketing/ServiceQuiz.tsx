@@ -260,7 +260,7 @@ export function ServiceQuiz() {
 
               <p className="mt-5 text-sm text-muted-foreground">
                 A starting point, not an assessment. Most families end up mixing two or three of
-                these — you can change anything later, and the concierge can talk it through.
+                these — you can change anything later, and we're happy to talk it through.
               </p>
             </>
           )

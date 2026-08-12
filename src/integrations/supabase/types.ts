@@ -2241,6 +2241,48 @@ export type Database = {
           },
         ]
       }
+      waitlist_signups: {
+        Row: {
+          city: string | null
+          contacted_at: string | null
+          created_at: string
+          details: Json
+          email: string
+          id: string
+          name: string
+          phone: string | null
+          segment: string
+          source: string | null
+          state: string | null
+        }
+        Insert: {
+          city?: string | null
+          contacted_at?: string | null
+          created_at?: string
+          details?: Json
+          email: string
+          id?: string
+          name: string
+          phone?: string | null
+          segment: string
+          source?: string | null
+          state?: string | null
+        }
+        Update: {
+          city?: string | null
+          contacted_at?: string | null
+          created_at?: string
+          details?: Json
+          email?: string
+          id?: string
+          name?: string
+          phone?: string | null
+          segment?: string
+          source?: string | null
+          state?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

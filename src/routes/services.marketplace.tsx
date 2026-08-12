@@ -18,12 +18,13 @@ import {
   UserCheck,
   MapPin,
   Camera,
-  Phone,
+  LifeBuoy,
+  Mail,
   CalendarDays,
   DollarSign,
   ArrowRight,
 } from "lucide-react";
-import { PageShell, PageHero, CTASection, marketingHead, SITE_URL, PHONE, PHONE_HREF } from "@/components/marketing/PageShell";
+import { PageShell, PageHero, CTASection, marketingHead, SITE_URL, SUPPORT_EMAIL_HREF } from "@/components/marketing/PageShell";
 import { ServiceQuiz } from "@/components/marketing/ServiceQuiz";
 
 const examples = [
@@ -137,7 +138,7 @@ const faqs = [
   },
   {
     q: "What if something goes wrong during a visit?",
-    a: "Tap 'Get help' in the app or call our line — a real person picks up 24/7. Every visit is logged with a check-in and check-out, and we can dispatch a backup helper if needed.",
+    a: "Tap 'Help' in the app and it opens a tracked thread with a real person on our team. Every visit is logged with a check-in and check-out, so we can see what happened without you having to reconstruct it — and we can dispatch a backup helper if needed.",
   },
 ];
 
@@ -147,7 +148,7 @@ export const Route = createFileRoute("/services/marketplace")({
       path: "/services/marketplace",
       title: "CompanionCare Marketplace — Verified local helpers for older adults",
       description:
-        "Meet, choose, and book verified local helpers for errands, rides, cleaning, companionship, meal prep, tech help, and more. Transparent hourly rates, the same helper week after week, and a real person on the phone 24/7.",
+        "Meet, choose, and book verified local helpers for errands, rides, cleaning, companionship, meal prep, tech help, and more. Transparent hourly rates, the same helper week after week, and a real person to message when something comes up.",
       jsonLd: [
         {
           "@context": "https://schema.org",
@@ -192,10 +193,10 @@ function MarketplacePage() {
             Find a helper
           </Link>
           <a
-            href={PHONE_HREF}
+            href={SUPPORT_EMAIL_HREF}
             className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-primary bg-card px-6 py-3 text-base font-semibold text-primary hover:bg-secondary"
           >
-            <Phone className="size-5" /> Call {PHONE}
+            <Mail className="size-5" /> Ask us a question
           </a>
         </div>
       </PageHero>
@@ -207,7 +208,7 @@ function MarketplacePage() {
             { icon: ShieldCheck, label: "5-stage verification" },
             { icon: DollarSign, label: "Transparent hourly rates" },
             { icon: CalendarDays, label: "No contracts, cancel free" },
-            { icon: Phone, label: "Real person 24/7" },
+            { icon: LifeBuoy, label: "Real person on support" },
           ].map((t) => (
             <div key={t.label} className="flex items-center gap-3">
               <span className="grid size-10 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
@@ -434,7 +435,7 @@ function MarketplacePage() {
                 "Every visit begins with a live selfie + GPS check-in",
                 "Free reschedules and cancellations up to 24 hours before",
                 "The same helper, week after week, as long as it's working",
-                "A real person on the phone 24/7 if anything comes up",
+                "A real person to message if anything comes up",
               ].map((point) => (
                 <li key={point} className="flex items-start gap-3 rounded-2xl bg-card p-4">
                   <Check className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden />

@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
   AlertTriangle,
-  Phone,
+  Mail,
   LifeBuoy,
   MessageCircle,
   Wallet,
@@ -21,8 +21,7 @@ export const Route = createFileRoute("/_authenticated/family/help")({
   errorComponent: RouteErrorBoundary,
 });
 
-const CONCIERGE_TEL = "18002273628";
-const CONCIERGE_DISPLAY = "1 (800) 227-3628";
+const SUPPORT_EMAIL = "support@getcompanioncare.com";
 
 function FamilyHelp() {
   const create = useServerFn(createSupportTicket);
@@ -48,34 +47,32 @@ function FamilyHelp() {
         <p className="text-xs uppercase tracking-widest text-muted-foreground">
           We're here for you
         </p>
-        <h1 className="mt-1 font-serif text-3xl lg:text-4xl">Help &amp; concierge</h1>
+        <h1 className="mt-1 font-serif text-3xl lg:text-4xl">Help &amp; support</h1>
         <p className="mt-2 max-w-2xl text-muted-foreground">
-          Human concierge for billing, care plan, and escalation. Emergencies always call 911 first.
+          A real person handles billing, care plan, and escalation. For a medical emergency, call 911
+          first.
         </p>
       </header>
 
       <section className="surface-card p-5 lg:p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-xs uppercase tracking-widest text-muted-foreground">
-              Concierge line
-            </p>
+            <p className="text-xs uppercase tracking-widest text-muted-foreground">Email support</p>
             <a
-              href={`tel:${CONCIERGE_TEL}`}
-              className="mt-1 block font-serif text-3xl text-primary hover:underline"
+              href={`mailto:${SUPPORT_EMAIL}`}
+              className="mt-1 block break-words font-serif text-2xl text-primary hover:underline lg:text-3xl"
             >
-              {CONCIERGE_DISPLAY}
+              {SUPPORT_EMAIL}
             </a>
             <p className="mt-1 text-sm text-muted-foreground">
-              7 days · 7am–10pm local time. After-hours pages an on-call coordinator for urgent
-              issues.
+              Replies within one business day. Anything about someone's safety jumps the queue.
             </p>
           </div>
           <a
-            href={`tel:${CONCIERGE_TEL}`}
+            href={`mailto:${SUPPORT_EMAIL}`}
             className="inline-flex min-h-14 items-center gap-2 rounded-full bg-primary px-6 text-base font-semibold text-primary-foreground shadow-soft hover:bg-primary/90"
           >
-            <Phone className="size-5" /> Call now
+            <Mail className="size-5" /> Email us
           </a>
         </div>
       </section>

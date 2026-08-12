@@ -38,6 +38,43 @@ describe("renderTemplate", () => {
     expect(email!.html).toContain("your caregiver"); // default provider name
   });
 
+  it("renders the waitlist-confirmation template with the segment label", () => {
+    const email = renderTemplate("waitlist-confirmation", {
+      first_name: "Marta",
+      segment_label: "Older adult",
+    });
+    expect(email).not.toBeNull();
+    expect(email!.subject).toContain("CompanionCare");
+    expect(email!.html).toContain("Marta");
+    expect(email!.html).toContain("Older adult");
+    expect(email!.text).toContain("Older adult");
+  });
+
+  it("renders waitlist-confirmation without a segment label", () => {
+    const email = renderTemplate("waitlist-confirmation", { first_name: "Dana" });
+    expect(email).not.toBeNull();
+    expect(email!.html).toContain("Dana");
+    expect(email!.html).not.toContain("undefined");
+    expect(email!.text).not.toContain("undefined");
+  });
+
+  it("renders the internal waitlist notification with the raw submission", () => {
+    const email = renderTemplate("waitlist-internal-notification", {
+      segment_label: "Caregiver",
+      name: "Andrea Ruiz",
+      email: "andrea@example.com",
+      phone: "555-0100",
+      location: "Phoenix, AZ",
+      details: '{\n  "specialties": ["Companionship"]\n}',
+    });
+    expect(email!.subject).toContain("Caregiver");
+    expect(email!.subject).toContain("Andrea Ruiz");
+    expect(email!.html).toContain("andrea@example.com");
+    expect(email!.html).toContain("Phoenix, AZ");
+    expect(email!.html).toContain("Companionship");
+    expect(email!.text).toContain("555-0100");
+  });
+
   it("renders every provider-drip stage without throwing and includes the first name", () => {
     for (const code of [
       "provider-drip-day1",

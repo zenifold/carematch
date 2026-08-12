@@ -21,9 +21,6 @@ export const Route = createFileRoute("/_authenticated/senior/help")({
   errorComponent: RouteErrorBoundary,
 });
 
-const CONCIERGE_TEL = "18002273628";
-const CONCIERGE_DISPLAY = "1 (800) 227-3628";
-
 function SeniorHelp() {
   const create = useServerFn(createSupportTicket);
   const [subject, setSubject] = useState("");
@@ -52,7 +49,7 @@ function SeniorHelp() {
         </div>
         <h1 className="mt-1 font-serif text-3xl">How can we help?</h1>
         <p className="mt-1 text-muted-foreground">
-          One tap for emergencies, a real human on call, or send us a message.
+          One tap for emergencies, or send us a message and a real person will read it.
         </p>
       </div>
 
@@ -71,22 +68,6 @@ function SeniorHelp() {
           </p>
         </div>
         <Phone className="size-5 text-destructive" aria-hidden />
-      </a>
-
-      {/* Concierge */}
-      <a
-        href={`tel:${CONCIERGE_TEL}`}
-        className="flex items-center gap-4 rounded-3xl border-2 border-primary/40 bg-primary/5 p-5 transition hover:bg-primary/10"
-      >
-        <span className="grid size-14 place-items-center rounded-full bg-primary text-primary-foreground">
-          <Phone className="size-7" />
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className="font-serif text-xl">Call the concierge</p>
-          <p className="text-sm text-muted-foreground">
-            {CONCIERGE_DISPLAY} · a real person, 24/7.
-          </p>
-        </div>
       </a>
 
       {/* Quick actions */}

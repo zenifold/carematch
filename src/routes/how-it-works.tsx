@@ -4,11 +4,13 @@ import {
   HandHeart,
   UserCheck,
   Check,
-  Phone,
+  Mail,
+  LifeBuoy,
   ShieldCheck,
   MessageCircle,
   MapPin,
   Mic,
+  Eye,
   Clock,
   ArrowRight,
   Camera,
@@ -22,24 +24,23 @@ import {
   PageHero,
   CTASection,
   marketingHead,
-  PHONE,
-  PHONE_HREF,
+  SUPPORT_EMAIL_HREF,
   SITE_URL,
 } from "@/components/marketing/PageShell";
 import step1Img from "@/assets/hiw-step1.jpg";
 import step2Img from "@/assets/hiw-step2.jpg";
 import step3Img from "@/assets/hiw-step3.jpg";
-import conciergeImg from "@/assets/hiw-concierge.jpg";
+import supportImg from "@/assets/hiw-concierge.jpg";
 
 const steps = [
   {
     name: "Tell us what you need",
-    text: "One question at a time — care type, hours, preferences, budget. Use voice input on any field, or call our concierge and we'll do intake with you on the phone.",
+    text: "One question at a time — care type, hours, preferences, budget. Type it or speak it, with voice input on any field and text you can scale up as large as you need.",
     icon: HandHeart,
     image: step1Img,
     highlights: [
       { icon: Mic, label: "Voice input on every field" },
-      { icon: Phone, label: "Or call — we'll do it with you" },
+      { icon: Eye, label: "Large Text Mode, any screen" },
       { icon: Clock, label: "About 10 minutes, at your pace" },
     ],
   },
@@ -62,7 +63,7 @@ const steps = [
     highlights: [
       { icon: Check, label: "Live selfie + GPS at the door" },
       { icon: MessageCircle, label: "Optional family updates" },
-      { icon: Phone, label: "Concierge on standby 24/7" },
+      { icon: LifeBuoy, label: "Support thread on every visit" },
     ],
   },
 ];
@@ -101,7 +102,7 @@ function HowItWorksPage() {
       <PageHero
         eyebrow="How it works"
         title="From first question to verified visit — in three simple steps."
-        lead="No apps to learn. No fine print. Do it online, or call our concierge and we'll walk through it together on the phone."
+        lead="No fine print, and nothing to learn beyond answering one question at a time. If you get stuck at any point, a real person is a message away."
       />
 
       <StepNavigator />
@@ -143,12 +144,12 @@ function HowItWorksPage() {
               {
                 icon: Check,
                 title: "Simple recap after each visit",
-                text: "Tap one of three faces: great / okay / needs review. That's it. Concerns escalate to our concierge within minutes.",
+                text: "Tap one of three faces: great / okay / needs review. That's it. Anything you flag for review goes straight to our trust and safety team.",
               },
               {
-                icon: Phone,
-                title: "Human concierge, 24/7",
-                text: "Prefer to talk? Every step of CompanionCare can be done by phone with the same team you already know.",
+                icon: LifeBuoy,
+                title: "Support that knows the context",
+                text: "Open a thread from any visit and we can already see it — no explaining your situation from scratch to someone new.",
               },
             ].map((f) => (
               <li key={f.title} className="surface-card p-6">
@@ -167,14 +168,14 @@ function HowItWorksPage() {
             aria-hidden
             className="pointer-events-none absolute right-6 top-0 select-none font-serif text-[10rem] italic leading-none text-primary-foreground/[0.08] md:text-[14rem]"
           >
-            24/7
+            &amp;
           </span>
           <div className="relative z-10 grid grid-cols-1 items-center gap-12 md:grid-cols-12">
             <div className="md:col-span-5">
               <div className="relative aspect-square overflow-hidden rounded-xl bg-primary-foreground/10">
                 <img
-                  src={conciergeImg}
-                  alt="A CompanionCare concierge on the phone in a softly lit home office"
+                  src={supportImg}
+                  alt="A member of the CompanionCare support team working in a softly lit home office"
                   loading="lazy"
                   width={1024}
                   height={1024}
@@ -182,27 +183,32 @@ function HowItWorksPage() {
                 />
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-primary/60 via-primary/10 to-transparent" />
                 <div className="absolute bottom-4 left-4 rounded-full border border-primary-foreground/30 bg-primary-foreground/15 p-3 backdrop-blur">
-                  <Phone className="size-5 text-primary-foreground" strokeWidth={1.5} aria-hidden />
+                  <LifeBuoy
+                    className="size-5 text-primary-foreground"
+                    strokeWidth={1.5}
+                    aria-hidden
+                  />
                 </div>
               </div>
             </div>
             <div className="md:col-span-7">
               <p className="mb-6 text-[11px] font-semibold uppercase tracking-[0.2em] text-primary-foreground/60">
-                Prefer to talk?
+                Stuck on something?
               </p>
               <h2 className="mb-4 font-serif text-4xl font-medium md:text-5xl">
-                A real person is always a call away.
+                A real person reads every message.
               </h2>
               <p className="mb-8 max-w-xl text-lg leading-relaxed text-primary-foreground/85">
-                Every step of CompanionCare can be done by phone with the same friendly team — intake,
-                matching, booking, changes, or just a question. Day or night.
+                Support lives inside your account, so when you ask about a visit we can already see
+                it. Open a thread from the Help button and someone on our team replies within one
+                business day — the same team every time, not a queue of strangers.
               </p>
               <div className="flex flex-wrap items-center gap-6">
                 <a
-                  href={PHONE_HREF}
+                  href={SUPPORT_EMAIL_HREF}
                   className="inline-flex items-center gap-2 rounded-full bg-primary-foreground px-8 py-3.5 font-semibold text-primary transition-colors hover:bg-primary-foreground/90"
                 >
-                  <Phone className="size-5" /> Call {PHONE}
+                  <Mail className="size-5" /> Email us
                 </a>
                 <Link
                   to="/trust"

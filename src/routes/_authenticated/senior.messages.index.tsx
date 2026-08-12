@@ -128,7 +128,7 @@ function MessagesList() {
       <p className="mt-2 text-lg text-muted-foreground">
         {totalUnread > 0
           ? `You have ${totalUnread} new message${totalUnread === 1 ? "" : "s"}.`
-          : "Text your caregivers or the concierge. Tap the mic to speak."}
+          : "Message your caregivers or our support team. Tap the mic to speak."}
       </p>
 
       {rows.length === 0 ? (

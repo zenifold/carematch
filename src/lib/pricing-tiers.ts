@@ -97,6 +97,16 @@ export function tierByKey(key: string): ServiceTier {
   return tier;
 }
 
+/**
+ * "$18–$30/hr" for use inside prose. Exists so copy can name a rate band
+ * without retyping the numbers — the homepage FAQ had drifted to $20–$35 for
+ * companionship and $25–$45 for cleaning before this was used.
+ */
+export function rateBand(key: string): string {
+  const tier = tierByKey(key);
+  return `$${tier.providerLow}–$${tier.providerHigh}/hr`;
+}
+
 export const money = (n: number) =>
   n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 });
 

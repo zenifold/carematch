@@ -6,7 +6,7 @@ import {
   ArrowLeft,
   ArrowRight,
   Check,
-  Phone,
+  Mail,
   Sparkles,
   Users,
   HandHeart,
@@ -64,7 +64,7 @@ const roleMeta: Record<Role, {
     benefits: [
       "Meet your helper before the first visit — no surprises",
       "Same friendly face week after week, not a rotating stranger",
-      "One phone number, a real person answers on the first ring",
+      "Large text, voice input, and a real person to message when you're stuck",
       "Share only what you want with family — you stay in charge",
     ],
 
@@ -377,10 +377,10 @@ function AuthPage() {
         </Link>
 
         <a
-          href="tel:18002273362"
+          href="mailto:support@getcompanioncare.com"
           className="hidden items-center gap-2 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground sm:inline-flex"
         >
-          <Phone className="size-4" /> 1-800-COMPANION
+          <Mail className="size-4" /> Need a hand?
         </a>
       </header>
 

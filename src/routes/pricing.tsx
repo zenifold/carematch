@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import {
   Wallet,
   Check,
-  Phone,
+  Mail,
   ShieldCheck,
   Receipt,
   Sparkles,
@@ -22,8 +22,7 @@ import {
   PageHero,
   CTASection,
   marketingHead,
-  PHONE,
-  PHONE_HREF,
+  SUPPORT_EMAIL_HREF,
 } from "@/components/marketing/PageShell";
 // Rate bands, fees, and money formatting live in one place so this page and the
 // cost article can't quote different numbers at the same visitor.
@@ -458,7 +457,7 @@ function PricingPage() {
                   { label: "Live selfie + GPS check-in at door", cm: true, ag: false, off: false },
                   { label: "Insurance for theft, damage, injury", cm: true, ag: true, off: false },
                   { label: "You keep the same helper", cm: true, ag: "sometimes", off: true },
-                  { label: "24/7 human concierge", cm: true, ag: "biz hrs", off: false },
+                  { label: "Human support, reply in 1 business day", cm: true, ag: "biz hrs", off: false },
                   { label: "Cancel anytime, no contract", cm: true, ag: false, off: true },
                   { label: "Family dashboard + visit updates", cm: true, ag: "extra", off: false },
                   { label: "Taxes & 1099 handled for you", cm: true, ag: true, off: false },
@@ -602,7 +601,7 @@ function PricingPage() {
               {[
                 "Service fees waived on first $200/month of bookings",
                 "Priority booking with top-rated providers",
-                "Dedicated care concierge line",
+                "Dedicated care coordinator",
                 "Cancel anytime — no contracts",
               ].map((i) => (
                 <li key={i} className="flex items-start gap-2 text-base">
@@ -725,10 +724,10 @@ function PricingPage() {
       <section className="mx-auto max-w-6xl px-5 py-12 lg:px-10">
         <div className="flex flex-wrap items-center gap-3">
           <a
-            href={PHONE_HREF}
+            href={SUPPORT_EMAIL_HREF}
             className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-base font-semibold text-primary-foreground"
           >
-            <Phone className="size-5" /> Get a personal quote at {PHONE}
+            <Mail className="size-5" /> Ask us for a personal quote
           </a>
           <Link
             to="/faq"
@@ -756,7 +755,7 @@ function PricingPage() {
               },
               {
                 q: "What is the 15–18% service fee actually for?",
-                a: "Our 5-stage verification (ID, background, credentials, monthly re-checks, live check-in), insurance coverage for theft/damage/injury, in-visit selfie + GPS confirmation, 24/7 concierge, and dispute protection. Skilled tiers like nursing are 15%; general care is 18%.",
+                a: "Our 5-stage verification (ID, background, credentials, monthly re-checks, live check-in), insurance coverage for theft/damage/injury, in-visit selfie + GPS confirmation, human support, and dispute protection. Skilled tiers like nursing are 15%; general care is 18%.",
               },
               {
                 q: "How much does the provider actually keep?",

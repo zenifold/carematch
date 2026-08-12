@@ -111,7 +111,7 @@ function SeniorPeople() {
   const people = aggregate(visitsQ.data ?? []);
 
   const rebook = (p: Person) => {
-    toast.success(`Rebooking ${p.name} — concierge will confirm shortly.`);
+    toast.success(`Rebooking ${p.name} — we'll confirm shortly.`);
     navigate({ to: "/senior/book" });
   };
 

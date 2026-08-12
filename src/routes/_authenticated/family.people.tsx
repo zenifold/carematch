@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Users, HeartHandshake, Phone, MessageCircle } from "lucide-react";
+import { Users, HeartHandshake, LifeBuoy, MessageCircle } from "lucide-react";
 import {
   PageSkeleton,
   EmptyState,
@@ -152,18 +152,18 @@ function FamilyPeople() {
 
       <section className="surface-card p-5 lg:p-6">
         <div className="flex items-start gap-3">
-          <Phone className="mt-1 size-5 text-primary" />
+          <LifeBuoy className="mt-1 size-5 text-primary" />
           <div>
-            <h2 className="font-serif text-2xl">Concierge</h2>
+            <h2 className="font-serif text-2xl">Support</h2>
             <p className="text-sm text-muted-foreground">
-              Your dedicated concierge coordinator is available 7 days a week for scheduling, care plan
-              questions, and escalations.
+              A real person handles scheduling, care plan questions, and escalations — and replies
+              within one business day.
             </p>
             <Link
               to="/family/help"
               className="mt-3 inline-flex rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
             >
-              Contact concierge
+              Contact support
             </Link>
           </div>
         </div>

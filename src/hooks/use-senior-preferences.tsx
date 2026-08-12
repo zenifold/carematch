@@ -1,9 +1,26 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import {
-  getSeniorPreferences,
-  upsertSeniorPreferences,
-} from "@/lib/senior-preferences.functions";
+import { supabase } from "@/integrations/supabase/client";
+import { getSeniorPreferences, upsertSeniorPreferences } from "@/lib/senior-preferences.functions";
+
+/**
+ * Mounted in __root.tsx, so it runs on public marketing pages as well as the
+ * senior portal. That matters: the first page an older adult ever sees is a
+ * marketing page, and Large Text Mode was previously unreachable there.
+ *
+ * Signed-out visitors get localStorage only. The server round-trips are gated
+ * on an actual session rather than relying on catch(), so a public page load
+ * doesn't fire a request that is guaranteed to fail auth.
+ */
+
+async function hasSession(): Promise<boolean> {
+  try {
+    const { data } = await supabase.auth.getSession();
+    return Boolean(data.session);
+  } catch {
+    return false;
+  }
+}
 
 export type TextSize = "normal" | "large" | "xlarge";
 
@@ -74,14 +91,16 @@ export function SeniorPreferencesProvider({ children }: { children: ReactNode })
   const savePrefs = useServerFn(upsertSeniorPreferences);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Load: apply localStorage instantly, then reconcile with server.
+  // Load: apply localStorage instantly, then reconcile with the server when
+  // (and only when) the visitor is actually signed in.
   useEffect(() => {
     const local = readStored();
     setPrefs(local);
     applyToDocument(local);
     setHydrated(true);
 
-    fetchPrefs()
+    hasSession()
+      .then((signedIn) => (signedIn ? fetchPrefs() : null))
       .then((row) => {
         if (!row) return;
         const merged: Preferences = {
@@ -100,7 +119,7 @@ export function SeniorPreferencesProvider({ children }: { children: ReactNode })
         } catch {}
       })
       .catch(() => {
-        // offline / unauth — keep local values
+        // offline or a stale session — keep local values
       });
   }, [fetchPrefs]);
 
@@ -117,8 +136,11 @@ export function SeniorPreferencesProvider({ children }: { children: ReactNode })
       // Debounce server writes so slider-like interactions don't spam.
       if (saveTimer.current) clearTimeout(saveTimer.current);
       saveTimer.current = setTimeout(() => {
-        savePrefs({ data: toRow(next) }).catch(() => {
-          // ignore; localStorage remains the source of truth if the write fails
+        void hasSession().then((signedIn) => {
+          if (!signedIn) return; // anonymous visitor: localStorage is the record
+          savePrefs({ data: toRow(next) }).catch(() => {
+            // ignore; localStorage remains the source of truth if this fails
+          });
         });
       }, 400);
       return next;
@@ -129,9 +151,7 @@ export function SeniorPreferencesProvider({ children }: { children: ReactNode })
   void hydrated;
 
   return (
-    <PreferencesContext.Provider value={{ prefs, setPref }}>
-      {children}
-    </PreferencesContext.Provider>
+    <PreferencesContext.Provider value={{ prefs, setPref }}>{children}</PreferencesContext.Provider>
   );
 }
 
