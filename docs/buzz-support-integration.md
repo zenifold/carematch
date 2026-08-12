@@ -1,19 +1,19 @@
-# Buzz ↔ CompanionCare support tickets
+# Buzz ↔ CompanionCare support
 
-How the Buzz agents read and write customer support tickets, and how new tickets
-reach the support channel.
+How the Buzz agents read and write customer support tickets and trust-and-safety
+incidents, and how both reach the support channel.
 
 **The design in one line:** there is no bespoke support API. RLS already encodes
-the permission model, so Buzz authenticates as a machine account with the
-`support` role and calls Supabase's REST API directly, with Postgres enforcing the
-boundary.
+the permission model, so Buzz authenticates as a machine account holding the
+`support` and `trust_safety` roles and calls Supabase's REST API directly, with
+Postgres enforcing the boundary.
 
 ## Credentials
 
 | What         | Value                                                                    |
 | ------------ | ------------------------------------------------------------------------ |
 | Account      | `buzz-agent@integrations.getcompanioncare.com`                           |
-| Role         | `support`                                                                |
+| Roles        | `support` (tickets) + `trust_safety` (incidents)                         |
 | Password     | `AGENT_ACCOUNT_PASSWORD` in `.env` — ask, never committed                |
 | Supabase URL | `https://wcjahuathjuzocvpmewu.supabase.co`                               |
 | Anon key     | `SUPABASE_PUBLISHABLE_KEY` (safe to embed; it grants nothing on its own) |
@@ -51,18 +51,37 @@ Authorization: Bearer <access_token>
 Verified against live RLS by the provisioning script. Each row is an assertion it
 re-checks on every run.
 
-| Operation                     | Allowed | Notes                                                       |
-| ----------------------------- | ------- | ----------------------------------------------------------- |
-| Read all tickets              | yes     | `GET /rest/v1/support_tickets`                              |
-| Read all messages             | yes     | including `internal = true` staff notes                     |
-| Update a ticket               | yes     | status, priority, assignee, category                        |
-| Post a public reply           | yes     | `internal: false` — the requester sees it                   |
-| Post an internal note         | yes     | `internal: true` — staff only                               |
-| Post as someone else          | **no**  | policy pins `author_id` to `auth.uid()`; returns 403        |
-| Delete a message              | **no**  | no DELETE grant and no policy — history is append-only      |
-| Read `incidents`              | **no**  | trust & safety needs `admin`/`trust_safety`; returns 0 rows |
-| Read `payment_ledger`         | **no**  | returns 0 rows                                              |
-| Open a ticket _as a customer_ | **no**  | see the gap below                                           |
+| Operation                     | Allowed | Notes                                                  |
+| ----------------------------- | ------- | ------------------------------------------------------ |
+| Read all tickets              | yes     | `GET /rest/v1/support_tickets`                         |
+| Read all messages             | yes     | including `internal = true` staff notes                |
+| Update a ticket               | yes     | status, priority, assignee, category                   |
+| Post a public reply           | yes     | `internal: false` — the requester sees it              |
+| Post an internal note         | yes     | `internal: true` — staff only                          |
+| Read all incidents            | yes     | via `trust_safety`                                     |
+| Triage an incident            | yes     | status, severity, `resolution_notes`                   |
+| Read all profiles             | yes     | **including care notes — see below**                   |
+| Post as someone else          | **no**  | policy pins `author_id` to `auth.uid()`; returns 403   |
+| Delete a message              | **no**  | no DELETE grant and no policy — history is append-only |
+| Read `payment_ledger`         | **no**  | returns 0 rows                                         |
+| Open a ticket _as a customer_ | **no**  | see the gap below                                      |
+
+### What the agent can see that you may not expect
+
+`support` already grants SELECT on **every** profile, and `profiles` includes
+`care_notes`, `care_medical_notes`, `care_home_notes`, `care_no_go_notes`, and
+`phone`. That is not something `trust_safety` added — it has been true since
+`20260728093100_add_staff_read_profiles.sql`, which exists because the admin views
+silently returned zero rows without it.
+
+So the agent can read care notes. If that is not acceptable, the fix is a narrower
+projection for the staff-read policy or a view that excludes the care columns —
+worth doing deliberately, and it will need the admin views checked against it.
+
+Why `trust_safety` rather than `admin` or `staff`: checked against every policy
+referencing it, `trust_safety` adds exactly `incidents`, `message_flags`, and
+`user_legal_acceptances`. `admin` and `staff` would additionally open
+`payment_ledger`, `bookings`, and `visits`.
 
 ### Reading the queue
 
@@ -98,12 +117,47 @@ PATCH /rest/v1/support_tickets?id=eq.<id>
 `normal`, `high`, `urgent`. Setting `resolved_at` is the app's job, not the
 agent's — leave it alone.
 
-## New-ticket notifications
+### Incidents
 
-`createSupportTicket` posts to `SUPPORT_WEBHOOK_URL` when a ticket is filed. That
-function is the only path a customer ticket can take, because RLS restricts INSERT
-to `requester_id = auth.uid()` — which is why this sits in the application rather
-than in a database trigger. No `pg_net` and no dashboard webhook config needed.
+Trust-and-safety reports live in a separate table with its own vocabulary.
+
+```http
+GET /rest/v1/incidents?select=id,category,severity,status,summary,reporter_id,subject_user_id,booking_id,created_at&status=eq.open&order=created_at.desc
+```
+
+`category` is one of `no_show`, `safety`, `abuse`, `theft`, `quality`, `billing`,
+`other`. `severity` is `1`–`4` (low / normal / high / critical). `status` is `open`,
+`triaged`, `resolved`, `dismissed`.
+
+```http
+PATCH /rest/v1/incidents?id=eq.<id>
+{ "status": "triaged", "severity": 3, "resolution_notes": "…" }
+```
+
+Incidents have no message thread — `resolution_notes` is the only free-text field
+an agent can add, and it overwrites rather than appends. Read it before writing so
+you don't discard a human's note.
+
+An incident is not a ticket, and the difference is worth respecting: `abuse`,
+`safety`, and `theft` are allegations about a person's conduct. An agent
+auto-resolving one of those is a materially worse mistake than mishandling a
+billing question. Triage and route them; leave the judgement to a human.
+
+## Notifications
+
+Both event types go to the same `SUPPORT_WEBHOOK_URL`, so one channel sees
+everything. Tell them apart by the `event` field or the `x-companioncare-event`
+header.
+
+| Event                    | Fired from            | Table             |
+| ------------------------ | --------------------- | ----------------- |
+| `support_ticket.created` | `createSupportTicket` | `support_tickets` |
+| `incident.created`       | `reportIncident`      | `incidents`       |
+
+Both hooks sit in the application rather than in database triggers, because RLS
+restricts INSERT on each table to `reporter_id`/`requester_id = auth.uid()` — which
+makes those two server functions the only paths in. No `pg_net` and no dashboard
+webhook config needed.
 
 Set both secrets to turn it on; it is inert without them:
 
@@ -138,6 +192,38 @@ bodies routinely carry health details and home circumstances. When `body_truncat
 is true and the agent needs the rest, fetch it over the API under the same RLS a
 human staffer works within. `BODY_PREVIEW_LIMIT` in `src/lib/support-webhook.ts`
 can be raised, but that is the tradeoff being made.
+
+### Incident payload
+
+```json
+{
+  "event": "incident.created",
+  "id": "7a1b…",
+  "category": "safety",
+  "severity": 3,
+  "severity_label": "high",
+  "status": "open",
+  "summary_preview": "Loved one was left alone for two hours during a…",
+  "summary_truncated": true,
+  "reporter_id": "aa…",
+  "subject_user_id": "bb…",
+  "booking_id": null,
+  "created_at": "2026-08-12T16:00:00.000Z",
+  "admin_url": "https://getcompanioncare.com/admin/trust-safety",
+  "urgent": true
+}
+```
+
+**Incident payloads carry no names at all — not even the reporter's.** Stricter than
+tickets, deliberately. `abuse`, `safety`, and `theft` incidents can be allegations
+against a named person, and a chat channel is the wrong place for that to live
+permanently, searchable by the whole workspace and outliving any dismissal of the
+report. Ids are enough to open the right record; resolve them over the API when
+there's a reason to.
+
+`urgent` is computed server-side (`category` in `safety`/`abuse`/`theft`, **or**
+`severity >= 3`) so the routing rule lives in one place and is covered by tests.
+Use it to decide whether to @-mention.
 
 ### Verifying a delivery
 
@@ -174,7 +260,11 @@ the webhook as a latency optimisation and still reconcile periodically:
 
 ```http
 GET /rest/v1/support_tickets?select=id,subject,created_at&created_at=gt.<last seen>&order=created_at.asc
+GET /rest/v1/incidents?select=id,category,severity,created_at&created_at=gt.<last seen>&order=created_at.asc
 ```
+
+Reconcile **both**. A missed incident matters more than a missed ticket, so if only
+one sweep gets built, build the incidents one.
 
 If guaranteed delivery is ever required, the right shape is an outbox table drained
 by the existing hourly scheduled task — not retries inside the request.
@@ -188,10 +278,15 @@ needs to create tickets for customers (say, from an inbound email), add a
 rather than widening the INSERT policy. The RPC can validate input and write an
 `admin_audit_log` row, which a policy cannot.
 
-**Trust-and-safety `incidents` are deliberately out of scope.** They need
-`admin`/`trust_safety` to read and `admin` to write, and the agent has neither.
-Extending there is a separate decision: incidents cover allegations of harm, not
-billing questions.
+**The agent can read care notes,** via the staff profiles policy described above.
+Narrowing that is a deliberate piece of work, not a config change, because the
+admin views depend on it.
+
+**Agents can triage incidents but shouldn't close harm reports.** Nothing in RLS
+stops the agent setting an `abuse` incident to `dismissed` — `trust_safety` grants
+UPDATE on the whole row. That boundary is currently convention, not enforcement. If
+you want it enforced, the shape is a policy that blocks status transitions to
+`resolved`/`dismissed` for the harm categories unless the actor holds `admin`.
 
 **Agent writes are not in `admin_audit_log`.** Direct REST calls bypass the app's
 `writeAudit` helper, so agent replies appear in `support_messages` (attributed,

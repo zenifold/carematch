@@ -2,7 +2,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createHmac } from "crypto";
 
 import { isTimestampFresh, parseSignatureHeader, signingPayload } from "./support-webhook";
-import { isSupportWebhookConfigured, notifyNewSupportTicket } from "./support-webhook.server";
+import {
+  isSupportWebhookConfigured,
+  notifyNewIncident,
+  notifyNewSupportTicket,
+} from "./support-webhook.server";
 
 const SECRET = "whsec_test_value";
 const URL_ = "https://buzz.example.com/hooks/companioncare";
@@ -158,5 +162,62 @@ describe("notifyNewSupportTicket", () => {
   it("never rejects — a ticket must not fail because a chat integration is down", async () => {
     stubFetch(new Error("catastrophe"));
     await expect(notifyNewSupportTicket(ticket)).resolves.toBeTruthy();
+  });
+});
+
+describe("notifyNewIncident", () => {
+  const incident = {
+    id: "99999999-9999-4999-8999-999999999999",
+    category: "safety",
+    severity: 3,
+    summary: "Loved one was left alone for two hours during a scheduled visit.",
+    reporterId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+    subjectUserId: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+    bookingId: null,
+    createdAt: "2026-08-12T16:00:00.000Z",
+  };
+
+  it("goes to the same endpoint, tagged as an incident", async () => {
+    const spy = stubFetch(new Response(null, { status: 200 }));
+    const result = await notifyNewIncident(incident);
+    expect(result).toEqual({ delivered: true, status: 200 });
+
+    const [url, init] = spy.mock.calls[0];
+    expect(url).toBe(URL_);
+    expect(init.headers["x-companioncare-event"]).toBe("incident.created");
+    const sent = JSON.parse(init.body);
+    expect(sent.event).toBe("incident.created");
+    expect(sent.severity_label).toBe("high");
+    expect(sent.urgent).toBe(true);
+    expect(sent.admin_url).toContain("/admin/trust-safety");
+  });
+
+  it("is signed the same way, so one verifier handles both event types", async () => {
+    const spy = stubFetch(new Response(null, { status: 200 }));
+    await notifyNewIncident(incident);
+    const [, init] = spy.mock.calls[0];
+    const ts = Number(init.headers["x-companioncare-timestamp"]);
+    const expected = createHmac("sha256", SECRET)
+      .update(signingPayload(ts, init.body))
+      .digest("hex");
+    expect(parseSignatureHeader(init.headers["x-companioncare-signature"])).toBe(expected);
+  });
+
+  it("stays silent when unconfigured", async () => {
+    delete process.env.SUPPORT_WEBHOOK_SECRET;
+    const spy = stubFetch(new Response(null, { status: 200 }));
+    await expect(notifyNewIncident(incident)).resolves.toEqual({
+      delivered: false,
+      reason: "not_configured",
+    });
+    expect(spy).not.toHaveBeenCalled();
+  });
+
+  it("never rejects — a report of harm must still be recorded if the channel is down", async () => {
+    stubFetch(new Error("channel down"));
+    await expect(notifyNewIncident(incident)).resolves.toEqual({
+      delivered: false,
+      reason: "network_error",
+    });
   });
 });

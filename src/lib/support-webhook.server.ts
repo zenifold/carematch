@@ -1,15 +1,20 @@
 import { createHmac } from "crypto";
 
 import {
+  buildIncidentEvent,
   buildTicketEvent,
   signatureHeader,
   signingPayload,
-  type SupportTicketEvent,
+  type WebhookEvent,
 } from "./support-webhook";
 
 /**
- * Delivery half of the support-ticket webhook. Server-only: it reads secrets and
- * uses node:crypto (available because wrangler.toml sets nodejs_compat).
+ * Delivery half of the support webhook. Server-only: it reads secrets and uses
+ * node:crypto (available because wrangler.toml sets nodejs_compat).
+ *
+ * Carries two event types to one endpoint — support tickets and trust-and-safety
+ * incidents — so the receiving channel sees everything. They are distinguishable
+ * by the `event` field and the x-companioncare-event header.
  */
 
 /** Single attempt, tight timeout. See notifyNewSupportTicket for why. */
@@ -27,37 +32,24 @@ export function isSupportWebhookConfigured(): boolean {
 }
 
 /**
- * Posts a new-ticket event to SUPPORT_WEBHOOK_URL, signed with
- * SUPPORT_WEBHOOK_SECRET.
+ * Signs and posts one event.
  *
- * Best-effort by design, matching the confirmation email alongside it: a ticket
- * must never fail because a downstream chat integration is down. One attempt with
- * a 3s timeout, because this runs inline in the request that creates the ticket
- * and a hanging endpoint would otherwise be felt by the person filing it.
+ * Best-effort by design, matching the confirmation email alongside it: neither a
+ * ticket nor an incident report must ever fail because a downstream chat
+ * integration is down. One attempt with a 3s timeout, because this runs inline in
+ * the request that creates the row and a hanging endpoint would otherwise be felt
+ * by the person filing it.
  *
- * The cost of that choice is that a dropped delivery is a missed channel post. It
- * is not a lost ticket — the row is committed before this runs and stays in the
- * admin queue, and an agent can reconcile by listing tickets over the API. If
- * guaranteed delivery becomes a requirement, that wants an outbox table drained
- * by the existing hourly task, not retries here.
+ * The cost is that a dropped delivery is a missed channel post. It is not a lost
+ * record — the row is committed before this runs and stays in the admin queue, and
+ * an agent can reconcile by listing. If guaranteed delivery becomes a requirement,
+ * that wants an outbox table drained by the existing hourly task, not retries here.
  */
-export async function notifyNewSupportTicket(input: {
-  id: string;
-  subject: string;
-  body: string;
-  category: string | null;
-  portal: string;
-  priority: string;
-  status?: string;
-  requesterId: string;
-  requesterName: string | null;
-  createdAt: string;
-}): Promise<DeliveryResult> {
+async function deliver(event: WebhookEvent & { urgent?: boolean }): Promise<DeliveryResult> {
   const url = process.env.SUPPORT_WEBHOOK_URL;
   const secret = process.env.SUPPORT_WEBHOOK_SECRET;
   if (!url || !secret) return { delivered: false, reason: "not_configured" };
 
-  const event: SupportTicketEvent = buildTicketEvent({ ...input, siteOrigin: siteOrigin() });
   const body = JSON.stringify(event);
   const timestamp = Math.floor(Date.now() / 1000);
   const digest = createHmac("sha256", secret).update(signingPayload(timestamp, body)).digest("hex");
@@ -86,4 +78,40 @@ export async function notifyNewSupportTicket(input: {
     const name = err instanceof Error ? err.name : "";
     return { delivered: false, reason: name === "TimeoutError" ? "timeout" : "network_error" };
   }
+}
+
+export async function notifyNewSupportTicket(input: {
+  id: string;
+  subject: string;
+  body: string;
+  category: string | null;
+  portal: string;
+  priority: string;
+  status?: string;
+  requesterId: string;
+  requesterName: string | null;
+  createdAt: string;
+}): Promise<DeliveryResult> {
+  if (!isSupportWebhookConfigured()) return { delivered: false, reason: "not_configured" };
+  return deliver(buildTicketEvent({ ...input, siteOrigin: siteOrigin() }));
+}
+
+/**
+ * Trust-and-safety incidents go to the same endpoint as tickets, because the team
+ * wants one channel that sees everything. The payload deliberately carries no
+ * names — see buildIncidentEvent.
+ */
+export async function notifyNewIncident(input: {
+  id: string;
+  category: string;
+  severity: number;
+  status?: string;
+  summary: string;
+  reporterId: string;
+  subjectUserId: string | null;
+  bookingId: string | null;
+  createdAt: string;
+}): Promise<DeliveryResult> {
+  if (!isSupportWebhookConfigured()) return { delivered: false, reason: "not_configured" };
+  return deliver(buildIncidentEvent({ ...input, siteOrigin: siteOrigin() }));
 }

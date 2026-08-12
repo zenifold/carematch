@@ -1,22 +1,25 @@
 #!/usr/bin/env node
 /**
  * Provisions the machine account that external agents (Buzz) use to read and
- * write support tickets.
+ * write support tickets and trust-and-safety incidents.
  *
  * The point of doing it this way: RLS already encodes exactly the permission
  * model we want. `admin`/`support`/`staff` can SELECT every ticket, UPDATE status
- * and assignment, read internal notes, and post replies. So an agent holding a
- * normal Supabase session for an account with the `support` role needs no bespoke
- * API — it calls /rest/v1 directly, and Postgres enforces the boundary.
+ * and assignment, read internal notes, and post replies; `admin`/`trust_safety`/
+ * `staff` can read and triage incidents. So an agent holding a normal Supabase
+ * session for an account with those roles needs no bespoke API — it calls
+ * /rest/v1 directly, and Postgres enforces the boundary.
  *
  * What it deliberately does NOT get:
  *
  *   - the service-role key, which bypasses RLS entirely and would expose every
- *     senior's care notes and every payment row to a prompt-injected agent
- *   - the `admin` role, which would let it write to trust-and-safety `incidents`
+ *     payment row, visit, and senior preference to a prompt-injected agent
+ *   - the `admin` or `staff` roles, which would additionally open payment_ledger,
+ *     bookings, and visits
  *   - INSERT on support_tickets beyond its own (RLS pins requester_id to
  *     auth.uid(), so it cannot file tickets as a customer — see docs for the RPC
  *     that would be needed if that is ever wanted)
+ *   - DELETE anywhere: support history is append-only for this account
  *
  *   node scripts/provision-agent-account.mjs           create or update, then verify
  *   node scripts/provision-agent-account.mjs --verify   verify only, change nothing
@@ -37,7 +40,23 @@ import { readFileSync } from "node:fs";
  */
 const AGENT_EMAIL = "buzz-agent@integrations.getcompanioncare.com";
 const AGENT_NAME = "Buzz AI Agent";
-const AGENT_ROLE = "support";
+
+/**
+ * `support` covers tickets; `trust_safety` adds incidents (SELECT and UPDATE).
+ *
+ * `trust_safety` was chosen over `admin` deliberately. Checked against every
+ * policy referencing it, the incremental reach is: incidents, message_flags, and
+ * user_legal_acceptances. It does NOT add payment_ledger, visits, bookings, or
+ * senior_preferences — which `admin` and `staff` would.
+ *
+ * profiles is already readable via `support` (see 20260728093100), and that
+ * includes care_notes and care_medical_notes. Adding trust_safety does not widen
+ * that; it was already true, and it is documented in
+ * docs/buzz-support-integration.md rather than glossed over.
+ */
+const AGENT_ROLES = ["support", "trust_safety"];
+/** profiles.role holds a single value; tickets are the primary job. */
+const AGENT_PRIMARY_ROLE = "support";
 
 function loadEnv(key) {
   if (process.env[key]) return process.env[key];
@@ -136,18 +155,11 @@ async function verify() {
     "allowed",
   );
 
-  // Must be denied: trust-and-safety incidents need admin/trust_safety, and the
-  // whole point of scoping to `support` is that this returns nothing.
-  const incRes = await fetch(`${SUPABASE_URL}/rest/v1/incidents?select=id&limit=5`, { headers: A });
-  const incRows = incRes.ok ? (await incRes.json()).length : -1;
-  checks.push({
-    label: "incidents NOT readable",
-    ok: incRows === 0,
-    detail: incRes.ok ? `HTTP 200 with ${incRows} rows` : `HTTP ${incRes.status}`,
-    rows: Math.max(incRows, 0),
-  });
+  // Trust-and-safety incidents, in scope via the trust_safety role.
+  await q("read incidents", "incidents?select=id,category,severity,status&limit=100", "allowed");
 
-  // Must be denied: care notes and payment rows are the blast radius we're avoiding.
+  // Still out of scope. payment_ledger is the surface `admin`/`staff` would have
+  // opened up, and the reason trust_safety was the right role to add.
   const payRes = await fetch(`${SUPABASE_URL}/rest/v1/payment_ledger?select=id&limit=5`, {
     headers: A,
   });
@@ -158,6 +170,33 @@ async function verify() {
     detail: payRes.ok ? `HTTP 200 with ${payRows} rows` : `HTTP ${payRes.status}`,
     rows: Math.max(payRows, 0),
   });
+
+  // Incident triage: set status/severity/resolution_notes. Written as a no-op
+  // value change so a real queue is never disturbed by a provisioning check.
+  const [incident] = await fetch(
+    `${SUPABASE_URL}/rest/v1/incidents?select=id,status,severity&limit=1`,
+    { headers: A },
+  ).then((r) => (r.ok ? r.json() : []));
+  if (incident) {
+    const iupd = await fetch(`${SUPABASE_URL}/rest/v1/incidents?id=eq.${incident.id}`, {
+      method: "PATCH",
+      headers: { ...A, "Content-Type": "application/json", Prefer: "return=representation" },
+      body: JSON.stringify({ status: incident.status, severity: incident.severity }),
+    });
+    checks.push({
+      label: "triage an incident",
+      ok: iupd.ok,
+      detail: `HTTP ${iupd.status}`,
+      rows: 0,
+    });
+  } else {
+    checks.push({
+      label: "triage an incident",
+      ok: true,
+      detail: "no incident to test against (skipped)",
+      rows: 0,
+    });
+  }
 
   // Write path: flip a ticket's priority to itself. A no-op value change still
   // proves UPDATE passes RLS without disturbing the queue.
@@ -291,17 +330,24 @@ async function provision() {
   await call("/rest/v1/profiles?on_conflict=id", {
     method: "POST",
     body: [
-      { id: agent.id, full_name: AGENT_NAME, role: AGENT_ROLE, city: null, onboarded_at: null },
+      {
+        id: agent.id,
+        full_name: AGENT_NAME,
+        role: AGENT_PRIMARY_ROLE,
+        city: null,
+        onboarded_at: null,
+      },
     ],
     headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
   });
   await call("/rest/v1/user_roles?on_conflict=user_id,role", {
     method: "POST",
-    body: [{ user_id: agent.id, role: AGENT_ROLE }],
+    body: AGENT_ROLES.map((role) => ({ user_id: agent.id, role })),
     headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
   });
-  // Strip anything else the trigger added, so the account holds exactly one role.
-  await call(`/rest/v1/user_roles?user_id=eq.${agent.id}&role=neq.${AGENT_ROLE}`, {
+  // Strip anything the trigger added, so the account holds exactly the roles listed
+  // above and nothing accumulates across runs.
+  await call(`/rest/v1/user_roles?user_id=eq.${agent.id}&role=not.in.(${AGENT_ROLES.join(",")})`, {
     method: "DELETE",
     headers: { Prefer: "return=minimal" },
   });
@@ -353,7 +399,9 @@ async function main() {
   const ok = await verify();
   console.log(
     ok
-      ? "\nAgent account can read and write support tickets, and cannot reach incidents or billing."
+      ? "\nAgent can read and write support tickets and triage incidents.\n" +
+          "It cannot reach payment_ledger, forge an author, or delete history.\n" +
+          "Note: `support` already grants read on all profiles, care notes included."
       : "\nSome checks FAILED — see above.",
   );
   process.exitCode = ok ? 0 : 1;

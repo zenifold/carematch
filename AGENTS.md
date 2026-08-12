@@ -80,22 +80,31 @@ Three things to know before touching it:
 ## External agent access to support tickets
 
 `docs/buzz-support-integration.md` is the reference. The short version: there is no
-bespoke support API. RLS already grants `admin`/`support`/`staff` everything an
-agent needs, so `buzz-agent@integrations.getcompanioncare.com` holds the `support`
-role and calls Supabase REST directly, with Postgres enforcing the boundary.
+bespoke support API. RLS already grants the right things, so
+`buzz-agent@integrations.getcompanioncare.com` holds `support` (tickets) plus
+`trust_safety` (incidents) and calls Supabase REST directly, with Postgres
+enforcing the boundary.
 
-`node scripts/provision-agent-account.mjs --verify` re-asserts that boundary as
-nine live assertions — including the negative ones, that the agent cannot read
-`incidents` or `payment_ledger`, cannot forge an `author_id`, and cannot delete
-support history. Run it after touching any support RLS policy.
+`node scripts/provision-agent-account.mjs --verify` re-asserts that boundary as ten
+live assertions, including the negative ones: the agent cannot read
+`payment_ledger`, cannot forge an `author_id`, and cannot delete support history.
+Run it after touching any support or incident RLS policy.
+
+Two things about that account worth knowing before extending it. `support` already
+grants SELECT on every profile, and `profiles` carries `care_medical_notes` and
+`care_notes` — so the agent can read care notes, and has been able to since
+`20260728093100`. And `trust_safety` grants UPDATE on the whole `incidents` row, so
+nothing in RLS stops an agent dismissing an `abuse` report; that limit is currently
+convention rather than enforcement.
 
 Never hand an external agent `SUPABASE_SERVICE_ROLE_KEY`; it bypasses RLS entirely.
 The account is deliberately not on `companioncare.test`, because
 `seed-demo.mjs --reset` deletes everything on that domain.
 
-New tickets notify `SUPPORT_WEBHOOK_URL` from `createSupportTicket` — the only path
-a customer ticket can take, since RLS pins INSERT to `requester_id = auth.uid()`.
-Inert unless both `SUPPORT_WEBHOOK_URL` and `SUPPORT_WEBHOOK_SECRET` are set.
+New tickets and new incidents both notify `SUPPORT_WEBHOOK_URL`, from
+`createSupportTicket` and `reportIncident` — the only paths in, since RLS pins
+INSERT on both tables to `auth.uid()`. Inert unless both `SUPPORT_WEBHOOK_URL` and
+`SUPPORT_WEBHOOK_SECRET` are set. Incident payloads carry no names, only ids.
 
 ## Verifying seeded accounts
 

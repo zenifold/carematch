@@ -35,6 +35,54 @@ export type SupportTicketEvent = {
 };
 
 /**
+ * Trust-and-safety incidents. Shaped differently from tickets on purpose, and
+ * carries *no names* — see buildIncidentEvent.
+ */
+export type IncidentEvent = {
+  event: "incident.created";
+  id: string;
+  category: string;
+  severity: number;
+  severity_label: string;
+  status: string;
+  summary_preview: string;
+  summary_truncated: boolean;
+  reporter_id: string;
+  subject_user_id: string | null;
+  booking_id: string | null;
+  created_at: string;
+  admin_url: string;
+};
+
+export type WebhookEvent = SupportTicketEvent | IncidentEvent;
+
+/** severity is 1–4 in incidents.functions.ts; label it so a channel post scans. */
+export function severityLabel(severity: number): string {
+  switch (severity) {
+    case 1:
+      return "low";
+    case 2:
+      return "normal";
+    case 3:
+      return "high";
+    case 4:
+      return "critical";
+    default:
+      return "unknown";
+  }
+}
+
+/**
+ * Categories where a delay is the expensive failure. Surfaced as a flag so the
+ * receiving channel can route or @-mention on these without re-deriving the rule.
+ */
+const URGENT_CATEGORIES = new Set(["safety", "abuse", "theft"]);
+
+export function isUrgentIncident(category: string, severity: number): boolean {
+  return URGENT_CATEGORIES.has(category) || severity >= 3;
+}
+
+/**
  * Builds the webhook body.
  *
  * The full ticket body is deliberately *not* included, only a preview. These
@@ -74,6 +122,52 @@ export function buildTicketEvent(input: {
     created_at: input.createdAt,
     // Deep link so a human can take over from the channel in one click.
     admin_url: `${input.siteOrigin.replace(/\/+$/, "")}/admin/support`,
+  };
+}
+
+/**
+ * Builds the incident webhook body.
+ *
+ * Deliberately stricter than buildTicketEvent in one way: **no names at all**, not
+ * even the reporter's. Incident categories include `abuse`, `safety`, and `theft`,
+ * so these payloads can carry an allegation against a named person — and a chat
+ * channel is the wrong place for that to live permanently, where it is searchable
+ * by everyone in the workspace and outlives any dismissal of the report. Ids are
+ * enough to open the right record; an agent resolves them over the API when it has
+ * a reason to.
+ *
+ * `urgent` is computed here rather than left to the receiver so the routing rule
+ * lives in one place and is covered by tests.
+ */
+export function buildIncidentEvent(input: {
+  id: string;
+  category: string;
+  severity: number;
+  status?: string;
+  summary: string;
+  reporterId: string;
+  subjectUserId: string | null;
+  bookingId: string | null;
+  createdAt: string;
+  siteOrigin: string;
+}): IncidentEvent & { urgent: boolean } {
+  const summary = input.summary ?? "";
+  const truncated = summary.length > BODY_PREVIEW_LIMIT;
+  return {
+    event: "incident.created",
+    id: input.id,
+    category: input.category,
+    severity: input.severity,
+    severity_label: severityLabel(input.severity),
+    status: input.status ?? "open",
+    summary_preview: truncated ? `${summary.slice(0, BODY_PREVIEW_LIMIT)}…` : summary,
+    summary_truncated: truncated,
+    reporter_id: input.reporterId,
+    subject_user_id: input.subjectUserId ?? null,
+    booking_id: input.bookingId ?? null,
+    created_at: input.createdAt,
+    admin_url: `${input.siteOrigin.replace(/\/+$/, "")}/admin/trust-safety`,
+    urgent: isUrgentIncident(input.category, input.severity),
   };
 }
 
