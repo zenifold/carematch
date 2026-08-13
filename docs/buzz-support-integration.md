@@ -81,7 +81,13 @@ worth doing deliberately, and it will need the admin views checked against it.
 Why `trust_safety` rather than `admin` or `staff`: checked against every policy
 referencing it, `trust_safety` adds exactly `incidents`, `message_flags`, and
 `user_legal_acceptances`. `admin` and `staff` would additionally open
-`payment_ledger`, `bookings`, and `visits`.
+`payment_ledger` and `visits`.
+
+An earlier version of this list also claimed `bookings` was among them. That was
+wrong: `20260728093000_add_staff_read_bookings.sql` grants bookings to `support`, so
+the account could already read them. Corrected rather than quietly dropped, because
+this table is the security boundary and an over-tight description of it is as
+misleading as an over-loose one.
 
 ## Writes go through RPCs, not raw table calls
 

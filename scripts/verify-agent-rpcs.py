@@ -236,6 +236,14 @@ if s == 200:
         "customer" if row[0]["requester_id"] == SENIOR else "AGENT",
     )
 
+# --- read boundary ---------------------------------------------------------
+_, verifs = req("/rest/v1/verifications?select=id&limit=100", token=JWT)
+check("verifications readable (credential expiry needs it)", len(verifs or []) > 0, f"{len(verifs or [])} rows")
+_, ledger = req("/rest/v1/payment_ledger?select=id&limit=5", token=JWT)
+check("payment_ledger still NOT readable", len(ledger or []) == 0, f"{len(ledger or [])} rows")
+_, visits = req("/rest/v1/visits?select=id&limit=5", token=JWT)
+check("visits still NOT readable", len(visits or []) == 0, f"{len(visits or [])} rows")
+
 # --- audit + helper isolation ---------------------------------------------
 _, audit = svc(
     f"/rest/v1/admin_audit_log?select=action,payload&actor_id=eq.{AGENT}&action=like.agent.*&limit=30"
