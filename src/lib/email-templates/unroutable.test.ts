@@ -28,9 +28,11 @@ describe("isUnroutableAddress", () => {
   });
 
   it("leaves real addresses alone — this must never block a customer email", () => {
+    // Deliberately fictional. A real person's address in a public repo is not a
+    // test fixture, whoever it belongs to.
     for (const a of [
-      "maximilian.murphy@sourcefuse.com",
       "support@getcompanioncare.com",
+      "j.smith@acme-homecare.co.uk",
       "someone@gmail.com",
       "a.b+tag@sub.domain.co.uk",
       // Contains "test" but is a real domain.
